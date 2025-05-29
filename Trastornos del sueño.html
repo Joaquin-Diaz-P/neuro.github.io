@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trastornos del Sueño</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        :root {
+            --primary-main: #1ABC9C; 
+            --primary-dark: #16A085; 
+            --accent-orange: #E67E22; 
+            --accent-petroleum-blue: #2C3E50; 
+            --alert-red: #E74C3C; 
+            --complement-light-blue: #AED6F1; 
+            --complement-beige: #F5EFEB; 
+            --text-dark: #212529; 
+            --text-medium: #495057; 
+            --text-light: #6C757D; 
+            --bg-main: #F8F9FA; 
+            --card-bg: #FFFFFF; 
+            --border-color: #DEE2E6; 
+            --border-strong: #CED4DA;
+            --sidebar-width: 280px;
+            --top-bar-height: 65px;
+            --main-content-max-width: 1000px; 
+        }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-main); 
+            color: var(--text-dark); 
+            line-height: 1.6;
+            margin: 0;
+            padding-top: var(--top-bar-height);
+        }
+
+        .top-bar {
+            position: fixed; top: 0; left: 0; right: 0;
+            height: var(--top-bar-height);
+            background-color: var(--card-bg); 
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center;
+            padding: 0 1rem; 
+            z-index: 1032; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        }
+        
+        .fixed-back-button { /* Estilo copiado de ACV hemorrágico.html */
+            background-color: var(--primary-main); color: var(--card-bg); border: 2px solid var(--card-bg);      
+            padding: 0.6rem 1rem; border-radius: 6px; text-decoration: none; 
+            font-weight: 600; font-size: 0.85rem; white-space: nowrap; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15); 
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            margin-left: 5px; 
+        }
+        .fixed-back-button:hover { background-color: var(--accent-orange); border-color: var(--accent-orange); }
+
+        .hamburger-button {
+            background-color: var(--accent-petroleum-blue); color: var(--card-bg); border: none;
+            padding: 0.6rem 0.8rem; border-radius: 6px; cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15); 
+            margin-left: 1.5rem; /* Ajustado como en ACV hemorrágico.html */
+        }
+        .hamburger-button span { display: block; width: 20px; height: 2px; background-color: var(--card-bg); margin: 4px 0; transition: all 0.3s ease-in-out; }
+        body.sidebar-open .hamburger-button span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+        body.sidebar-open .hamburger-button span:nth-child(2) { opacity: 0; }
+        body.sidebar-open .hamburger-button span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+        .sidebar-nav {
+            position: fixed; top: var(--top-bar-height); 
+            left: calc(-1 * var(--sidebar-width)); 
+            width: var(--sidebar-width); height: calc(100vh - var(--top-bar-height)); 
+            background-color: var(--card-bg); color: var(--text-dark);
+            overflow-y: auto; transition: left 0.3s ease; 
+            z-index: 1030; border-right: 1px solid var(--border-color);
+            box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+        }
+        body.sidebar-open .sidebar-nav { left: 0; }
+        .sidebar-nav h3 { /* Título del tema actual en la barra lateral */
+            color: var(--accent-petroleum-blue); padding: 1.2rem 1.5rem 0.8rem;
+            margin: 0; font-size: 1.15rem; border-bottom: 1px solid var(--border-color);
+        }
+        .sidebar-nav ul { list-style: none; padding: 0.75rem 0; margin: 0; }
+        .sidebar-nav li a {
+            display: block; padding: 0.75rem 1.5rem; margin: 0.5rem 1rem; 
+            color: var(--card-bg); background-color: var(--primary-main); 
+            border: 1px solid var(--primary-dark); border-radius: 6px;
+            text-decoration: none; font-size: 0.9rem; font-weight: 500;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.07); text-align: left;
+        }
+        .sidebar-nav li a:hover { background-color: var(--accent-orange); border-color: var(--accent-orange); color: var(--card-bg); }
+        .sidebar-nav li a.active {
+            background-color: var(--primary-dark); color: var(--card-bg);
+            border-color: var(--primary-main); font-weight: bold;
+        }
+
+        .main-content { padding: 1.5rem; max-width: var(--main-content-max-width); margin-left: auto; margin-right: auto; }
+        .page-header-within-content {
+            background-color: var(--primary-main); color: var(--card-bg);
+            padding: 2rem 1.5rem; text-align: center; border-radius: 8px; 
+            margin-bottom: 2rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .page-header-within-content h1 { color: var(--card-bg); font-size: 1.8rem; margin:0; } 
+        .page-header-within-content p { color: var(--complement-beige); font-size: 1.0rem; margin-top: 0.5rem; }
+
+        .content-section { background-color: var(--card-bg); border-radius: 12px; margin-bottom: 1.5rem; box-shadow: 0 6px 18px rgba(44, 62, 80, 0.08); border: 1px solid var(--border-color); }
+        .content-wrapper { padding: 1.5rem; } 
+        .content-section h2 { border-bottom: 3px solid var(--primary-main); padding-bottom: 0.75rem; margin-bottom: 1.5rem; font-size: 1.7rem; color: var(--accent-petroleum-blue); margin-top:0; }
+        .content-section h3 { font-size: 1.35rem; margin-top: 1.5rem; margin-bottom: 1rem; color: var(--primary-dark); }
+        .content-section h4 { font-size: 1.15rem; margin-top: 1.2rem; margin-bottom: 0.75rem; color: var(--accent-petroleum-blue); font-weight: 500; }
+        
+        table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.05); font-size: 0.88rem; }
+        th, td { border: 1px solid var(--border-strong); padding: 0.7rem; text-align: left; vertical-align: top;} 
+        th { background-color: var(--accent-petroleum-blue); color: var(--card-bg); font-weight: 600; }
+        tbody tr:nth-child(even) { background-color: var(--complement-beige); }
+        tbody tr:hover { background-color: var(--complement-light-blue); }
+
+        details {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 1.2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        }
+        details summary { 
+            font-weight: 600; 
+            cursor: pointer; 
+            padding: 0.8rem 1rem; 
+            color: var(--primary-dark); 
+            background-color: var(--complement-light-blue); 
+            border-radius: 8px; 
+            font-size: 1.0rem; 
+            transition: background-color 0.3s ease, color 0.3s ease;
+            list-style-position: inside; 
+        }
+        details[open] summary { 
+            border-bottom: 1px solid var(--border-color); 
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        details summary:hover {
+            background-color: var(--primary-main);
+            color: var(--card-bg);
+        }
+        details .details-content { 
+            padding: 1rem; 
+            border-top: none; 
+            border-radius: 0 0 8px 8px;
+            background-color: var(--card-bg);
+        }
+        
+        .chart-container { max-width: 450px; height: auto; margin: 2rem auto; padding: 1rem; background-color: var(--complement-beige); border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.07); }
+        
+        footer { text-align: center; padding: 2rem 1.5rem; margin-top: 3rem; border-top: 1px solid var(--border-strong); background-color: var(--accent-petroleum-blue); color: var(--complement-beige); }
+        footer p { color: var(--complement-beige); margin: 0.3rem 0;}
+
+        html { scroll-behavior: smooth; }
+        
+        .key-point { background-color: var(--complement-light-blue); border-left: 4px solid var(--primary-main); padding: 0.75em 1em; margin: 0.75em 0; border-radius: 4px; }
+        .highlight-tip { background-color: #e7f6fd; border-left: 4px solid #2ECC71; padding: 0.5em 0.8em; margin: 0.5em 0; border-radius: 4px; color: var(--text-dark); }
+        .table-responsive { overflow-x: auto; }
+        ul, ol { padding-left: 20px; margin-top: 0.5rem; margin-bottom: 1rem;}
+        li { margin-bottom: 0.3rem; }
+        .text-red-emphasis { color: var(--alert-red); font-weight: bold; }
+        .text-green-emphasis { color: var(--primary-dark); font-weight: bold; }
+
+        .custom-table th:nth-child(1),
+        .custom-table td:nth-child(1) {
+            min-width: 160px; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <a href="Prueba_2_Neuro.html" class="fixed-back-button">Volver al Índice</a>
+        <button class="hamburger-button" aria-label="Abrir/Cerrar Navegación" aria-expanded="false" aria-controls="sidebarNav">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        </div>
+
+    <nav class="sidebar-nav" id="sidebarNav" aria-hidden="true" role="navigation">
+        <h3>Trastornos del Sueño</h3> <ul>
+            <li><a href="#fisiologia">I. Fisiología del Sueño</a></li>
+            <li><a href="#herramientas">II. Herramientas Diagnósticas</a></li>
+            <li><a href="#patologia-general">III. Patología del Sueño (Intro)</a></li>
+            <li><a href="#insomnio">Insomnio</a></li>
+            <li><a href="#sahos">SAHOS</a></li>
+            <li><a href="#narcolepsia">Narcolepsia</a></li>
+            <li><a href="#parasomnias">Parasomnias</a></li>
+            <li><a href="#ritmo-circadiano">Tr. Ritmo Circadiano</a></li>
+            <li><a href="#tr-movimiento">Tr. del Movimiento</a></li>
+            <li><a href="#patologia-neurologica">IV. Patología Neurológica Asociada</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <header class="page-header-within-content">
+            <h1>Trastornos del Sueño</h1>
+            <p>Apuntes Detallados Basados en Material de Estudio</p>
+        </header>
+
+        <section id="fisiologia" class="content-section">
+            <div class="content-wrapper">
+                <h2>I. Fisiología del Sueño</h2>
+                <details open>
+                    <summary>A. Definición de Sueño</summary>
+                    <div class="details-content">
+                        <p>El sueño se puede definir según criterios conductuales y fisiológicos:</p>
+                        <h4>Criterios Conductuales:</h4>
+                        <ul>
+                            <li>Ausencia de movimiento (o movimiento mínimo).</li>
+                            <li>Cierre palpebral.</li>
+                            <li>Respuesta disminuida a estímulos externos y mayor latencia de reacción.</li>
+                            <li>Umbral elevado para despertar.</li>
+                            <li>Estado de compromiso de conciencia reversible.</li>
+                            <li>Ensoñación onírica.</li>
+                        </ul>
+                        <h4>Criterios Fisiológicos:</h4>
+                        <ul>
+                            <li>Hallazgos característicos en Electroencefalograma (EEG), movimientos oculares (EOG) y Electromiograma (EMG).</li>
+                            <li>Cambios fisiológicos en la ventilación y respiración.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>B. Importancia del Sueño</summary>
+                    <div class="details-content">
+                        <p>Dormimos para diversas funciones esenciales:</p>
+                        <ul>
+                            <li>Restablecer la energía perdida durante el día.</li>
+                            <li>Eliminación de radicales libres.</li>
+                            <li>Favorecer la respuesta inmune.</li>
+                            <li>Procesos de cognición.</li>
+                            <li>Plasticidad sináptica necesaria para la consolidación de la memoria.</li>
+                        </ul>
+                        <p class="key-point">La privación de sueño y sus trastornos se asocian a múltiples problemas de salud: cardiovasculares, metabólicos, neuropsiquiátricos y aumento de la accidentabilidad.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>C. Arquitectura del Sueño</summary>
+                    <div class="details-content">
+                        <p>El sueño se organiza en ciclos que alternan entre sueño No REM (NREM) y sueño REM.</p>
+                        <ul>
+                            <li>Un adulto normal entra al sueño a través de fases NREM y luego REM aproximadamente 90 minutos después.</li>
+                            <li>Estos ciclos se alternan cada 90-110 minutos.</li>
+                            <li>El primer tercio de la noche está dominado por fases NREM (especialmente N3 o sueño profundo), mientras que el último tercio está dominado por fases REM.</li>
+                        </ul>
+                        <h4>Etapas del Sueño:</h4>
+                        <ul>
+                            <li><strong>NREM Etapa 1 (N1):</strong> Sueño ligero, adormecimiento. Representa el 2-5% del sueño total.</li>
+                            <li><strong>NREM Etapa 2 (N2):</strong> Disminución de la actividad cerebral, sin movimientos oculares. Representa el 45-55% del sueño. Se observan husos de sueño (sleep spindles) y complejos K en el EEG.</li>
+                            <li><strong>NREM Etapa 3 (N3):</strong> Sueño profundo (Slow Wave Sleep - SWS), actividad cerebral muy disminuida (ondas delta). Representa el 15-25% del sueño.</li>
+                            <li><strong>Sueño REM (Rapid Eye Movement):</strong> Aumento de la actividad cerebral (similar a la vigilia), movimientos oculares rápidos y pérdida del tono muscular (atonía). Representa el 20-25% del sueño.</li>
+                        </ul>
+                        <div class="chart-container">
+                            <canvas id="arquitecturaSuenoChart"></canvas>
+                        </div>
+                        <h4>Cambios en la Arquitectura del Sueño a lo largo de la vida:</h4>
+                        <ul>
+                            <li>Primer año de vida: Mayor porcentaje de sueño REM.</li>
+                            <li>Infancia: Mayor porcentaje de sueño N3.</li>
+                            <li>Los requerimientos de sueño también varían con la edad.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>D. Neurobiología Circadiana</summary>
+                    <div class="details-content">
+                        <ul>
+                            <li>El ciclo sueño-vigilia está regulado por un reloj biológico interno ubicado en el <strong>Núcleo Supraquiasmático (SCN)</strong> del hipotálamo.</li>
+                            <li>Las <strong>células ganglionares de la retina intrínsecamente fotosensibles (ipRGCs)</strong>, que contienen melanopsina, detectan la luz ambiental y envían señales al SCN.</li>
+                            <li>Durante el día, la activación del sistema de melanopsina por la luz suprime la liberación de <strong>melatonina</strong> por la glándula pineal.</li>
+                            <li>Durante la noche, en ausencia de luz, el sistema de melanopsina no está activo, permitiendo la liberación de melatonina, que promueve el sueño.</li>
+                            <li>La luz artificial durante la noche puede activar la melanopsina y suprimir la melatonina nocturna.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>E. Neuroanatomía y Neurotransmisores del Sueño</summary>
+                    <div class="details-content">
+                        <h4>Vigilia:</h4>
+                        <p>Es mediada por múltiples neurotransmisores, núcleos y proyecciones.</p>
+                        <ul>
+                            <li>Una rama <strong>colinérgica</strong> proyecta a neuronas corticales y talámicas.</li>
+                            <li>Una rama <strong>monoaminérgica</strong> incluye múltiples núcleos como el locus ceruleus (Noradrenalina - NE), núcleos del rafe (Serotonina) y sustancia gris periacueductal, así como neuronas que liberan Histamina.</li>
+                            <li>Otras sustancias que promueven la vigilia incluyen las <strong>Hipocretinas (Orexinas)</strong> y la Dopamina.</li>
+                        </ul>
+                        <h4>Sueño:</h4>
+                        <ul>
+                            <li>Implica la desactivación rápida de las vías promotoras de la vigilia.</li>
+                            <li>Neuronas <strong>GABAérgicas</strong> en el núcleo preóptico ventrolateral (VLPO) del hipotálamo promueven el sueño mediante proyecciones inhibitorias a las áreas de la vigilia.</li>
+                            <li>Interleuquinas y otras sustancias transportadas por la sangre también pueden influir en la inducción del sueño.</li>
+                        </ul>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="herramientas" class="content-section">
+            <div class="content-wrapper">
+                <h2>II. Herramientas Diagnósticas</h2>
+                <details>
+                    <summary>Polisomnografía (PSG)</summary>
+                    <div class="details-content">
+                        <p>Registra múltiples variables fisiológicas durante el sueño: EEG, EMG, EOG, ECG, esfuerzo respiratorio (bandas torácica y abdominal) y saturación de oxígeno (SpO2). Es útil para el diagnóstico de trastornos ventilatorios del sueño (como SAHOS), narcolepsia, movimientos periódicos de las extremidades y trastornos de la conducta del sueño REM.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>Test de Latencias Múltiples del Sueño (TLMS o MSLT)</summary>
+                    <div class="details-content">
+                        <p>Consiste en 5 oportunidades de siesta programadas cada 2 horas durante el día (cada siesta de 20 minutos de duración). Mide la latencia promedio al sueño y la presencia de inicio de sueño en fase REM (SOREMPs). Es útil para el diagnóstico de narcolepsia e hipersomnia idiopática.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>Actigrafía</summary>
+                    <div class="details-content">
+                        <p>Dispositivo similar a un reloj de pulsera que registra la actividad motora y la exposición a la luz, permitiendo objetivar el ritmo sueño-vigilia en el ambiente normal del paciente por un período de 1-2 semanas. Es de utilidad en el estudio de trastornos del ritmo circadiano e insomnio.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>Estudios de Sueño en Casa (Poligrafía Respiratoria)</summary>
+                    <div class="details-content">
+                        <p>Versión simplificada de la PSG que se enfoca exclusivamente en parámetros ventilatorios (flujo aéreo, esfuerzo respiratorio, SpO2, frecuencia cardíaca, ronquido, posición corporal). Utilizada principalmente para el diagnóstico de SAHOS en pacientes seleccionados.</p>
+                    </div>
+                </details>
+            </div>
+        </section>
+        
+        <section id="patologia-general" class="content-section">
+            <div class="content-wrapper">
+                <h2>III. Patología del Sueño</h2>
+                <details open>
+                    <summary>A. Clasificación de los Trastornos del Sueño</summary>
+                    <div class="details-content">
+                        <p>Según la Clasificación Internacional de Trastornos del Sueño (ICSD), los principales grupos son:</p>
+                        <ul>
+                            <li>Insomnio.</li>
+                            <li>Trastornos respiratorios asociados al sueño (Ej: Síndrome de Apnea/Hipopnea Obstructiva del Sueño - SAHOS).</li>
+                            <li>Hipersomnias de origen central (Ej: Narcolepsia).</li>
+                            <li>Parasomnias (asociadas a REM o NREM).</li>
+                            <li>Trastornos del ritmo circadiano sueño-vigilia.</li>
+                            <li>Trastornos del movimiento relacionados con el sueño (Ej: Síndrome de Piernas Inquietas - SPI, Movimientos Periódicos de las Extremidades - MPE).</li>
+                        </ul>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="insomnio" class="content-section">
+            <div class="content-wrapper">
+                <h2>Insomnio</h2>
+                <details>
+                    <summary>Definición</summary>
+                    <div class="details-content">
+                        <p>Dificultad para la iniciación o mantención del sueño, despertar precoz, o sueño de mala calidad o no reparador. Estos síntomas deben ocurrir al menos 3 noches por semana y persistir por al menos 30 días (aunque clasificaciones más recientes usan 3 meses para insomnio crónico).</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>Comorbilidades</summary>
+                    <div class="details-content">
+                        <p>Frecuentemente asociado a condiciones médicas neurológicas (stroke, Parkinson), pulmonares (EPOC, asma), endocrinas (diabetes, HTA), renales, reumatológicas, cardiovasculares (ICC) y gastrointestinales (reflujo).</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>Sustancias Asociadas</summary>
+                    <div class="details-content">
+                        <p>Alcohol, cafeína, nicotina, antidepresivos, descongestionantes, corticoides, broncodilatadores, beta-bloqueadores, estimulantes, estatinas.</p>
+                    </div>
+                </details>
+                 <details>
+                    <summary>Estudio</summary>
+                    <div class="details-content">
+                        <p>Anamnesis detallada de síntomas, factores precipitantes, fármacos y terapias previas. Se puede usar el Índice de Severidad de Insomnio y la actigrafía.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>Tratamiento</summary>
+                    <div class="details-content">
+                        <h4>Higiene del Sueño:</h4>
+                        <ul>
+                            <li>Mantener horarios regulares de acostarse/levantarse.</li>
+                            <li>Limitar líquidos, comidas pesadas, tabaco y alcohol antes de dormir (3h).</li>
+                            <li>Limitar cafeína (8h antes).</li>
+                            <li>Ejercicio regular (no 3h antes).</li>
+                            <li>Crear rutina relajante 1h antes de dormir con luces tenues.</li>
+                            <li>Mantener dormitorio quieto, fresco y oscuro.</li>
+                            <li>Tomar ducha caliente 1.5-2h antes (no justo antes).</li>
+                            <li>Limitar pantallas 1h antes y durante la noche.</li>
+                        </ul>
+                        <h4>Farmacológico:</h4>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Categoría</th>
+                                        <th>Fármacos</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Aprobados para Insomnio</strong></td>
+                                        <td>Zolpidem (liberación inmediata y CR), Eszopiclona, Zaleplon, Ramelteon (agonista melatoninérgico), Doxepina (bajas dosis), Benzodiacepinas (Temazepam, Estazolam, Flurazepam, Quazepam, Triazolam).</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Comúnmente Usados Off-label</strong></td>
+                                        <td>Amitriptilina, Trazodona, Mirtazapina, Quetiapina, Olanzapina, Gabapentina.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="sahos" class="content-section">
+            <div class="content-wrapper">
+                 <h2>Trastornos del Sueño Asociados a la Respiración (Principalmente SAHOS)</h2>
+                 <h3>Síndrome de Apnea/Hipopnea Obstructiva del Sueño (SAHOS)</h3>
+                <details>
+                    <summary>Definición</summary>
+                    <div class="details-content">
+                        <p>Episodios repetitivos de cese completo (apnea) o casi completo (hipopnea) del flujo aéreo durante el sueño, con esfuerzo respiratorio continuo frente a una vía aérea superior cerrada. Se diagnostica con un Índice de Apnea/Hipopnea (IAH) ≥ 5 eventos/hora (&gt;30 severo).</p>
+                        <ul>
+                            <li><strong>Apnea obstructiva:</strong> Reducción del 90% del flujo aéreo por al menos 10 segundos, con persistencia de esfuerzo respiratorio.</li>
+                            <li><strong>Hipopnea:</strong> Reducción del 30% en el flujo aéreo por 10 segundos, asociada a una desaturación de oxígeno ≥3% o un microdespertar.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>Prevalencia y Factores de Riesgo</summary>
+                    <div class="details-content">
+                        <p><strong>Prevalencia:</strong> 5-20% de la población.</p>
+                        <div class="chart-container">
+                            <canvas id="prevalenciaTrastornosChart"></canvas>
+                        </div>
+                        <p><strong>Factores de Riesgo:</strong> Mayor edad, sexo masculino, obesidad (presente en ~70% de los casos), tabaquismo, consumo de alcohol.</p>
+                        <p class="highlight-tip">Los eventos obstructivos pueden ocurrir en cualquier etapa del sueño, pero son más severos en sueño REM debido a la atonía muscular fisiológica.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>Clínica</summary>
+                    <div class="details-content">
+                        <h4>Síntomas Nocturnos:</h4>
+                        <ul>
+                            <li>Ronquidos fuertes e interrumpidos.</li>
+                            <li>Pausas respiratorias presenciadas.</li>
+                            <li>Ahogos o "gasping".</li>
+                            <li>Despertares frecuentes.</li>
+                            <li>Nicturia.</li>
+                            <li>Movimientos excesivos durante el sueño.</li>
+                            <li>Hiperhidrosis.</li>
+                        </ul>
+                        <h4>Síntomas Diurnos:</h4>
+                        <ul>
+                            <li>Somnolencia diurna excesiva.</li>
+                            <li>Dificultad para concentrarse.</li>
+                            <li>Fatiga.</li>
+                            <li>Cefalea matutina.</li>
+                            <li>Irritabilidad.</li>
+                            <li>Riesgo aumentado de accidentes de tránsito y laborales.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>Consecuencias Clínicas</summary>
+                    <div class="details-content">
+                        <p>Fragmentación del sueño, hipoxemia intermitente, cambios en la presión intratorácica y activación simpática. Esto lleva a inflamación sistémica, estrés oxidativo, disfunción endotelial, aumento del riesgo de trombosis, resistencia a la insulina, y remodelado cardíaco adverso, incrementando el riesgo cardiovascular (HTA, arritmias, cardiopatía isquémica, ACV).</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>Diagnóstico</summary>
+                    <div class="details-content">
+                        <p>Polisomnografía (PSG) es el gold standard.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>Tratamiento</summary>
+                    <div class="details-content">
+                        <ul>
+                            <li><strong>CPAP (Presión Positiva Continua en la Vía Aérea):</strong> Tratamiento más importante y efectivo.</li>
+                            <li>Cambios conductuales: Baja de peso, cese de alcohol y tabaquismo, terapia posicional.</li>
+                            <li>Dispositivos de avance mandibular.</li>
+                            <li>Cirugía: Uvulopalatofaringoplastia (UPPP), septoplastia, rinoplastia, reducción lingual, etc., en casos seleccionados.</li>
+                        </ul>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="narcolepsia" class="content-section">
+            <div class="content-wrapper">
+                <h2>Narcolepsia</h2>
+                <details>
+                    <summary>Definición e Inicio</summary>
+                    <div class="details-content">
+                        <p>Trastorno neurológico crónico que ocurre cuando la regulación del sueño y la vigilia se altera debido a transiciones rápidas entre la vigilia y el sueño REM, resultando en sueño fragmentado e hipersomnolencia diurna.</p>
+                        <p class="key-point"><strong>Inicio:</strong> Habitualmente comienza en la segunda década de la vida, con un segundo peak alrededor de los 35 años. En muchos casos, se debe a la pérdida de neuronas productoras de hipocretina/orexina en el hipotálamo.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>Clínica (Tétrada Clásica)</summary>
+                    <div class="details-content">
+                        <p>(No siempre completa)</p>
+                        <ul>
+                            <li><strong>Hipersomnolencia Diurna Excesiva:</strong> Necesidad constante de dormir durante el día, los pacientes se quedan dormidos en cualquier situación, especialmente en actividades pasivas.</li>
+                            <li><strong>Cataplejía:</strong> Pérdida súbita y bilateral del tono muscular, gatillada por emociones (habitualmente positivas como la risa, sorpresa). La conciencia se mantiene durante los episodios.</li>
+                            <li><strong>Parálisis del Sueño:</strong> Estado temporal de inmovilidad involuntaria que ocurre en la transición del sueño REM con la vigilia (al quedarse dormido o al despertar).</li>
+                            <li><strong>Alucinaciones Hipnagógicas/Hipnopómpicas:</strong> Percepciones auditivas, visuales o táctiles vívidas y a menudo atemorizantes que ocurren en la transición del sueño REM y la vigilia (hipnagógicas al inicio del sueño, hipnopómpicas al despertar).</li>
+                        </ul>
+                        <p>El hipnograma de 24 horas en narcolepsia muestra una distribución anormal de sueño y vigilia, con fragmentación del sueño nocturno e intrusiones de sueño (incluyendo SOREMPs) durante el día.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>Tratamiento</summary>
+                    <div class="details-content">
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Síntoma</th>
+                                        <th>Tratamiento</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Hipersomnolencia (EDS)</strong></td>
+                                        <td>Modafinilo (primera línea), Armodafinilo, Metilfenidato, Dextroanfetamina.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Cataplejía</strong></td>
+                                        <td>Oxibato de Sodio, Antidepresivos (ISRS como Paroxetina, ISRN, tricíclicos), Fenilzina.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>EDS y Sueño Nocturno Interrumpido</strong></td>
+                                        <td>Oxibato de Sodio.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="parasomnias" class="content-section">
+            <div class="content-wrapper">
+                <h2>Parasomnias</h2>
+                <p>Trastornos caracterizados por conductas anómalas o cambios fisiológicos que acompañan etapas específicas del sueño o las transiciones sueño-vigilia. Se traducen en fenómenos motores o verbales durante el sueño.</p>
+                
+                <details>
+                    <summary>1. Parasomnias del Ciclo No REM (NREM)</summary>
+                    <div class="details-content">
+                        <p>Ocurren principalmente en la primera mitad de la noche, durante el sueño N3, y se caracterizan por amnesia del episodio.</p>
+                        <h4>Tipos:</h4>
+                        <ul>
+                            <li><strong>Sonambulismo:</strong> Serie de conductas motoras complejas que resultan en caminata durante un estado de compromiso de conciencia, usualmente en el primer tercio de la noche. Puede durar de segundos a 30 minutos. Más común en niños.</li>
+                            <li><strong>Despertares Confusos:</strong> Despertar incompleto en el cual el paciente no deja su cama, mostrando confusión, lentitud y respuestas inapropiadas.</li>
+                            <li><strong>Terrores Nocturnos:</strong> Episodios de despertar súbito desde el sueño N3 con una imagen o sensación aterradora, acompañados de intensa activación autonómica (gritos, agitación, sudoración, taquicardia, hiperpnea). Más comunes en niños. Ocurren en el primer tercio de la noche y la persona no tiene recuerdo del contenido del terror (o muy poco).</li>
+                        </ul>
+                        <h4>Gatillantes:</h4>
+                        <p>Ansiedad, privación de sueño, consumo de alcohol o hipnóticos, antihistamínicos, litio.</p>
+                        <h4>Tratamiento:</h4>
+                        <p>Educación, higiene del sueño, psicoterapia. En casos severos o frecuentes: Clonazepam o Triazolam (primera línea); Paroxetina o Zolpidem (alternativa).</p>
+                    </div>
+                </details>
+
+                <details>
+                    <summary>2. Parasomnias del Ciclo REM</summary>
+                    <div class="details-content">
+                        <h4>Tipos:</h4>
+                        <ul>
+                            <li><strong>Pesadillas:</strong> Sueños desagradables y vívidos que despiertan al paciente del sueño REM y se asocian con emociones negativas como miedo, enojo, tristeza o vergüenza. Pueden ocurrir en cualquier parte de la noche, pero predominan en el tercio final. El recuerdo del contenido del sueño suele ser detallado. Pueden ser idiopáticas o asociadas a cuadros psiquiátricos (ej. TEPT).</li>
+                            <li><strong>Trastorno Conductual del Sueño REM (RBD):</strong> Se caracteriza por actividad motora importante (a veces violenta, como "actuar los sueños") durante el sueño REM, en ausencia de la atonía muscular normal de esta fase. <span class="key-point">Puede ser idiopático o secundario, asociado a patología neurológica (especialmente sinucleinopatías como Enfermedad de Parkinson, Demencia con Cuerpos de Lewy, Atrofia Multisistémica), pudiendo ser un precursor de estas enfermedades.</span></li>
+                        </ul>
+                        <h4>Tratamiento:</h4>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Parasomnia REM</th>
+                                        <th>Tratamiento</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>RBD</strong></td>
+                                        <td>Clonazepam (primera línea), Melatonina (puede ser efectiva). Pramipexol si RBD con Parkinson.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Pesadillas</strong></td>
+                                        <td>Prazosina (especialmente en TEPT), ISRS (ej. Sertralina). Topiramato también listado.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="ritmo-circadiano" class="content-section">
+            <div class="content-wrapper">
+                <h2>Trastornos del Ritmo Circadiano Sueño-Vigilia</h2>
+                <p>Ocurren cuando existen patrones de sueño alterados por un trastorno del reloj biológico interno o un desalineamiento entre el ritmo circadiano biológico y el ambiente externo (horarios sociales o laborales).</p>
+                <p><strong>Herramientas para el diagnóstico:</strong> Historia clínica, diario de sueño y actigrafía.</p>
+
+                <details>
+                    <summary>Trastorno por Fase Retardada del Sueño</summary>
+                    <div class="details-content">
+                        <p>Horarios de sueño y despertar persistentemente retrasados respecto a lo convencional (ej. duermen de 3 AM a 11 AM). Prevalencia: 0.17% población general, 7-16% adolescentes. Tratamiento: higiene del sueño, fototerapia matutina, melatonina vespertina.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>Trastorno por Fase Adelantada del Sueño</summary>
+                    <div class="details-content">
+                        <p>Horarios de sueño y despertar persistentemente adelantados (ej. duermen de 8 PM a 4 AM). Más común en edad media a adulto mayor (1%). Tratamiento: higiene del sueño, fototerapia vespertina.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>Trastorno por Trabajo por Turnos</summary>
+                    <div class="details-content">
+                        <p>Afecta al 10% de los trabajadores por turnos. Puede generar insomnio, hipersomnolencia o ambas. La meta es realinear el ritmo circadiano con el de trabajo. Tratamiento: exposición a luz brillante durante el turno, siestas estratégicas (1-2 hrs antes de trabajar), uso juicioso de fármacos promotores de vigilia o sueño, cafeína.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>Jet Lag</summary>
+                    <div class="details-content">
+                        <p>Desajuste temporal al cruzar múltiples zonas horarias. Los síntomas mejoran espontáneamente, usualmente a los 7 días.</p>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="tr-movimiento" class="content-section">
+            <div class="content-wrapper">
+                 <h2>Trastornos del Sueño por Movimientos Anormales</h2>
+                <details>
+                    <summary>Síndrome de Piernas Inquietas (SPI) / Enfermedad de Willis-Ekbom</summary>
+                    <div class="details-content">
+                        <p>Necesidad imperiosa de mover las extremidades inferiores (EEII), sobre todo al descansar o en la noche, asociada a sensaciones desagradables en las piernas que mejoran con el movimiento.</p>
+                        <p>Puede ser primario (idiopático, a menudo familiar) o secundario a diversas condiciones. Hasta el 80% de los pacientes con SPI se asocia a Movimientos Periódicos de las Extremidades durante el sueño.</p>
+                        <h4>Causas Secundarias de SPI:</h4>
+                        <ul>
+                            <li>Anemia por deficiencia de hierro, enfermedad renal terminal, trastornos reumatológicos, diabetes, SAHOS, enfermedad hepática, EPOC, enfermedad celíaca, cirugía bariátrica, enfermedad de Crohn, neuropatías, Parkinson, ataxias espinocerebelosas, esclerosis múltiple, migrañas, mielopatías.</li>
+                            <li>Medicamentos (antihistamínicos, neurolépticos, metoclopramida, IBP, ISRS, ISRN, litio, mirtazapina).</li>
+                            <li>Estilo de vida (restricción de sueño, tabaquismo, alcohol, cafeína, actividad física inadecuada).</li>
+                        </ul>
+                        <h4>Tratamiento:</h4>
+                        <ul>
+                            <li>Manejo de causas secundarias (ej. suplementos de hierro si hay deficiencia).</li>
+                            <li>Agonistas dopaminérgicos (Levodopa, Pramipexol, Ropinirol, Rotigotina).</li>
+                            <li>Gabapentina, Pregabalina, Gabapentina enacarbil.</li>
+                            <li>Otros: Opioides (Oxicodona, Tramadol), Benzodiacepinas (Clonazepam), Hipnóticos no BZD (Zolpidem).</li>
+                            <li><span class="text-red-emphasis">Precauciones:</span> riesgo de aumentación con dopaminérgicos (empeoramiento paradójico de síntomas), rebote, tolerancia, somnolencia, alteraciones del control de impulsos, potencial de abuso/dependencia con opioides y benzodiacepinas.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>Movimientos Periódicos de las Extremidades (MPE) durante el Sueño</summary>
+                    <div class="details-content">
+                        <p>Movimientos estereotipados y repetitivos de las extremidades (usualmente piernas) durante el sueño. Pueden llegar a despertar a la persona o a su compañero/a de cama. Pueden ocurrir en asociación con otros trastornos del sueño (como SPI o SAHOS) o de forma aislada.</p>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="patologia-neurologica" class="content-section">
+            <div class="content-wrapper">
+                <h2>IV. Trastornos del Sueño Asociados a Patología Neurológica</h2>
+                <details>
+                    <summary>Enfermedad de Parkinson</summary>
+                    <div class="details-content">
+                        <p>Afecta al 60-98% de los pacientes. Manifestaciones: Insomnio, trastornos del movimiento durante el sueño (incluyendo MPE), hipersomnolencia diurna, Trastorno Conductual del Sueño REM (RBD).</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>Enfermedad de Alzheimer</summary>
+                    <div class="details-content">
+                        <p>Los trastornos del sueño pueden empeorar la cognición y el ánimo. Común el trastorno del ritmo circadiano (ej. fase adelantada). SAHOS también es frecuente y debe buscarse y tratarse.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>Epilepsia</summary>
+                    <div class="details-content">
+                        <p>Existe una relación bidireccional: la privación de sueño o un sueño de mala calidad pueden precipitar crisis, y la propia epilepsia (o sus tratamientos) puede alterar el sueño. Hay mayor riesgo de algunas crisis durante las fases NREM (especialmente N3).</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>Accidente Cerebrovascular (ACV / Stroke)</summary>
+                    <div class="details-content">
+                        <p>SAHOS es un factor de riesgo independiente para HTA y patología cerebrovascular (ACV isquémico y hemorrágico). Existe asociación de SAHOS con patología de vaso pequeño cerebral.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>Cefalea</summary>
+                    <div class="details-content">
+                        <p>Hay asociación entre los trastornos del sueño y la mayoría de las cefaleas primarias. Cualquier trastorno del sueño puede gatillar cefalea matutina. La migraña y la cefalea tensional se asocian principalmente a insomnio.</p>
+                    </div>
+                </details>
+            </div>
+        </section>
+        
+        <footer>
+            <p>&copy; 2024-2025 Apuntes Interactivos de Medicina. Creado para fines educativos.</p>
+            <p style="font-size: 0.8em; color: var(--complement-beige);">Información basada en la presentación "Trastornos del sueño" de Dra. Deborah Perlroth.</p>
+        </footer>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const hamburgerButton = document.querySelector('.hamburger-button');
+            const sidebar = document.getElementById('sidebarNav');
+            const body = document.body;
+            const topBarHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--top-bar-height')) || 65;
+
+            if (hamburgerButton && sidebar) {
+                hamburgerButton.addEventListener('click', function () {
+                    body.classList.toggle('sidebar-open');
+                    const isExpanded = body.classList.contains('sidebar-open');
+                    hamburgerButton.setAttribute('aria-expanded', isExpanded);
+                    sidebar.setAttribute('aria-hidden', !isExpanded);
+                });
+            }
+
+            const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
+            sidebarLinks.forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - topBarHeight - 15;
+                        window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+                        if (window.innerWidth < 768 && body.classList.contains('sidebar-open')) {
+                           body.classList.remove('sidebar-open');
+                           hamburgerButton.setAttribute('aria-expanded', 'false');
+                           sidebar.setAttribute('aria-hidden', 'true');
+                        }
+                    }
+                });
+            });
+
+            const sections = document.querySelectorAll('.main-content section[id]');
+            function highlightSidebarLink() {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTopMargin = parseFloat(window.getComputedStyle(section).marginTop) || 0;
+                    const sectionEffectiveTop = section.getBoundingClientRect().top + window.pageYOffset - topBarHeight - sectionTopMargin - 20;
+                    if (window.pageYOffset >= sectionEffectiveTop) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                sidebarLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').substring(1) === current) {
+                        link.classList.add('active');
+                    }
+                });
+                 // Fallback for top of page or if no section is matched
+                if (!current && sections.length > 0 && window.pageYOffset < sections[0].getBoundingClientRect().top + window.pageYOffset - topBarHeight - 20) {
+                    if(sidebarLinks.length > 0) sidebarLinks[0].classList.add('active');
+                }
+            }
+            window.addEventListener('scroll', highlightSidebarLink);
+            highlightSidebarLink(); // Initial call
+
+            // Chart Initialization
+            const chartFont = { size: 10, family: 'Inter', weight: '500'};
+            const chartTextColor = getComputedStyle(document.documentElement).getPropertyValue('--text-dark').trim();
+            const commonPieDonutOptions = { 
+                responsive: true, maintainAspectRatio: false,
+                plugins: { 
+                    legend: { position: 'bottom', labels: { font: chartFont, color: chartTextColor, boxWidth:10, padding:6 } },
+                    tooltip: { bodyFont: chartFont, titleFont: {size: 12, family: 'Inter', weight: '600'}, backgroundColor: 'rgba(44, 62, 80, 0.9)', titleColor: '#F5EFEB', bodyColor: '#F8F9FA', padding: 7, cornerRadius: 5,
+                        callbacks: { 
+                            label: function(context) { 
+                                let label = context.label || ''; 
+                                if (label) { label = label.split('(')[0].trim() + ': '; } // Extract main label part
+                                if (context.parsed !== null) { label += context.parsed + '%'; } 
+                                return label; 
+                            } 
+                        }
+                    }
+                }
+            };
+            
+            const arquitecturaSuenoCanvas = document.getElementById('arquitecturaSuenoChart');
+            if (arquitecturaSuenoCanvas) {
+                const arquitecturaSuenoData = {
+                    labels: ['N1 (2-5%)', 'N2 (45-55%)', 'N3 (15-25%)', 'REM (20-25%)'],
+                    datasets: [{ 
+                        label: 'Arquitectura del Sueño (%)',
+                        data: [3.5, 50, 22.5, 24], 
+                        backgroundColor: ['#1abc9c', '#3498db', '#9b59b6', '#e67e22'], 
+                        borderColor: ['#16A085', '#2980b9', '#8e44ad', '#d35400'], 
+                        borderWidth: 1 
+                    }]
+                };
+                new Chart(arquitecturaSuenoCanvas.getContext('2d'), { type: 'doughnut', data: arquitecturaSuenoData, options: commonPieDonutOptions });
+            }
+
+            const prevalenciaTrastornosCanvas = document.getElementById('prevalenciaTrastornosChart');
+            if (prevalenciaTrastornosCanvas) {
+                const prevalenciaTrastornosData = {
+                    labels: ['SAHOS (Pob.)', 'Fase Retardada (Pob.)', 'F. Retardada (Adol.)', 'Fase Adelantada (Pob.)', 'Trabajo Turnos (Trab.)'],
+                    datasets: [{
+                        label: 'Prevalencia Estimada (%)',
+                        data: [12.5, 0.17, 11.5, 1, 10], 
+                        backgroundColor: [
+                            'rgba(26, 188, 156, 0.7)', 
+                            'rgba(230, 126, 34, 0.7)',
+                            'rgba(52, 152, 219, 0.7)',
+                            'rgba(155, 89, 182, 0.7)',
+                            'rgba(241, 196, 15, 0.7)'
+                        ],
+                        borderColor: [
+                            '#16A085',
+                            '#D35400',
+                            '#2980B9',
+                            '#8E44AD',
+                            '#F39C12'
+                        ],
+                        borderWidth: 1
+                    }]
+                };
+                new Chart(prevalenciaTrastornosCanvas.getContext('2d'), {
+                    type: 'bar',
+                    data: prevalenciaTrastornosData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }, 
+                            title: { display: true, text: 'Prevalencia de Algunos Trastornos del Sueño', font: {size: 14, family: 'Inter', weight: '600'}, color: chartTextColor},
+                             tooltip: { bodyFont: chartFont, titleFont: {size: 12, family: 'Inter', weight: '600'}, backgroundColor: 'rgba(44, 62, 80, 0.9)', titleColor: '#F5EFEB', bodyColor: '#F8F9FA', padding: 7, cornerRadius: 5,
+                                callbacks: { 
+                                    label: function(context) { 
+                                        let label = context.dataset.label || ''; 
+                                        if (label) { label += ': '; } 
+                                        if (context.parsed.y !== null) { label += context.parsed.y + '%'; } 
+                                        return label; 
+                                    } 
+                                }
+                            }
+                        },
+                        scales: {
+                            y: { beginAtZero: true, ticks: { font: chartFont, color: chartTextColor, callback: function(value){return value + "%"} }, grid: { color: 'rgba(222, 226, 230, 0.5)'} },
+                            x: { ticks: { font: chartFont, color: chartTextColor, maxRotation: 0, minRotation: 0, autoSkip: false, callback: function(value, index, values) {
+                                    // Acortar etiquetas si es necesario para que quepan
+                                    const label = this.getLabelForValue(value);
+                                    if (label.length > 15) return label.substring(0,12) + '...';
+                                    return label;
+                                }}, 
+                                grid: { display: false } 
+                            }
+                        }
+                    }
+                });
+            }
+
+        });
+    </script>
+</body>
+</html>

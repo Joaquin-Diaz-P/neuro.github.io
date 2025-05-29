@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accidente Cerebrovascular (ACV) Isquémico</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-main: #1ABC9C; 
+            --primary-dark: #16A085; 
+            --accent-orange: #E67E22; 
+            --accent-petroleum-blue: #2C3E50; 
+            --alert-red: #E74C3C; 
+            --complement-light-blue: #AED6F1; 
+            --complement-beige: #F5EFEB; 
+            --text-dark: #212529; 
+            --text-medium: #495057; 
+            --text-light: #6C757D; 
+            --bg-main: #F8F9FA; 
+            --card-bg: #FFFFFF; 
+            --border-color: #DEE2E6; 
+            --border-strong: #CED4DA;
+            --sidebar-width: 280px;
+            --top-bar-height: 65px;
+            --main-content-max-width: 1000px; 
+        }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-main); 
+            color: var(--text-dark); 
+            line-height: 1.6;
+            margin: 0;
+            padding-top: var(--top-bar-height);
+        }
+
+        .top-bar {
+            position: fixed; top: 0; left: 0; right: 0;
+            height: var(--top-bar-height);
+            background-color: var(--card-bg); 
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center;
+            padding: 0 1rem; 
+            z-index: 1032; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        }
+        .fixed-back-button {
+            background-color: var(--primary-main); color: var(--card-bg); border: 2px solid var(--card-bg);      
+            padding: 0.6rem 1rem; border-radius: 6px; text-decoration: none; 
+            font-weight: 600; font-size: 0.85rem; white-space: nowrap; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15); 
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            margin-left: 5px; 
+        }
+        .fixed-back-button:hover { background-color: var(--accent-orange); border-color: var(--accent-orange); }
+        .hamburger-button {
+            background-color: var(--accent-petroleum-blue); color: var(--card-bg); border: none;
+            padding: 0.6rem 0.8rem; border-radius: 6px; cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15); margin-left: 1.5rem; 
+        }
+        .hamburger-button span { display: block; width: 20px; height: 2px; background-color: var(--card-bg); margin: 4px 0; transition: all 0.3s ease-in-out; }
+        body.sidebar-open .hamburger-button span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+        body.sidebar-open .hamburger-button span:nth-child(2) { opacity: 0; }
+        body.sidebar-open .hamburger-button span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+        .sidebar-nav {
+            position: fixed; top: var(--top-bar-height); 
+            left: calc(-1 * var(--sidebar-width)); 
+            width: var(--sidebar-width); height: calc(100vh - var(--top-bar-height)); 
+            background-color: var(--card-bg); color: var(--text-dark);
+            overflow-y: auto; transition: left 0.3s ease; 
+            z-index: 1030; border-right: 1px solid var(--border-color);
+            box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+        }
+        body.sidebar-open .sidebar-nav { left: 0; }
+        .sidebar-nav h3 {
+            color: var(--accent-petroleum-blue); padding: 1.2rem 1.5rem 0.8rem;
+            margin: 0; font-size: 1.15rem; border-bottom: 1px solid var(--border-color);
+        }
+        .sidebar-nav ul { list-style: none; padding: 0.75rem 0; margin: 0; }
+        .sidebar-nav li a {
+            display: block; padding: 0.75rem 1.5rem; margin: 0.5rem 1rem; 
+            color: var(--card-bg); background-color: var(--primary-main); 
+            border: 1px solid var(--primary-dark); border-radius: 6px;
+            text-decoration: none; font-size: 0.9rem; font-weight: 500;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.07); text-align: left;
+        }
+        .sidebar-nav li a:hover { background-color: var(--accent-orange); border-color: var(--accent-orange); color: var(--card-bg); }
+        .sidebar-nav li a.active {
+            background-color: var(--primary-dark); color: var(--card-bg);
+            border-color: var(--primary-main); font-weight: bold;
+        }
+
+        .main-content { padding: 1.5rem; max-width: var(--main-content-max-width); margin-left: auto; margin-right: auto; }
+        .page-header-within-content {
+            background-color: var(--primary-main); color: var(--card-bg);
+            padding: 2rem 1.5rem; text-align: center; border-radius: 8px; 
+            margin-bottom: 2rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .page-header-within-content h1 { color: var(--card-bg); font-size: 1.8rem; margin:0; } 
+        .page-header-within-content p { color: var(--complement-beige); font-size: 1.0rem; margin-top: 0.5rem; }
+
+        .content-section { background-color: var(--card-bg); border-radius: 12px; margin-bottom: 1.5rem; box-shadow: 0 6px 18px rgba(44, 62, 80, 0.08); border: 1px solid var(--border-color); }
+        .content-wrapper { padding: 1.5rem; } 
+        .content-section h2 { border-bottom: 3px solid var(--primary-main); padding-bottom: 0.75rem; margin-bottom: 1.5rem; font-size: 1.7rem; color: var(--accent-petroleum-blue); margin-top:0; }
+        .content-section h3 { font-size: 1.35rem; margin-top: 1.5rem; margin-bottom: 1rem; color: var(--primary-dark); }
+        .content-section h4 { font-size: 1.15rem; margin-top: 1.2rem; margin-bottom: 0.75rem; color: var(--accent-petroleum-blue); font-weight: 500; }
+        
+        table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.05); font-size: 0.88rem; }
+        th, td { border: 1px solid var(--border-strong); padding: 0.7rem; text-align: left; } 
+        th { background-color: var(--accent-petroleum-blue); color: var(--card-bg); font-weight: 600; }
+        tbody tr:nth-child(even) { background-color: var(--complement-beige); }
+        details summary { font-weight: 600; cursor: pointer; padding: 0.8rem 1rem; color: var(--primary-dark); background-color: var(--complement-light-blue); border-radius: 8px 8px 0 0; font-size: 1.0rem; }
+        details[open] summary { border-bottom: 1px solid var(--border-color); }
+        details .details-content { padding: 1rem; border: 1px solid var(--border-color); border-top:none; border-radius: 0 0 8px 8px;}
+        .chart-container { max-width: 400px; height: auto; margin: 2rem auto; padding: 1rem; background-color: var(--complement-beige); border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.07); }
+        footer { text-align: center; padding: 2rem 1.5rem; margin-top: 3rem; border-top: 1px solid var(--border-strong); background-color: var(--accent-petroleum-blue); color: var(--complement-beige); }
+        footer p { color: var(--complement-beige); }
+        html { scroll-behavior: smooth; }
+        .citation { font-size: 0.75em; color: var(--text-light); margin-left: 2px; }
+        .key-point { background-color: var(--complement-light-blue); border-left: 4px solid var(--primary-main); padding: 0.75em 1em; margin: 0.75em 0; border-radius: 4px; }
+        .highlight-question { background-color: var(--complement-light-blue); padding: 0.2em 0.4em; border-radius: 4px; color: var(--accent-petroleum-blue); font-style: italic;}
+        .text-red-emphasis { color: var(--alert-red); font-weight: bold; }
+        .flowchart-container { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; margin: 1.5rem auto; padding: 1rem; background-color: var(--complement-beige); border-radius: 10px; border: 1px solid var(--border-strong); max-width: 90%;}
+        .flowchart-step, .flowchart-action, .flowchart-io { background-color: var(--primary-main); color: var(--card-bg); padding: 0.6rem 1.2rem; border-radius: 8px; text-align: center; min-width: 180px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid var(--primary-dark); font-weight: 500; margin-bottom: 0.4rem; font-size: 0.9rem; }
+        .flowchart-decision { background-color: var(--accent-orange); color: var(--card-bg); padding: 0.6rem 1.5rem; border-radius: 8px; min-width: 200px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid #D35400; font-weight: 500; transform: skewX(-15deg); text-align: center; margin-bottom: 0.4rem; font-size: 0.9rem;}
+        .flowchart-decision p { transform: skewX(15deg); margin:0; }
+        .flowchart-arrow { font-size: 1.3rem; color: var(--accent-petroleum-blue); line-height: 1; margin: 0.15rem 0; }
+        .flowchart-group { display: flex; justify-content: space-around; align-items: flex-start; width: 100%; gap: 0.8rem; margin-top: 0.4rem; flex-wrap: wrap; }
+        .flowchart-branch { display: flex; flex-direction: column; align-items: center; text-align: center; flex-basis: 48%; min-width: 200px; }
+        .flowchart-label { font-size: 0.8rem; color: var(--text-dark); margin-bottom: 0.2rem; font-weight: 500; background-color: var(--complement-light-blue); padding: 0.3rem 0.6rem; border-radius: 4px; border: 1px solid var(--primary-main); line-height: 1.2; min-width: 100px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .diagram-box { border: 2px solid var(--primary-main); padding: 1em; margin: 1em 0; border-radius: 8px; background-color: var(--complement-beige); }
+        .diagram-title {font-weight: bold; text-align: center; margin-bottom: 0.5em; color: var(--accent-petroleum-blue)}
+        .diagram-element { background-color: var(--complement-light-blue); color: var(--text-dark); padding: 0.4em 0.8em; border-radius: 6px; border: 1px solid var(--primary-dark); margin: 0.3em auto; display: inline-block; font-size:0.85rem;}
+        .diagram-horizontal-group {display: flex; justify-content: space-around; align-items: center; margin-bottom: 0.5em; flex-wrap: wrap;}
+        .diagram-vertical-group {display: flex; flex-direction: column; align-items: center;}
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <a href="Prueba_2_Neuro.html" class="fixed-back-button">Volver al Índice</a>
+        <button class="hamburger-button" aria-label="Abrir/Cerrar Navegación" aria-expanded="false" aria-controls="sidebarNav">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </div>
+
+    <nav class="sidebar-nav" id="sidebarNav" aria-hidden="true" role="navigation">
+        <h3>ACV Isquémico</h3>
+        <ul>
+            <li><a href="#intro-acvisq">Introducción</a></li>
+            <li><a href="#vasc-acvisq">Vascularización</a></li>
+            <li><a href="#riesgo-acvisq">Factores Riesgo</a></li>
+            <li><a href="#clasif-acvisq">Clasificación</a></li>
+            <li><a href="#diag-acvisq">Diagnóstico</a></li>
+            <li><a href="#manejo-acvisq">Manejo Agudo</a></li>
+            <li><a href="#compli-acvisq">Complicaciones</a></li>
+            <li><a href="#utac-acvisq">Unidades ACV</a></li>
+            <li><a href="#conclu-acvisq">Conclusiones</a></li>
+            <li><a href="#contra-acvisq">Contradicciones</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <header class="page-header-within-content">
+            <h1>Accidente Cerebrovascular (ACV) Isquémico</h1>
+            <p>Apuntes Completos y Detallados</p>
+        </header>
+
+        <section id="intro-acvisq" class="content-section">
+            <div class="content-wrapper">
+                <h2>I. Introducción y Epidemiología</h2>
+                <details open>
+                    <summary>A. Definición e Impacto</summary>
+                    <div class="details-content">
+                        <ul class="list-disc list-inside ml-4 space-y-1">
+                            <li>El Accidente Cerebrovascular (ACV) es una causa importante de mortalidad y discapacidad<span class="citation"></span>.</li>
+                            <li>En Chile, es la primera causa de muerte, con más de 8000 fallecimientos al año<span class="citation"></span>.</li>
+                            <li>Es la primera causa de invalidez, destacando la importancia de las secuelas<span class="citation"></span>.</li>
+                            <li>Representa la segunda causa de hospitalización en personas mayores de 65 años<span class="citation"></span>.</li>
+                            <li>Se estima que ocurren 25,200 ACV al año en Chile<span class="citation"></span>, y fallece un paciente por hora a causa de ACV en el país<span class="citation"></span>.</li>
+                            <li>La mortalidad general por ACV es del 10-25%, variando según series y países<span class="citation"></span>.
+                                <ul class="list-disc list-inside ml-6">
+                                    <li>El 15-20% de los pacientes fallece en el primer mes<span class="citation"></span>.</li>
+                                    <li>El 30% fallece en el primer año<span class="citation"></span>.</li>
+                                </ul>
+                            </li>
+                            <li>De los sobrevivientes, el 50% queda con dependencia funcional<span class="citation"></span>.</li>
+                            <li>Solo el 25% puede reincorporarse a su vida previa sin secuelas significativas<span class="citation"></span>.</li>
+                            <li>La incidencia de ACV total (primer evento y recurrente) en Chile es de 168 por 100,000 habitantes al año<span class="citation"></span>.
+                                <ul class="list-disc list-inside ml-6">
+                                    <li>Primer ACV: 97 por 100,000 habitantes al año<span class="citation"></span>.</li>
+                                    <li>ACV Recurrente: 33 por 100,000 habitantes al año<span class="citation"></span>.</li>
+                                    <li>Infartos (isquémicos): 60 por 100,000 habitantes al año, proyectando 9,000 casos anuales<span class="citation"></span>.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>B. Tipos de ACV</summary>
+                    <div class="details-content">
+                         <div class="chart-container">
+                            <canvas id="tiposAcvChart"></canvas>
+                        </div>
+                        <ul class="list-disc list-inside ml-4 space-y-1 mt-4">
+                            <li><strong>ACV Isquémico:</strong> Constituye el 70-80% de los casos<span class="citation"></span>.
+                                <ul class="list-disc list-inside ml-6">
+                                    <li>La incidencia de ACV isquémicos ha disminuido gracias a programas de control de la presión arterial en Chile<span class="citation"></span>.</li>
+                                </ul>
+                            </li>
+                            <li><strong>ACV Hemorrágico:</strong> Representa el 20-30% de los casos<span class="citation"></span>.
+                                <ul class="list-disc list-inside ml-6">
+                                    <li>Incluye hemorragias intraparenquimatosas y subaracnoideas (causas espontáneas primarias)<span class="citation"></span>.</li>
+                                    <li>Hemorragia Intracerebral (HIC): 20 por 100,000 habitantes al año (3,000 casos)<span class="citation"></span>.</li>
+                                    <li>Hemorragia Subaracnoidea (HSA): 4.5 por 100,000 habitantes al año (675 casos)<span class="citation"></span>.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>C. Subtipos de ACV Isquémico</summary>
+                    <div class="details-content">
+                        <div class="chart-container">
+                            <canvas id="subtiposAcvIsquemicoChart"></canvas>
+                        </div>
+                        <ul class="list-disc list-inside ml-4 space-y-1 mt-4">
+                            <li>Crisis Isquémicas Transitorias (CIT/TIA): 15-20%<span class="citation"></span>.</li>
+                            <li>Infartos Trombóticos: 10%<span class="citation"></span>.</li>
+                            <li>Infartos Embólicos: 30% (los más frecuentes)<span class="citation"></span>.</li>
+                            <li>Infartos Lacunares: 20%<span class="citation"></span>.</li>
+                            <li>Infartos de origen no determinado: 20%<span class="citation"></span>.</li>
+                            <li>Infartos de origen infrecuente: 5%<span class="citation"></span>.</li>
+                        </ul>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="vasc-acvisq" class="content-section">
+            <div class="content-wrapper">
+                <h2>II. Vascularización Cerebral y Fisiopatología</h2>
+                 <details open>
+                    <summary>A. Vascularización del Sistema Nervioso</summary>
+                    <div class="details-content">
+                        <p>El cerebro consume el 20-25% del gasto cardíaco, a pesar de representar solo el 5% del peso corporal (1200-1500 gramos)<span class="citation"></span>.</p>
+                        <p class="mt-2">La irrigación cerebral depende de dos grandes sistemas<span class="citation"></span>:</p>
+                        <ul class="list-disc list-inside ml-4 mt-2 space-y-1">
+                            <li><strong>Sistema Anterior (Carotídeo):</strong> Formado por las dos arterias carótidas. Cada carótida interna, tras una curva (sifón carotídeo), se divide en la arteria cerebral media (ACM) y la arteria cerebral anterior (ACA)<span class="citation"></span>.</li>
+                            <li><strong>Sistema Posterior (Vertebrobasilar):</strong> Formado por dos arterias vertebrales que se unen para formar la arteria basilar<span class="citation"></span>. Las ramas terminales de la arteria basilar son las arterias cerebrales posteriores (ACP), que irrigan principalmente la región occipital<span class="citation"></span>. El sistema vertebrobasilar irriga fundamentalmente el tronco encefálico<span class="citation"></span>.</li>
+                        </ul>
+                        <h4 class="mt-4">Polígono de Willis (Círculo Arterial Cerebral)</h4>
+                        <div class="diagram-box">
+                            <p class="diagram-title">Polígono de Willis</p>
+                            <div class="diagram-horizontal-group">
+                                <div class="diagram-element">Sistema Carotídeo (Der & Izq)</div>
+                                 <span class="diagram-arrow">⇄</span>
+                                <div class="diagram-element">A. Comunicante Anterior (une ACAs)</div>
+                            </div>
+                             <div class="diagram-vertical-group">
+                                <div class="diagram-arrow">↕ A. Com. Posterior (une ACM con ACP) ↕</div>
+                            </div>
+                            <div class="diagram-horizontal-group">
+                                <div class="diagram-element">Sistema Vertebrobasilar</div>
+                            </div>
+                            <p class="text-xs mt-2">Esta red de comunicaciones permite suplir parcialmente deficiencias de flujo en caso de obstrucción<span class="citation"></span>.</p>
+                        </div>
+                        <ul class="list-disc list-inside ml-4 space-y-1 mt-2">
+                            <li>Las dos arterias carótidas y las dos vertebrales conforman este círculo<span class="citation"></span>.</li>
+                            <li>Existe comunicación entre el territorio anterior y posterior: la arteria cerebral media de cada lado emite una rama comunicante posterior que se une con la arteria cerebral posterior del mismo lado<span class="citation"></span>.</li>
+                            <li>Existe comunicación entre el lado izquierdo y derecho: la arteria cerebral anterior se comunica con la del lado opuesto a través de la arteria comunicante anterior<span class="citation"></span>. La arteria cerebral posterior se comunica con la del otro lado por la arteria comunicante posterior<span class="citation"></span>.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>B. Fisiopatología del ACV Isquémico</summary>
+                    <div class="details-content">
+                        <p><strong>Isquemia Cerebral:</strong> Es un proceso, no un episodio instantáneo<span class="citation"></span>. El tiempo para actuar depende de la severidad de la interrupción del flujo sanguíneo (FSC)<span class="citation"></span>.</p>
+                        <h4 class="mt-4">Penumbra Isquémica e Infarto Constituido</h4>
+                         <div class="flowchart-container my-4">
+                            <div class="flowchart-step">↓ Flujo Sanguíneo Cerebral (FSC)</div>
+                            <div class="flowchart-arrow">↓</div>
+                            <div class="flowchart-decision"><p>¿Severidad Interrupción?</p></div>
+                            <div class="flowchart-group">
+                                <div class="flowchart-branch">
+                                    <div class="flowchart-label">Muy Severa</div> <div class="flowchart-arrow">↓</div>
+                                    <div class="flowchart-io" style="background-color: var(--alert-red); border-color: #C0392B;">Core Isquémico (Daño Irreversible Rápido)</div>
+                                </div>
+                                <div class="flowchart-branch">
+                                    <div class="flowchart-label">Menos Severa</div> <div class="flowchart-arrow">↓</div>
+                                    <div class="flowchart-io" style="background-color: var(--accent-orange); border-color: #D35400;">Penumbra Isquémica (Salvable)</div>
+                                    <div class="flowchart-arrow">↓</div>
+                                    <div class="flowchart-decision"><p>¿Reperfusión a Tiempo?</p></div>
+                                    <div class="flowchart-group">
+                                         <div><div class="flowchart-label">SÍ</div><div class="flowchart-arrow">↓</div><div class="flowchart-io" style="background-color: var(--primary-dark); color:white;">Recuperación</div></div>
+                                         <div><div class="flowchart-label">NO</div><div class="flowchart-arrow">↓</div><div class="flowchart-io" style="background-color: var(--alert-red); border-color: #C0392B;">Infarto Constituido</div></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <ul class="list-disc list-inside ml-4 space-y-1">
+                            <li>Cuando el FSC disminuye bruscamente, el infarto se constituye rápidamente<span class="citation"></span>. Si la disminución del flujo es menos severa, se requiere más tiempo para que se produzca el daño irreversible<span class="citation"></span>.</li>
+                            <li>La <strong>penumbra isquémica</strong> es tejido cerebral en riesgo, pero potencialmente salvable si se restaura el flujo a tiempo<span class="citation"></span>.</li>
+                            <li>El <strong>core isquémico</strong> o infarto cerebral es el tejido que ha sufrido daño irreversible<span class="citation"></span>.</li>
+                            <li>En RM, el <strong>mismatch</strong> entre el área alterada en perfusión (mayor) y el área alterada en difusión (menor) define la penumbra isquémica<span class="citation"></span>. Destapar la arteria en presencia de mismatch puede llevar a un beneficio clínico enorme<span class="citation"></span>.</li>
+                            <li>A las 3-4 horas, el infarto suele estar constituido en las imágenes<span class="citation"></span>.</li>
+                        </ul>
+                        <p class="mt-4 key-point"><strong>"Tiempo es Cerebro":</strong> Destaca la urgencia del manejo, ya que cada minuto de isquemia implica pérdida neuronal<span class="citation"></span>.</p>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="riesgo-acvisq" class="content-section">
+            <div class="content-wrapper">
+                <h2>III. Factores de Riesgo</h2>
+                <p class="highlight-question"><strong>Más Importantes</strong> (Pregunta de prueba según la fuente):</p>
+                <ul class="list-disc list-inside ml-4 mt-2 space-y-1">
+                    <li><strong>Edad:</strong> A mayor edad, mayor riesgo<span class="citation"></span>.</li>
+                    <li><strong>Hipertensión Arterial (HTA):</strong> Es el factor de riesgo modificable más importante<span class="citation"></span>.</li>
+                    <li><strong>Diabetes Mellitus (DM)</strong><span class="citation"></span>.</li>
+                    <li><strong>Cardiopatía:</strong> Cualquier tipo<span class="citation"></span>.</li>
+                </ul>
+    
+                <h4 class="mt-4">Menos Importantes (según la fuente):</h4>
+                <ul class="list-disc list-inside ml-4 mt-2 space-y-1">
+                    <li>Obesidad<span class="citation"></span>.</li>
+                    <li>Tabaco<span class="citation"></span>.</li>
+                    <li>Dislipidemia<span class="citation"></span>.</li>
+                    <li>Homocisteinemia<span class="citation"></span>.</li>
+                    <li>Factores Genéticos<span class="citation"></span>.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="clasif-acvisq" class="content-section">
+            <div class="content-wrapper">
+                <h2>IV. Clasificación y Tipos Clínicos de ACV Isquémico</h2>
+                <details open>
+                    <summary>A. Crisis Isquémica Transitoria (CIT / TIA)</summary>
+                    <div class="details-content">
+                        <p>Representan el 15-20% de los eventos isquémicos<span class="citation"></span>.</p>
+                        <p><strong>Definición:</strong> Trastornos episódicos y focales de la circulación cerebral, de comienzo habitualmente brusco, que producen alteraciones neurológicas subjetivas y objetivas de breve duración (minutos), sin evidencia de infarto<span class="citation"></span>. <strong>Importante:</strong> No se define por un tiempo específico, sino por la brevedad y la ausencia de infarto<span class="citation"></span>. Recuperación completa. Análogo a angina de pecho<span class="citation"></span>. Si se realiza RNM a todos los TIA clínicos, hasta un 50% puede tener alteraciones (infarto pequeño)<span class="citation"></span>.</p>
+                        <h4 class="mt-3">Manifestaciones Clínicas:</h4>
+                        <p>Inicio súbito, corta duración, ceden en minutos<span class="citation"></span>. Sintomatología depende de región afectada<span class="citation"></span>.</p>
+                        <ul class="list-disc list-inside ml-4">
+                            <li><strong>Territorio Carotídeo:</strong> Amaurosis unilateral<span class="citation"></span>, hemiparesia faciobraquiocrural<span class="citation"></span>, hemiparestesia faciobraquiocrural<span class="citation"></span>, afasia<span class="citation"></span>, hemianopsia<span class="citation"></span>, alexia, agrafia<span class="citation"></span>, desorientación espacial<span class="citation"></span>.</li>
+                            <li><strong>Territorio Vertebrobasilar:</strong> Ceguera bilateral<span class="citation"></span>, hemianopsia<span class="citation"></span>, hemi o cuadriparesia<span class="citation"></span>, vértigo y ataxia<span class="citation"></span>, diplopía<span class="citation"></span>, disartria, disfagia<span class="citation"></span>, amnesia global transitoria<span class="citation"></span>.</li>
+                        </ul>
+                        <p><strong>Etiología:</strong> Patología de bifurcación carotídea (ateromas) es una causa frecuente<span class="citation"></span>. Ateromas más comunes en bifurcaciones<span class="citation"></span>.</p>
+                        <h4 class="mt-3">Manejo y Estudio del TIA:</h4>
+                        <ul class="list-disc list-inside ml-4">
+                            <li><strong>Urgencia:</strong> Acudir rápido si evento reciente (riesgo recurrencia/ACV)<span class="citation"></span>. Consultar para estudio incluso si síntomas ceden<span class="citation"></span>.</li>
+                            <li><strong>Imágenes Cerebrales:</strong> TAC o RNM (preferir RNM si disponible)<span class="citation"></span>.</li>
+                            <li><strong>Estudio de Arterias (Angiografía):</strong> Para buscar placa aterosclerótica<span class="citation"></span>. AngioTAC (más usado) > AngioRMN > Angiografía digital<span class="citation"></span>. Eco-Doppler carotídeo (menor especificidad)<span class="citation"></span>.</li>
+                            <li><strong>Estudio Cardiológico:</strong> ECG, Holter, Ecocardiograma (sospecha embólica)<span class="citation"></span>.</li>
+                            <li><strong>Estudio General:</strong> Glicemia, hemograma, etc.<span class="citation"></span>.</li>
+                            <li><strong>Tratamiento (según causa):</strong> Estenosis carotídea (>70% y riesgo qx <6% -> endarterectomía<span class="citation"></span>; 50-69% y riesgo qx <3% -> considerar endarterectomía<span class="citation"></span>; <50% -> manejo médico<span class="citation"></span>). Cardiopatía embolígena (TACO)<span class="citation"></span>.</li>
+                        </ul>
+                        <p>Es fundamental diferenciar el tipo de ACV isquémico para prevenir eventos futuros<span class="citation"></span>.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>B. ACV Trombótico</summary>
+                    <div class="details-content">
+                        <p>Representa el 10% de los ACV isquémicos<span class="citation"></span>.</p>
+                        <ul class="list-disc list-inside ml-4">
+                            <li><strong>Modo de Inicio:</strong> Variable, clásicamente con evolución "en escalera"<span class="citation"></span>.</li>
+                            <li><strong>Antecedentes:</strong> 75% de los pacientes han tenido síntomas previos similares (TIA)<span class="citation"></span>.</li>
+                            <li><strong>Perfil del Paciente:</strong> Típicamente en pacientes de edad avanzada, con múltiples FRCV (DM, HTA, cardiopatía coronaria)<span class="citation"></span>.</li>
+                            <li><strong>Momento de Inicio:</strong> Frecuentemente durante el sueño o reposo<span class="citation"></span>.</li>
+                            <li><strong>Clínica:</strong> Depende de la arteria afectada<span class="citation"></span>.</li>
+                            <li><strong>Imagen:</strong> La angiografía puede mostrar estenosis arterial significativa<span class="citation"></span>.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>C. ACV Embólico</summary>
+                    <div class="details-content">
+                         <p>Representa el 30% de los ACV isquémicos (los más frecuentes)<span class="citation"></span>. Origen del Émbolo: "Embólico a secas" se refiere a un émbolo de origen central (cardíaco principalmente)<span class="citation"></span>. Modo de Inicio: Más abrupto que el trombótico. El máximo déficit neurológico se presenta al inicio<span class="citation"></span>. Émbolo puede migrar distalmente, disminuyendo síntomas<span class="citation"></span>.</p>
+                        <ul class="list-disc list-inside ml-4">
+                            <li><strong>Manifestaciones Clínicas:</strong> Comienzo instantáneo, a menudo durante la actividad<span class="citation"></span>. Puede iniciarse con crisis convulsivas<span class="citation"></span>. Posibilidad de embolia concomitante en otro territorio<span class="citation"></span>. TIA previas son poco frecuentes<span class="citation"></span>. Antecedentes de cardiopatía embolígena (ej. Fibrilación Auricular - FA, causa más frecuente)<span class="citation"></span>.</li>
+                            <li><strong>Pistas en TAC:</strong> Infarto con componente hemorrágico (transformación hemorrágica)<span class="citation"></span>. Infartos corticales bilaterales<span class="citation"></span>.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>D. Infarto Lacunar</summary>
+                    <div class="details-content">
+                        <p>Representa el 20% de los ACV isquémicos<span class="citation"></span>. Se define por su tamaño y ubicación<span class="citation"></span>. Tamaño: Pequeño, 1.5 - 2.0 cm diámetro<span class="citation"></span>. Ubicación: Ganglios basales, sustancia blanca región semioval, o tronco cerebral<span class="citation"></span>.</p>
+                        <ul class="list-disc list-inside ml-4">
+                            <li><strong>Etiología:</strong> Más frec. lipohialinosis arterial (HTA crónica)<span class="citation"></span>. También origen embólico (microémbolos) o aterosclerosis arterias pequeñas<span class="citation"></span>.</li>
+                            <li><strong>Manifestaciones Clínicas ("Síndromes Lacunares Puros"):</strong> No suelen dar síntomas corticales<span class="citation"></span>.
+                                <ul class="list-circle list-inside ml-6">
+                                    <li><strong>Hemiparesia Motora Pura:</strong> Lesión cápsula interna o base protuberancia<span class="citation"></span>.</li>
+                                    <li><strong>Hemihipoestesia (Síndrome Sensitivo Puro):</strong> Lesión tálamo o protuberancia<span class="citation"></span>.</li>
+                                    <li><strong>Hemisíndrome Sensitivo-Motor:</strong> Lesión cápsula interna-tálamo<span class="citation"></span>.</li>
+                                    <li><strong>Ataxia-Hemiparesia:</strong> Lesión brazo posterior cápsula interna o base protuberancia.</li>
+                                    <li><strong>Disartria-Mano Torpe:</strong> Lesión rodilla cápsula interna o base protuberancia.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="diag-acvisq" class="content-section">
+            <div class="content-wrapper">
+                <h2>V. Diagnóstico del ACV Isquémico</h2>
+                <details open>
+                    <summary>A. Reconocimiento Rápido y Evaluación Prehospitalaria</summary>
+                    <div class="details-content">
+                        <h4>Identificación Rápida de Síntomas (inicio brusco)<span class="citation"></span>:</h4>
+                        <ul class="list-disc list-inside ml-4">
+                            <li>Trastornos del lenguaje o habla (disartria, afasia)<span class="citation"></span>.</li>
+                            <li>Pérdida de fuerza muscular o torpeza (hemiparesia)<span class="citation"></span>.</li>
+                            <li>Pérdida de sensibilidad (hemihipoestesia)<span class="citation"></span>.</li>
+                            <li>Alteración del estado mental (confusión, coma)<span class="citation"></span>.</li>
+                            <li>Trastornos visuales (amaurosis, hemianopsia, diplopía)<span class="citation"></span>.</li>
+                            <li>Cefalea (súbita e intensa)<span class="citation"></span>.</li>
+                            <li>Crisis convulsiva<span class="citation"></span>.</li>
+                            <li>Alteración del equilibrio o ataxia<span class="citation"></span>.</li>
+                            <li>Asimetría facial<span class="citation"></span>.</li>
+                        </ul>
+                        <h4 class="mt-3">Acciones Prehospitalarias:</h4>
+                        <ul class="list-disc list-inside ml-4">
+                            <li>Traslado inmediato a centro ACV (TAC 24hrs)<span class="citation"></span>.</li>
+                            <li><strong>Prenotificación</strong> al centro receptor<span class="citation"></span>.</li>
+                            <li class="text-red-emphasis"><strong>NO bajar PA rutinariamente</strong><span class="citation"></span>.</li>
+                            <li>Asegurar vía aérea, O2 si necesario<span class="citation"></span>.</li>
+                            <li>Solución fisiológica IV si no retrasa<span class="citation"></span>.</li>
+                            <li>Si síntomas resuelven (TIA), trasladar igualmente<span class="citation"></span>.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>B. Evaluación en el Servicio de Urgencias</summary>
+                    <div class="details-content">
+                        <ol class="list-decimal list-inside ml-4">
+                            <li>Confirmar evento cerebrovascular<span class="citation"></span>.</li>
+                            <li>Determinar tipo (isquémico vs. hemorrágico):
+                                <ul class="list-disc list-inside ml-6">
+                                    <li><strong>Neuroimagen Urgente:</strong> TAC sin contraste (elección inicial)<span class="citation"></span>. RNM (más sensible)<span class="citation"></span>.</li>
+                                </ul>
+                            </li>
+                            <li>Exámenes para todos: TAC/RNM, ECG, Hemograma, plaquetas, VHS, Pruebas coagulación, ELP, <strong>Glicemia</strong> (antes de trombolizar)<span class="citation"></span>, Uremia, creatininemia<span class="citation"></span>.</li>
+                            <li>Exámenes según caso: Gases, PL (sospecha HSA con TAC normal), Rx tórax, EEG<span class="citation"></span>.</li>
+                        </ol>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="manejo-acvisq" class="content-section">
+            <div class="content-wrapper">
+                <h2>VI. Manejo del ACV Isquémico Agudo</h2>
+                <p class="key-point">Objetivo: evitar propagación daño neuronal y prevenir nuevos episodios<span class="citation"></span>.</p>
+                 <details open>
+                    <summary>A. Estabilización Inicial y Medidas Generales (ABC)</summary>
+                    <div class="details-content">
+                        <ul class="list-disc list-inside ml-4">
+                            <li><strong>Vía Aérea:</strong> Permeabilidad. Intubación si Glasgow < 8, etc.<span class="citation"></span>.</li>
+                            <li><strong>Ventilación:</strong> SatO2 >90%<span class="citation"></span>.</li>
+                            <li><strong>Circulación:</strong> Monitoreo cardíaco<span class="citation"></span>.</li>
+                            <li><strong>Sonda Nasogástrica:</strong> Considerar si Glasgow < 12<span class="citation"></span>.</li>
+                            <li><strong>Hidratación:</strong> Sol. fisiológica. Evitar glucosadas<span class="citation"></span>.</li>
+                            <li><strong>Glicemia:</strong> Medir c/6h. Corregir<span class="citation"></span>.</li>
+                            <li><strong>Temperatura:</strong> Tratar fiebre (T° ≥ 38°C)<span class="citation"></span>.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>B. Manejo de la Presión Arterial (PA)</summary>
+                    <div class="details-content">
+                        <p>HTA puede ser compensatoria<span class="citation"></span>. Autorregulación cerebral<span class="citation"></span>.</p>
+                        <p class="highlight-question mt-2">¿Cuándo tratar HTA en ACV isquémico agudo?<span class="citation"></span></p>
+                        <ul class="list-disc list-inside ml-4">
+                            <li>Candidatos trombólisis: PA ≤185/110 mmHg antes, ≤180/105 mmHg durante/después<span class="citation"></span>.</li>
+                            <li>Comorbilidades específicas<span class="citation"></span>.</li>
+                            <li>PA excesiva: PAM >130 mmHg<span class="citation"></span>. No candidatos: Tratar si PAS >220 o PAD >120<span class="citation"></span>.</li>
+                        </ul>
+                        <p>Fármacos: Labetalol, Nicardipino IV. <span class="text-red-emphasis">NO Nifedipino SL</span><span class="citation"></span>.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>C. Terapias de Reperfusión ("Tiempo es cerebro"<span class="citation"></span>)</summary>
+                    <div class="details-content">
+                        <div class="flowchart-container">
+                            <div class="flowchart-step">ACV Isquémico Agudo</div> <div class="flowchart-arrow">↓</div>
+                            <div class="flowchart-decision"><p>¿Ventana < 4.5h? ¿Sin Contraindicaciones?</p></div>
+                            <div class="flowchart-group">
+                                <div class="flowchart-branch"><div class="flowchart-label">SÍ</div><div class="flowchart-arrow">↓</div><div class="flowchart-action">Trombólisis IV (rt-PA)</div></div>
+                                <div class="flowchart-branch"><div class="flowchart-label">NO / Oclusión Gran Vaso</div><div class="flowchart-arrow">↓</div><div class="flowchart-action">Evaluar Trombectomía</div></div>
+                            </div> <div class="flowchart-arrow">↓</div>
+                            <div class="flowchart-decision"><p>¿Oclusión Gran Vaso Proximal? ¿Ventana 6-24h con Mismatch?</p></div>
+                             <div class="flowchart-group">
+                                 <div class="flowchart-branch"><div class="flowchart-label">SÍ</div><div class="flowchart-arrow">↓</div><div class="flowchart-action">Trombectomía Mecánica</div></div>
+                                 <div class="flowchart-branch"><div class="flowchart-label">NO</div><div class="flowchart-arrow">↓</div><div class="flowchart-action">Manejo Médico Estándar</div></div>
+                            </div>
+                        </div>
+                        <p><strong>Trombólisis IV (rt-PA):</strong> Ventana <4.5h<span class="citation"></span>. Criterios<span class="citation"></span>.</p>
+                        <p><strong>Trombectomía Mecánica:</strong> Ventana clásica <6h, extendida <24h (con mismatch)<span class="citation"></span>. Mayor beneficio<span class="citation"></span>.</p>
+                        <p>Selección con imágenes de perfusión (mismatch) crucial<span class="citation"></span>.</p>
+                    </div>
+                </details>
+                 <details>
+                    <summary>D. Otros Tratamientos Específicos</summary>
+                    <div class="details-content">
+                        <p><strong>Antiagregantes:</strong> Aspirina (AAS) 250 mg/día carga en 24-48h<span class="citation"></span>.</p>
+                        <p><strong>Heparinas:</strong> Rol agudo no demostrado<span class="citation"></span>. Profilaxis TVP/TEP<span class="citation"></span>.</p>
+                        <p><strong>Neuroprotectores:</strong> No útiles en clínica<span class="citation"></span>.</p>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="compli-acvisq" class="content-section">
+            <div class="content-wrapper">
+                <h2>VII. Complicaciones y Pronóstico</h2>
+                <p>Mortalidad y Dependencia: Ver Epidemiología<span class="citation"></span>. Complicaciones: Edema cerebral, transf. hemorrágica, convulsiones, neumonía, ITU, TVP/TEP, úlceras.</p>
+            </div>
+        </section>
+
+        <section id="utac-acvisq" class="content-section">
+            <div class="content-wrapper">
+                <h2>VIII. Unidades de ACV (UTAC / Stroke Units)</h2>
+                 <p>Manejo en UTAC reduce mortalidad y dependencia<span class="citation"></span>.</p>
+            </div>
+        </section>
+
+        <section id="conclu-acvisq" class="content-section">
+            <div class="content-wrapper">
+                <h2>IX. Conclusiones Clave</h2>
+                <ul class="list-disc list-inside ml-4">
+                    <li>ACV isquémico es emergencia médica tiempo-dependiente.</li>
+                    <li>Identificación rápida y traslado inmediato cruciales.</li>
+                    <li>Neuroimagen urgente (TAC s/c) fundamental.</li>
+                    <li>Terapias de reperfusión mejoran pronóstico funcional en seleccionados precozmente.</li>
+                    <li>Manejo en UTAC mejora resultados.</li>
+                    <li>Prevención secundaria es vital.</li>
+                    <li class="key-point">"Tiempo es cerebro"<span class="citation"></span>.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="contra-acvisq" class="content-section">
+            <div class="content-wrapper">
+                <h2>X. Puntos de Contradicción o Diferencias entre Fuentes</h2>
+                <p>No se encontraron contradicciones directas en la información factual presentada.</p>
+            </div>
+        </section>
+        
+        <footer>
+            <p>&copy; 2024-2025 Guía Interactiva. Creado para fines educativos.</p>
+        </footer>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const hamburgerButton = document.querySelector('.hamburger-button');
+            const sidebar = document.getElementById('sidebarNav');
+            const body = document.body;
+            const topBarHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--top-bar-height')) || 65;
+
+            if (hamburgerButton && sidebar) {
+                hamburgerButton.addEventListener('click', function () {
+                    body.classList.toggle('sidebar-open');
+                    const isExpanded = body.classList.contains('sidebar-open');
+                    hamburgerButton.setAttribute('aria-expanded', isExpanded);
+                    sidebar.setAttribute('aria-hidden', !isExpanded);
+                });
+            }
+
+            const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
+            sidebarLinks.forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - topBarHeight - 15;
+                        window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+                        if (window.innerWidth < 768 && body.classList.contains('sidebar-open')) {
+                           body.classList.remove('sidebar-open');
+                           hamburgerButton.setAttribute('aria-expanded', 'false');
+                           sidebar.setAttribute('aria-hidden', 'true');
+                        }
+                    }
+                });
+            });
+
+            const sections = document.querySelectorAll('.main-content section[id]');
+            function highlightSidebarLink() {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTopMargin = parseFloat(window.getComputedStyle(section).marginTop) || 0;
+                    const sectionEffectiveTop = section.getBoundingClientRect().top + window.pageYOffset - topBarHeight - sectionTopMargin - 20;
+                    if (window.pageYOffset >= sectionEffectiveTop) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                sidebarLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').substring(1) === current) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+            window.addEventListener('scroll', highlightSidebarLink);
+            highlightSidebarLink();
+
+            const chartFont = { size: 10, family: 'Inter', weight: '500'};
+            const chartTextColor = getComputedStyle(document.documentElement).getPropertyValue('--text-dark').trim();
+            const commonPieDonutOptions = { 
+                responsive: true, maintainAspectRatio: true,
+                plugins: { 
+                    legend: { position: 'bottom', labels: { font: chartFont, color: chartTextColor, boxWidth:10, padding:6 } },
+                    tooltip: { bodyFont: chartFont, titleFont: {size: 12, family: 'Inter', weight: '600'}, backgroundColor: 'rgba(44, 62, 80, 0.9)', titleColor: '#F5EFEB', bodyColor: '#F8F9FA', padding: 7, cornerRadius: 5,
+                        callbacks: { 
+                            label: function(context) { 
+                                let label = context.label || ''; 
+                                if (label) { label = label.split('(')[0].trim() + ': '; } 
+                                if (context.parsed !== null) { label += context.parsed + '%'; } 
+                                return label; 
+                            } 
+                        }
+                    }
+                }
+            };
+            const pieOptionsCustomLegend = JSON.parse(JSON.stringify(commonPieDonutOptions));
+            pieOptionsCustomLegend.plugins.tooltip.callbacks.label = function(context) {
+                let label = context.chart.data.labels[context.dataIndex] || '';
+                if (label) { label = label.split('(')[0].trim(); label += ': '; }
+                if (context.parsed !== null) { label += context.parsed + '%'; }
+                return label;
+            };
+             pieOptionsCustomLegend.plugins.legend.labels.generateLabels = function(chart) {
+                const data = chart.data;
+                if (data.labels.length && data.datasets.length) {
+                    return data.labels.map(function(label, i) {
+                        const meta = chart.getDatasetMeta(0);
+                        const ds = data.datasets[0];
+                        const arc = meta.data[i];
+                        const fill = ds.backgroundColor[i];
+                        const stroke = ds.borderColor ? ds.borderColor[i] : fill;
+                        const bw = ds.borderWidth ? ds.borderWidth[i] : 0;
+                        const value = ds.data[i];
+                        return { text: `${label.split('(')[0].trim()} (${value}%)`, fillStyle: fill, strokeStyle: stroke, lineWidth: bw, hidden: isNaN(ds.data[i]) || (meta.data[i] && meta.data[i].hidden), index: i };
+                    });
+                } return [];
+            };
+
+            const tiposAcvCanvas = document.getElementById('tiposAcvChart');
+            if (tiposAcvCanvas) {
+                const tiposAcvData = {
+                    labels: ['ACV Isquémico (70-80%)', 'ACV Hemorrágico (20-30%)'],
+                    datasets: [{ label: 'Tipos de ACV', data: [75, 25], backgroundColor: ['rgba(26, 188, 156, 0.8)', 'rgba(230, 126, 34, 0.8)'], borderColor: ['#16A085', '#D35400'], borderWidth: 1 }]
+                };
+                new Chart(tiposAcvCanvas.getContext('2d'), { type: 'doughnut', data: tiposAcvData, options: commonPieDonutOptions });
+            }
+
+            const subtiposAcvCanvas = document.getElementById('subtiposAcvIsquemicoChart');
+            if (subtiposAcvCanvas) {
+                 const subtiposAcvIsquemicoData = {
+                    labels: ['CIT/TIA', 'Trombótico', 'Embólico', 'Lacunar', 'No Determ.', 'Infrecuente'],
+                    datasets: [{ label: 'Subtipos ACV Isquémico (%)', data: [17.5, 10, 30, 20, 20, 5], backgroundColor: ['#1abc9c', '#e67e22', '#3498db', '#9b59b6', '#f1c40f', '#7f8c8d'], borderWidth: 0 }]
+                };
+                new Chart(subtiposAcvCanvas.getContext('2d'), { type: 'pie', data: subtiposAcvIsquemicoData, options: pieOptionsCustomLegend });
+            }
+        });
+    </script>
+</body>
+</html>

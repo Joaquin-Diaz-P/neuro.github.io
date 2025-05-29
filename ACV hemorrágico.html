@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accidente Cerebrovascular (ACV) Hemorrágico</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-main: #1ABC9C; 
+            --primary-dark: #16A085; 
+            --accent-orange: #E67E22; 
+            --accent-petroleum-blue: #2C3E50; 
+            --alert-red: #E74C3C; 
+            --complement-light-blue: #AED6F1; 
+            --complement-beige: #F5EFEB; 
+            --text-dark: #212529; 
+            --text-medium: #495057; 
+            --text-light: #6C757D; 
+            --bg-main: #F8F9FA; 
+            --card-bg: #FFFFFF; 
+            --border-color: #DEE2E6; 
+            --border-strong: #CED4DA;
+            --sidebar-width: 280px;
+            --top-bar-height: 65px;
+            --main-content-max-width: 1000px; 
+        }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-main); 
+            color: var(--text-dark); 
+            line-height: 1.6;
+            margin: 0;
+            padding-top: var(--top-bar-height);
+        }
+
+        .top-bar {
+            position: fixed; top: 0; left: 0; right: 0;
+            height: var(--top-bar-height);
+            background-color: var(--card-bg); 
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center;
+            padding: 0 1rem; 
+            z-index: 1032; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        }
+        .fixed-back-button {
+            background-color: var(--primary-main); color: var(--card-bg); border: 2px solid var(--card-bg);      
+            padding: 0.6rem 1rem; border-radius: 6px; text-decoration: none; 
+            font-weight: 600; font-size: 0.85rem; white-space: nowrap; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15); 
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            margin-left: 5px; 
+        }
+        .fixed-back-button:hover { background-color: var(--accent-orange); border-color: var(--accent-orange); }
+        .hamburger-button {
+            background-color: var(--accent-petroleum-blue); color: var(--card-bg); border: none;
+            padding: 0.6rem 0.8rem; border-radius: 6px; cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15); margin-left: 1.5rem; 
+        }
+        .hamburger-button span { display: block; width: 20px; height: 2px; background-color: var(--card-bg); margin: 4px 0; transition: all 0.3s ease-in-out; }
+        body.sidebar-open .hamburger-button span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+        body.sidebar-open .hamburger-button span:nth-child(2) { opacity: 0; }
+        body.sidebar-open .hamburger-button span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+        .sidebar-nav {
+            position: fixed; top: var(--top-bar-height); 
+            left: calc(-1 * var(--sidebar-width)); 
+            width: var(--sidebar-width); height: calc(100vh - var(--top-bar-height)); 
+            background-color: var(--card-bg); color: var(--text-dark);
+            overflow-y: auto; transition: left 0.3s ease; 
+            z-index: 1030; border-right: 1px solid var(--border-color);
+            box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+        }
+        body.sidebar-open .sidebar-nav { left: 0; }
+        .sidebar-nav h3 {
+            color: var(--accent-petroleum-blue); padding: 1.2rem 1.5rem 0.8rem;
+            margin: 0; font-size: 1.15rem; border-bottom: 1px solid var(--border-color);
+        }
+        .sidebar-nav ul { list-style: none; padding: 0.75rem 0; margin: 0; }
+        .sidebar-nav li a {
+            display: block; padding: 0.75rem 1.5rem; margin: 0.5rem 1rem; 
+            color: var(--card-bg); background-color: var(--primary-main); 
+            border: 1px solid var(--primary-dark); border-radius: 6px;
+            text-decoration: none; font-size: 0.9rem; font-weight: 500;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.07); text-align: left;
+        }
+        .sidebar-nav li a:hover { background-color: var(--accent-orange); border-color: var(--accent-orange); color: var(--card-bg); }
+        .sidebar-nav li a.active {
+            background-color: var(--primary-dark); color: var(--card-bg);
+            border-color: var(--primary-main); font-weight: bold;
+        }
+
+        .main-content { padding: 1.5rem; max-width: var(--main-content-max-width); margin-left: auto; margin-right: auto; }
+        .page-header-within-content {
+            background-color: var(--primary-main); color: var(--card-bg);
+            padding: 2rem 1.5rem; text-align: center; border-radius: 8px; 
+            margin-bottom: 2rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .page-header-within-content h1 { color: var(--card-bg); font-size: 1.8rem; margin:0; } 
+        .page-header-within-content p { color: var(--complement-beige); font-size: 1.0rem; margin-top: 0.5rem; }
+
+        .content-section { background-color: var(--card-bg); border-radius: 12px; margin-bottom: 1.5rem; box-shadow: 0 6px 18px rgba(44, 62, 80, 0.08); border: 1px solid var(--border-color); }
+        .content-wrapper { padding: 1.5rem; } 
+        
+        /* Estilos de Títulos de Sección (H2, H3, H4) inspirados en TAB.html y adaptados */
+        .content-section h2 { 
+            border-bottom: 3px solid var(--primary-main); 
+            padding-bottom: 0.75rem; 
+            margin-bottom: 1.75rem; /* Inspirado en TAB.html */
+            font-size: 1.85rem; /* Inspirado en TAB.html */
+            color: var(--accent-petroleum-blue); 
+            margin-top:0; 
+        }
+        .content-section h3 { 
+            font-size: 1.5rem; /* Inspirado en TAB.html */
+            margin-top: 1.5rem; 
+            margin-bottom: 1rem; 
+            color: var(--primary-dark); 
+        }
+        .content-section h4 { 
+            font-size: 1.2rem; /* Inspirado en TAB.html */
+            margin-top: 1.2rem; 
+            margin-bottom: 0.75rem; 
+            color: var(--text-dark); /* Inspirado en TAB.html */
+            font-weight: 500; 
+        }
+        
+        table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.05); font-size: 0.88rem; }
+        th, td { border: 1px solid var(--border-strong); padding: 0.7rem; text-align: left; } 
+        th { background-color: var(--accent-petroleum-blue); color: var(--card-bg); font-weight: 600; }
+        tbody tr:nth-child(even) { background-color: var(--complement-beige); }
+        details summary { font-weight: 600; cursor: pointer; padding: 0.8rem 1rem; color: var(--primary-dark); background-color: var(--complement-light-blue); border-radius: 8px 8px 0 0; font-size: 1.0rem; }
+        details[open] summary { border-bottom: 1px solid var(--border-color); }
+        details .details-content { padding: 1rem; border: 1px solid var(--border-color); border-top:none; border-radius: 0 0 8px 8px;}
+        .chart-container { max-width: 400px; height: auto; margin: 2rem auto; padding: 1rem; background-color: var(--complement-beige); border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.07); }
+        footer { text-align: center; padding: 2rem 1.5rem; margin-top: 3rem; border-top: 1px solid var(--border-strong); background-color: var(--accent-petroleum-blue); color: var(--complement-beige); }
+        footer p { color: var(--complement-beige); }
+        html { scroll-behavior: smooth; }
+        .citation { font-size: 0.75em; color: var(--text-light); margin-left: 2px; }
+        .key-point { background-color: var(--complement-light-blue); border-left: 4px solid var(--primary-main); padding: 0.75em 1em; margin: 0.75em 0; border-radius: 4px; }
+        .highlight-tip { background-color: #e7f6fd; border-left: 4px solid #2ECC71; padding: 0.5em 0.8em; margin: 0.5em 0; border-radius: 4px; color: var(--text-dark); }
+        .photo-reference { font-style: italic; color: var(--text-medium); font-size: 0.9em; }
+        .contradiction-point { border: 2px solid var(--alert-red); padding: 1em; margin-top: 1em; border-radius: 8px; background-color: #FEF9E7; }
+        .contradiction-point strong { color: var(--alert-red); }
+        .table-responsive { overflow-x: auto; }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <a href="Prueba_2_Neuro.html" class="fixed-back-button">Volver al Índice</a>
+        <button class="hamburger-button" aria-label="Abrir/Cerrar Navegación" aria-expanded="false" aria-controls="sidebarNav">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </div>
+
+    <nav class="sidebar-nav" id="sidebarNav" aria-hidden="true" role="navigation">
+        <h3>ACV Hemorrágico</h3>
+        <ul>
+            <li><a href="#intro-acvh">Introducción</a></li>
+            <li><a href="#hip-acvh">H. Intraparenquimatosa</a></li>
+            <li><a href="#hsa-acvh">H. Subaracnoidea</a></li>
+            <li><a href="#clarif-acvh">Puntos a Clarificar</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <header class="page-header-within-content">
+            <h1>Accidente Cerebrovascular (ACV) Hemorrágico</h1>
+            <p>Apuntes Detallados Basados en Material de Estudio</p>
+        </header>
+
+        <section id="intro-acvh" class="content-section">
+            <div class="content-wrapper">
+                <h2>I. Introducción y Generalidades</h2>
+                <details open>
+                    <summary>A. Definición y Tipos Principales</summary>
+                    <div class="details-content">
+                        <p>El Accidente Cerebrovascular (ACV) hemorrágico se divide en dos grandes grupos principales de hemorragias intracraneales<span class="citation"></span>:</p>
+                        <ul class="list-disc list-inside ml-4 mt-2 space-y-1">
+                            <li><strong>Hemorragias Intraparenquimatosas (HIP):</strong> Constituyen aproximadamente el 90% de los ACV hemorrágicos<span class="citation"></span>. Suponen el 20% de todos los ictus (ACV en general)<span class="citation"></span>.</li>
+                            <li><strong>Hemorragias Subaracnoideas (HSA):</strong> Representan aproximadamente el 10% de los ACV hemorrágicos<span class="citation"></span>. Son las menos frecuentes pero a las que más se les teme<span class="citation"></span>.</li>
+                        </ul>
+                        <div class="chart-container">
+                            <canvas id="tiposAcvHemorragicoChart"></canvas>
+                        </div>
+                    </div>
+                </details>
+                <details>
+                    <summary>B. Pronóstico General</summary>
+                    <div class="details-content">
+                        <ul class="list-disc list-inside ml-4 mt-2 space-y-1">
+                            <li><strong>Hemorragia Intraparenquimatosa:</strong>
+                                <ul class="list-disc list-inside ml-6">
+                                    <li>Mortalidad elevada: 20-50%<span class="citation"></span>.</li>
+                                    <li>Secuelas importantes: Solo 1 de cada 5 supervivientes será independiente a los 6 meses<span class="citation"></span>.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Hemorragia Subaracnoidea:</strong> El documento no especifica tasas de mortalidad generales para HSA, pero enfatiza la gravedad y el riesgo de complicaciones como el resangrado y el vasoespasmo<span class="citation"></span>.</li>
+                        </ul>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="hip-acvh" class="content-section">
+            <div class="content-wrapper">
+                <h2>II. Hemorragia Intraparenquimatosa (HIP)</h2>
+                 <details open>
+                    <summary>A. Etiologías y Factores de Riesgo</summary>
+                    <div class="details-content">
+                        <h4>1. Causas de Hemorragias Intracerebrales (Intraparenquimatosas):</h4>
+                        <div class="grid md:grid-cols-2 gap-x-8" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
+                            <div>
+                                <h5 style="font-weight: 600; margin-top: 0.5rem;">Primarias:</h5>
+                                <ul class="list-disc list-inside ml-4">
+                                    <li>Hipertensión Arterial (HTA)<span class="citation"></span>.</li>
+                                    <li>Angiopatía Amiloidea<span class="citation"></span>.</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h5 style="font-weight: 600; margin-top: 0.5rem;">Secundarias:</h5>
+                                <ul class="list-disc list-inside ml-4" style="font-size: 0.9em;">
+                                    <li>Aneurisma (sacular, fusiforme, micótico)<span class="citation"></span>.</li>
+                                    <li>Malformación vascular (arteriovenosa, cavernosa, angioma venoso, fístula AV dural)<span class="citation"></span>.</li>
+                                    <li>Neoplasma (primario, metastásico)<span class="citation"></span>.</li>
+                                    <li>Coagulopatía adquirida (anticoagulación con cumarinas o heparinas, trombolíticos, discrasias sanguíneas como leucemia o trombocitopenia, CID, insuficiencia hepática, disfunción plaquetaria por insuficiencia renal o fármacos)<span class="citation"></span>.</li>
+                                    <li>Coagulopatía congénita (hemofilia, desórdenes plaquetarios)<span class="citation"></span>.</li>
+                                    <li>Fármacos o alcohol (simpaticomiméticos como efedrina, cocaína, anfetaminas, éxtasis)<span class="citation"></span>.</li>
+                                    <li>Transformación hemorrágica de ictus isquémico<span class="citation"></span>.</li>
+                                    <li>Trombosis del seno dural<span class="citation"></span>.</li>
+                                    <li>Vasculitis/Vasculopatía (Enfermedad de Moyamoya, disección arterial)<span class="citation"></span>.</li>
+                                    <li>Embarazo (eclampsia, trombosis de senos venosos)<span class="citation"></span>.</li>
+                                    <li>Otras<span class="citation"></span>.</li>
+                                </ul>
+                            </div>
+                        </div>
+                         <div class="chart-container" style="max-width: 500px;">
+                            <canvas id="etiologiasHipChart"></canvas>
+                        </div>
+                        <h4 style="margin-top: 1.5rem;">2. Factores de Riesgo Específicos para HIP:</h4>
+                        <ul class="list-disc list-inside ml-4">
+                            <li>Los dos más importantes son la <strong>edad</strong> y la <strong>hipertensión arterial (HTA)</strong><span class="citation"></span>.</li>
+                            <li>La HTA es el principal factor de riesgo modificable y se presenta en el 45-70% de los hematomas cerebrales<span class="citation"></span>.</li>
+                            <li>Alcoholismo crónico: El consumo excesivo sube la PA (curva en "J")<span class="citation"></span>.</li>
+                            <li>Yatrogenia: Toma de dicumarínicos (anticoagulantes orales), antitrombina, fibrinolisis<span class="citation"></span>.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>B. Clasificación (según localización y etiología probable)</summary>
+                    <div class="details-content">
+                        <p>Para suponer la etiología más probable de una HIP se requieren fundamentalmente dos variables: la localización del hematoma y la edad del paciente<span class="citation"></span>.</p>
+                        <div class="table-responsive">
+                            <table>
+                                <thead><tr><th>Etiología</th><th>Localización</th><th>Edad</th></tr></thead>
+                                <tbody>
+                                    <tr><td>HTA (40-70%)</td><td>Ganglios de la base, Cerebelo, Tronco, Sustancia blanca subcortical (mismas zonas que el infarto lacunar) <span class="citation"></span></td><td>&gt;45 años</td></tr>
+                                    <tr><td>Malformación vascular (7%)</td><td>Lobares (en el lóbulo mismo, subcortical), fundamentalmente congénitas <span class="citation"></span></td><td>Joven</td></tr>
+                                    <tr><td>Angiopatía amiloidea (5-10%)</td><td>Lobares <span class="citation"></span></td><td>Anciano</td></tr>
+                                    <tr><td>Tumores cerebrales (2-10%)</td><td>Atípicas <span class="citation"></span></td><td>Anciano</td></tr>
+                                    <tr><td>Anticoagulación/fibrinolisis (12%)</td><td>Lobares (con antecedente de uso de medicamento) <span class="citation"></span></td><td>Anciano</td></tr>
+                                    <tr><td>Droga simpaticomimética</td><td>Ubicación sin determinar; hemorragia cortical/subcortical <span class="citation"></span></td><td>Jóvenes</td></tr>
+                                    <tr><td>Indeterminada (10%)</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <h5 style="margin-top: 1.5rem; font-weight: 600;">Enfrentamiento ante hemorragia lobar:</h5>
+                        <ul class="list-disc list-inside ml-4">
+                            <li>Si es joven: Pensar en malformación vascular<span class="citation"></span>.</li>
+                            <li>Si es anciano: Pensar en angiopatía amiloidea<span class="citation"></span>. <span class="photo-reference">(Ver Foto 8: Vasos birrefringentes en microscopía electrónica, patología de la angiopatía amiloidea)</span></li>
+                            <li>Si hay antecedente de uso de anticoagulación, considerar esta como la causa<span class="citation"></span>.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>C. Manifestaciones Clínicas</summary>
+                    <div class="details-content">
+                        <h4>1. Síntomas Generales:</h4>
+                        <p class="highlight-tip">Generalmente, el ACV hemorrágico se acompaña de un síndrome de hipertensión endocraneana (puede asociarse a cefalea, vómitos)<span class="citation"></span>. Este es un "TIP clínico" para diferenciarlo de un isquémico, además del TAC<span class="citation"></span>.</p>
+                        <h4 style="margin-top: 1.5rem;">2. Síntomas Focales según Localización:</h4>
+                        <ul class="list-disc list-inside ml-4">
+                            <li><strong>Ganglios de la Base:</strong> <span class="photo-reference">(Foto 1: Etiología más probable HTA)</span><span class="citation"></span>.</li>
+                            <li><strong>Tálamo:</strong> <span class="photo-reference">(Foto 3: Clínica de hipoestesia contralateral de todo el hemicuerpo - cara, brazo, mano)</span><span class="citation"></span>.</li>
+                            <li><strong>Lobar Occipital:</strong> <span class="photo-reference">(Foto 4: Clínica de hemianopsia contralateral. Preguntar si toma Anticoagulantes Orales (ACO) y la edad)</span><span class="citation"></span>.</li>
+                            <li><strong>Múltiples (ej. Lóbulo temporal y cerebelo simultáneas):</strong> <span class="photo-reference">(Foto 5: Lo más probable es que sea por uso de ACO)</span><span class="citation"></span>.</li>
+                            <li><strong>Cerebelo:</strong> <span class="photo-reference">(Foto 6: Puede haber depresión del sistema respiratorio, ya que el puente está justo por delante)</span><span class="citation"></span>.</li>
+                            <li><strong>Hemorragia lobar con extensión ventricular:</strong> <span class="photo-reference">(Foto 7)</span><span class="citation"></span>.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>D. Diagnóstico y E. Manejo</summary>
+                    <div class="details-content">
+                        <p><strong>Diagnóstico (Neuroimagen):</strong></p>
+                        <ul class="list-disc list-inside ml-4">
+                            <li><strong>Tomografía Axial Computarizada (TAC):</strong> La sangre se ve hiperdensa (blanca) en el TAC<span class="citation"></span>. <span class="photo-reference">(Ver Foto 2: hemorragia en TAC en ganglios basales)</span>.</li>
+                        </ul>
+                        <h4 style="margin-top: 1.5rem;">E. Manejo:</h4>
+                        <h5 style="font-weight: 600; margin-top: 1rem;">1. Manejo Médico General:</h5>
+                        <ul class="list-disc list-inside ml-4"><li>ABC (Vía Aérea, Ventilación, Circulación)<span class="citation"></span>.</li></ul>
+                        <h5 style="font-weight: 600; margin-top: 1rem;">2. Manejo de la Presión Arterial (PA):</h5>
+                        <ul class="list-disc list-inside ml-4">
+                            <li>Más permisivo y más proactivo que en el ACV isquémico<span class="citation"></span>.</li>
+                            <li>Por el hecho de haber una hemorragia, la presión tiende a aumentar más<span class="citation"></span>.</li>
+                            <li>Se busca una Presión Arterial Media (PAM) de 100 mmHg<span class="citation"></span>.</li>
+                        </ul>
+                        <h5 style="font-weight: 600; margin-top: 1rem;">3. Tratamiento Quirúrgico:</h5>
+                         <ul class="list-disc list-inside ml-4"><li>Indicaciones pueden incluir hematomas en cerebelo y hematomas lobares<span class="citation"></span>.</li></ul>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="hsa-acvh" class="content-section">
+            <div class="content-wrapper">
+                <h2>III. Hemorragia Subaracnoidea (HSA)</h2>
+                 <details open>
+                    <summary>A. Etiologías</summary>
+                    <div class="details-content">
+                        <ul class="list-disc list-inside ml-4 space-y-1">
+                            <li><strong>Aneurismas:</strong> Es la causa más frecuente (casi el 90% de las HSA son secundarias a aneurismas), pero no la única<span class="citation"></span>.</li>
+                            <li><strong>Anticoagulantes</strong><span class="citation"></span>.</li>
+                            <li><strong>Malformaciones Arteriovenosas (MAV)</strong><span class="citation"></span>.</li>
+                            <li><strong>Drogas de abuso</strong> (ej. cocaína, antijaquecosos)<span class="citation"></span>.</li>
+                            <li><strong>Traumáticas:</strong> Aunque mencionada, se indica que "en verdad no se ve" en este contexto de HSA espontánea<span class="citation"></span>.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>B. Aneurismas Cerebrales</summary>
+                    <div class="details-content">
+                        <h4>1. Características y Localizaciones Frecuentes:</h4>
+                        <ul class="list-disc list-inside ml-4">
+                            <li>La ubicación más frecuente de los aneurismas es en la <strong>bifurcación de las arterias</strong><span class="citation"></span>. El sitio más frecuente es la bifurcación entre la Arteria Cerebral Anterior (ACA) y la Comunicante Anterior (AComA)<span class="citation"></span>.</li>
+                            <li>Los aneurismas muy distales o periféricos son muy probablemente <strong>aneurismas micóticos</strong><span class="citation"></span>.</li>
+                            <li>Un sitio clásico de aneurismas en el polígono de Willis es en la parte más alta de la arteria basilar (tope de la basilar)<span class="citation"></span>.</li>
+                            <li class="key-point">Es CLAVE tener la causa de la HSA, ya que los aneurismas tienden a <strong>reromperse en las primeras 48 horas</strong><span class="citation"></span>.</li>
+                        </ul>
+
+                        <h4 style="margin-top: 1.5rem;">2. Tipos de Aneurismas:</h4>
+                        <ul class="list-disc list-inside ml-4">
+                            <li><strong>Sacular (o "berry"):</strong> Protruye desde un lado de una arteria, con un cuello que lo conecta<span class="citation"></span>.</li>
+                            <li><strong>Fusiforme:</strong> Dilatación de todos los lados de una arteria, raramente tiene un cuello<span class="citation"></span>.</li>
+                            <li><strong>Gigante:</strong> Involucra más de una arteria o tiene más de 2.5 centímetros de ancho<span class="citation"></span>.</li>
+                            <li><strong>Micótico:</strong> Causado por una pared arterial infectada; es un tipo de aneurisma bastante raro<span class="citation"></span>. Se asocian generalmente a endocarditis infecciosa y suelen ser distales<span class="citation"></span>.</li>
+                        </ul>
+
+                        <h4 style="margin-top: 1.5rem;">3. Causas de Formación de Aneurismas:</h4>
+                         <ul class="list-disc list-inside ml-4">
+                            <li><strong>Factores congénitos:</strong> Existen grupos de aneurismas descritos por asociación familiar<span class="citation"></span>.</li>
+                            <li><strong>Factores hemodinámicos (aterosclerosis y HTA):</strong> Es clásico que los aneurismas se desarrollen con el tiempo<span class="citation"></span>. En pacientes con HTA, tienden a crecer y romperse<span class="citation"></span>. Las mujeres también sangran más por aneurismas, y se desconoce por qué ocurre<span class="citation"></span>.</li>
+                            <li><strong>Factores hereditarios:</strong> Incidencia familiar de aneurismas, riñón poliquístico, pseudoxantoma elástico, enfermedad de Marfan, síndrome de Ehlers-Danlos, displasia fibromuscular<span class="citation"></span>.</li>
+                            <li><strong>Infección:</strong> Causa aneurismas micóticos (distales)<span class="citation"></span>.</li>
+                        </ul>
+
+                        <h4 style="margin-top: 1.5rem;">4. Epidemiología y Factores de Riesgo para Ruptura:</h4>
+                        <ul class="list-disc list-inside ml-4">
+                            <li>Se han encontrado aneurismas hasta en un 5% de la población en estudios de autopsias<span class="citation"></span>.</li>
+                            <li>La incidencia de HSA es más baja que ese 5%, lo que significa que muchas personas tienen aneurismas y no lo saben durante toda su vida<span class="citation"></span>. La mayoría de los aneurismas intracraneales no llegan a romperse nunca<span class="citation"></span>.</li>
+                            <li><strong>Factores de riesgo para la ruptura de aneurisma:</strong>
+                                <ul class="list-circle list-inside ml-6">
+                                    <li>Mayor edad, sexo femenino, raza negra<span class="citation"></span>.</li>
+                                    <li>Tabaquismo y alcoholismo<span class="citation"></span>.</li>
+                                    <li>HTA<span class="citation"></span>.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>C. Manifestaciones Clínicas de la HSA por Ruptura Aneurismática</summary>
+                    <div class="details-content">
+                        <p class="key-point">El <strong>INICIO</strong> del cuadro es fundamental para diferenciarla<span class="citation"></span>. La clínica traduce la ruptura del aneurisma<span class="citation"></span>.</p>
+                        
+                        <h5 style="font-weight: 600; margin-top: 1rem;">1. Cefalea Ictal (síntoma cardinal):</h5>
+                        <ul class="list-disc list-inside ml-4">
+                            <li>El máximo dolor llega en segundos ("ictal")<span class="citation"></span>. Es fundamental una buena anamnesis<span class="citation"></span>.</li>
+                            <li>Síntoma de inicio con instauración en segundos; el paciente tiende a recordar exactamente qué estaba haciendo cuando comenzó<span class="citation"></span>.</li>
+                            <li>Muy intensa<span class="citation"></span>.</li>
+                            <li>Localización generalizada; algunos pacientes podrían presentar dolores cervicales a lo largo del raquis<span class="citation"></span>. La localización no es el elemento característico para el diagnóstico<span class="citation"></span>.</li>
+                        </ul>
+
+                        <h5 style="font-weight: 600; margin-top: 1rem;">2. Depresión Variable del Nivel de Conciencia:</h5>
+                        <ul class="list-disc list-inside ml-4">
+                            <li>No siempre está presente; dependerá de cuánto sangró el aneurisma<span class="citation"></span>.</li>
+                            <li class="highlight-tip">TIP: La gran mayoría cuando llega al servicio de urgencia tiene mucho dolor de cabeza pero sin compromiso de conciencia<span class="citation"></span>.</li>
+                            <li>Hasta en un 10% de los casos, el debut de HSA es con colapso, apnea, muerte súbita<span class="citation"></span>.</li>
+                        </ul>
+
+                        <h5 style="font-weight: 600; margin-top: 1rem;">3. Náuseas y Vómitos:</h5>
+                         <ul class="list-disc list-inside ml-4">
+                            <li>Es importante cuando está presente, pero si no lo está, no descarta el diagnóstico<span class="citation"></span>. No es un elemento diagnóstico por sí solo<span class="citation"></span>.</li>
+                        </ul>
+
+                        <h5 style="font-weight: 600; margin-top: 1rem;">4. Síndrome Meníngeo:</h5>
+                        <ul class="list-disc list-inside ml-4">
+                            <li>Puede tardar algunas horas en aparecer, ya que la sangre demora en bajar al espacio subaracnoideo cervical<span class="citation"></span>.</li>
+                            <li>Se buscan signos meníngeos asociados<span class="citation"></span>. Una persona con cefalea ictal y signos meníngeos presenta una alta sospecha de HSA<span class="citation"></span>.</li>
+                            <li>De los signos meníngeos, el más importante es la <strong>rigidez de nuca</strong><span class="citation"></span>.</li>
+                        </ul>
+
+                        <h5 style="font-weight: 600; margin-top: 1rem;">5. Crisis Comiciales (epilépticas) o Síntomas Focales:</h5>
+                         <ul class="list-disc list-inside ml-4">
+                            <li>Pueden estar presentes e indicar el origen del sangrado, pero no es lo más frecuente<span class="citation"></span>. No se tienden a encontrar signos focales inicialmente<span class="citation"></span>.</li>
+                            <li>Los síntomas focales dependen de la localización y no se deben exigir para hacer el diagnóstico, pero si están presentes, aumentan la posibilidad diagnóstica<span class="citation"></span>.</li>
+                            <li><strong>Paresia de pares oculomotores:</strong> Lo más frecuente es la afectación del <strong>tercer par craneal completo</strong> por un aneurisma de la arteria comunicante posterior<span class="citation"></span>.</li>
+                            <li>Paresias motoras pueden ocurrir<span class="citation"></span>.</li>
+                        </ul>
+                        
+                        <h5 style="font-weight: 600; margin-top: 1rem;">6. Fondo de Ojo:</h5>
+                        <ul class="list-disc list-inside ml-4">
+                            <li>Presencia de <strong>hemorragias subhialoideas prerretineanas</strong> (en 25% de los casos)<span class="citation"></span>. El paciente puede referir que está viendo menos<span class="citation"></span>.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>D. Diagnóstico</summary>
+                    <div class="details-content">
+                        <h5 style="font-weight: 600; margin-top: 0.5rem;">1. Tomografía Computarizada (TAC) de Cerebro sin Contraste:</h5>
+                        <ul class="list-disc list-inside ml-4">
+                            <li>Sensibilidad &gt;90% en las primeras 24 horas<span class="citation"></span>. Hemorragias hiperdensas<span class="citation"></span>.</li>
+                            <li>No confundir sangre con contraste<span class="citation"></span>.</li>
+                            <li>Capacidad de encontrar sangre depende de tiempo evolución y cantidad<span class="citation"></span>.</li>
+                        </ul>
+
+                        <h5 style="font-weight: 600; margin-top: 1rem;">2. Punción Lumbar (PL):</h5>
+                        <ul class="list-disc list-inside ml-4">
+                            <li>Indicada si alta sospecha y TAC negativo<span class="citation"></span>.</li>
+                            <li>Buscar LCR con sangre (xantocromía o glóbulos rojos)<span class="citation"></span>.</li>
+                            <li>Realizar a las <strong>12 horas o más de evolución</strong> (riesgo falso negativo si precoz)<span class="citation"></span>.</li>
+                            <li>Si RNM es 2ª línea, realizar PL concomitante<span class="citation"></span>.</li>
+                        </ul>
+
+                        <h5 style="font-weight: 600; margin-top: 1rem;">3. Angiografía Cerebral:</h5>
+                        <ul class="list-disc list-inside ml-4">
+                            <li class="key-point">Es <strong>FUNDAMENTAL</strong> para diagnóstico final de causa/origen sangrado<span class="citation"></span>.</li>
+                            <li>Realizar lo más pronto posible<span class="citation"></span>.</li>
+                            <li><strong>Tipos:</strong> AngioTAC (puede reemplazar convencional)<span class="citation"></span>, AngioRNM<span class="citation"></span>, Angiografía por Sustracción Digital (DSA - *gold standard*)<span class="citation"></span>.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>E. Manejo</summary>
+                    <div class="details-content">
+                        <p class="key-point">Manejo de un aneurisma roto SIEMPRE debe ser en una Unidad de Paciente Crítico (UPC)<span class="citation"></span>.</p>
+                        
+                        <h5 style="font-weight: 600; margin-top: 1rem;">1. Medidas Generales y Objetivos Primarios:</h5>
+                        <ul class="list-disc list-inside ml-4">
+                            <li><strong>ABC</strong> (Vía Aérea, Ventilación, Circulación)<span class="citation"></span>.</li>
+                            <li>Primera preocupación: que <strong>NO vuelva a sangrar</strong><span class="citation"></span>.</li>
+                            <li>Evitar complicaciones primarias: <strong>Hidrocefalia y Resangrado</strong><span class="citation"></span>.</li>
+                            <li>Manejo de la Presión Arterial<span class="citation"></span>.</li>
+                        </ul>
+
+                        <h5 style="font-weight: 600; margin-top: 1rem;">2. Prevención y Manejo de Complicaciones Específicas:</h5>
+                        <ul class="list-disc list-inside ml-4">
+                            <li><strong>Resangrado:</strong> Más frecuente primeros 2 días<span class="citation"></span>.
+                                <ul class="list-circle list-inside ml-6">
+                                    <li><strong>Manejo de la causa (exclusión aneurisma) ASAP</strong><span class="citation"></span>: Terapia Endovascular (coils, 1ª opción)<span class="citation"></span> o Cirugía (clipaje)<span class="citation"></span>.</li>
+                                    <li><span style="color: var(--alert-red); font-style: italic;">Nota sobre Fármacos fibrinolíticos:</span> La fuente menciona "Fármacos fibrinolíticos" para prevención resangrado<span class="citation"></span>. Esto es inusual y requiere clarificación (Ver Sección IV).</li>
+                                </ul>
+                            </li>
+                            <li><strong>Vasoespasmo Cerebral:</strong> Día 6-8 post-HSA<span class="citation"></span>. Causa daño neurológico tardío<span class="citation"></span>. Prevención: Buena PAM, uso de <strong>Nimodipino</strong><span class="citation"></span>.</li>
+                            <li><strong>Hidrocefalia:</strong> Puede requerir derivación ventricular externa<span class="citation"></span>.</li>
+                            <li><strong>Otras Complicaciones:</strong> Convulsiones, SIADH<span class="citation"></span>.</li>
+                        </ul>
+                        <h5 style="font-weight: 600; margin-top: 1rem;">3. Manejo de Malformaciones Arteriovenosas (MAV) (si es la causa):</h5>
+                         <ul class="list-disc list-inside ml-4"><li>Opciones: Terapia endovascular, cirugía, radioterapia. Priorizando endovascular<span class="citation"></span>.</li></ul>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="clarif-acvh" class="content-section">
+            <div class="content-wrapper">
+                <h2>IV. Puntos que Requieren Clarificación o son Potencialmente Contradictorios del Documento Fuente</h2>
+                 <div class="contradiction-point">
+                    <p>Bajo el manejo de la HSA, en la sección "Prevención del resangrado", se lista <strong>"Fármacos fibrinolíticos"</strong><span class="citation"></span> como una opción. Esto es contraintuitivo, ya que los fibrinolíticos promueven el sangrado al disolver coágulos y están listados como una causa secundaria de hemorragia intraparenquimatosa ("tromboliticos (tPA, urokinasa)")<span class="citation"></span>. Esta mención requiere clarificación, ya que podría ser un error tipográfico en la fuente o referirse a un escenario muy específico no detallado.</p>
+                </div>
+            </div>
+        </section>
+        
+        <footer>
+            <p>&copy; 2024-2025 Guía Interactiva ACV Hemorrágico. Creado para fines educativos.</p>
+        </footer>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const hamburgerButton = document.querySelector('.hamburger-button');
+            const sidebar = document.getElementById('sidebarNav');
+            const body = document.body;
+            const topBarHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--top-bar-height')) || 65;
+
+            if (hamburgerButton && sidebar) {
+                hamburgerButton.addEventListener('click', function () {
+                    body.classList.toggle('sidebar-open');
+                    const isExpanded = body.classList.contains('sidebar-open');
+                    hamburgerButton.setAttribute('aria-expanded', isExpanded);
+                    sidebar.setAttribute('aria-hidden', !isExpanded);
+                });
+            }
+
+            const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
+            sidebarLinks.forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - topBarHeight - 15;
+                        window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+                        if (window.innerWidth < 768 && body.classList.contains('sidebar-open')) {
+                           body.classList.remove('sidebar-open');
+                           hamburgerButton.setAttribute('aria-expanded', 'false');
+                           sidebar.setAttribute('aria-hidden', 'true');
+                        }
+                    }
+                });
+            });
+
+            const sections = document.querySelectorAll('.main-content section[id]');
+            function highlightSidebarLink() {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTopMargin = parseFloat(window.getComputedStyle(section).marginTop) || 0;
+                    const sectionEffectiveTop = section.getBoundingClientRect().top + window.pageYOffset - topBarHeight - sectionTopMargin - 20;
+                    if (window.pageYOffset >= sectionEffectiveTop) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                sidebarLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').substring(1) === current) {
+                        link.classList.add('active');
+                    }
+                });
+                 // Fallback for top of page or if no section is matched
+                if (!current && sections.length > 0 && window.pageYOffset < (sections[0].getBoundingClientRect().top + window.pageYOffset - topBarHeight - (parseFloat(window.getComputedStyle(sections[0]).marginTop) || 0) - 20) ) {
+                    const firstLink = document.querySelector('.sidebar-nav a[href="#' + sections[0].id + '"]');
+                    if (firstLink) firstLink.classList.add('active');
+                }
+            }
+            window.addEventListener('scroll', highlightSidebarLink);
+            highlightSidebarLink(); // Initial call
+
+            // Chart Initialization
+            const chartFont = { size: 10, family: 'Inter', weight: '500'};
+            const chartTextColor = getComputedStyle(document.documentElement).getPropertyValue('--text-dark').trim();
+            const commonPieDonutOptions = { 
+                responsive: true, maintainAspectRatio: true,
+                plugins: { 
+                    legend: { position: 'bottom', labels: { font: chartFont, color: chartTextColor, boxWidth:10, padding:6 } },
+                    tooltip: { bodyFont: chartFont, titleFont: {size: 12, family: 'Inter', weight: '600'}, backgroundColor: 'rgba(44, 62, 80, 0.9)', titleColor: '#F5EFEB', bodyColor: '#F8F9FA', padding: 7, cornerRadius: 5,
+                        callbacks: { 
+                            label: function(context) { 
+                                let label = context.label || ''; 
+                                if (label) { label = label.split('(')[0].trim() + ': '; } 
+                                if (context.parsed !== null) { label += context.parsed + '%'; } 
+                                return label; 
+                            } 
+                        }
+                    }
+                }
+            };
+             const pieOptionsCustomLegend = JSON.parse(JSON.stringify(commonPieDonutOptions));
+            pieOptionsCustomLegend.plugins.tooltip.callbacks.label = function(context) {
+                let label = context.chart.data.labels[context.dataIndex] || '';
+                if (label) { label = label.split('(')[0].trim(); label += ': '; } 
+                if (context.parsed !== null) { label += context.parsed + '%'; }
+                return label;
+            };
+             pieOptionsCustomLegend.plugins.legend.labels.generateLabels = function(chart) {
+                const data = chart.data;
+                if (data.labels.length && data.datasets.length) {
+                    return data.labels.map(function(label, i) {
+                        const meta = chart.getDatasetMeta(0);
+                        const ds = data.datasets[0];
+                        const arc = meta.data[i];
+                        const fill = ds.backgroundColor[i];
+                        const stroke = ds.borderColor ? ds.borderColor[i] : fill;
+                        const bw = ds.borderWidth ? ds.borderWidth[i] : 0;
+                        const value = ds.data[i];
+                        return { text: `${label.split('(')[0].trim()} (${value}%)`, fillStyle: fill, strokeStyle: stroke, lineWidth: bw, hidden: isNaN(ds.data[i]) || (meta.data[i] && meta.data[i].hidden), index: i };
+                    });
+                } return [];
+            };
+
+            const tiposAcvHemorragicoCanvas = document.getElementById('tiposAcvHemorragicoChart');
+            if (tiposAcvHemorragicoCanvas) {
+                const tiposAcvHemorragicoData = {
+                    labels: ['H. Intraparenquimatosa (HIP ~90%)', 'H. Subaracnoidea (HSA ~10%)'],
+                    datasets: [{ data: [90, 10], backgroundColor: ['rgba(26, 188, 156, 0.8)', 'rgba(230, 126, 34, 0.8)'], borderColor: ['#16A085', '#D35400'], borderWidth: 1 }]
+                };
+                new Chart(tiposAcvHemorragicoCanvas.getContext('2d'), { type: 'doughnut', data: tiposAcvHemorragicoData, options: commonPieDonutOptions });
+            }
+
+            const etiologiasHipCanvas = document.getElementById('etiologiasHipChart');
+            if (etiologiasHipCanvas) {
+                const etiologiasHipData = {
+                    labels: ['HTA', 'Malformación Vasc.', 'Angiopatía Amil.', 'Tumores', 'Anticoagulación', 'Indeterminada', 'Otras'],
+                    datasets: [{ 
+                        label: 'Etiologías HIP (%)',
+                        data: [55, 7, 7.5, 6, 12, 10, 2.5],
+                        backgroundColor: ['#1abc9c', '#e67e22', '#3498db', '#9b59b6', '#f1c40f', '#e74c3c', '#7f8c8d'], 
+                        borderWidth: 0 
+                    }]
+                };
+                new Chart(etiologiasHipCanvas.getContext('2d'), { type: 'pie', data: etiologiasHipData, options: pieOptionsCustomLegend });
+            }
+        });
+    </script>
+</body>
+</html>

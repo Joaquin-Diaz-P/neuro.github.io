@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Epilepsia - Apuntes de Estudio</title>
+    <style>
+        :root {
+            --primary-main: #1ABC9C; 
+            --primary-dark: #16A085; 
+            --accent-orange: #E67E22; 
+            --accent-petroleum-blue: #2C3E50; 
+            --alert-red: #E74C3C; 
+            --complement-light-blue: #AED6F1; 
+            --complement-beige: #F5EFEB; 
+            --text-dark: #212529; 
+            --text-medium: #495057; 
+            --text-light: #6C757D; 
+            --bg-main: #F8F9FA; 
+            --card-bg: #FFFFFF; 
+            --border-color: #DEE2E6; 
+            --border-strong: #CED4DA;
+            --sidebar-width: 300px; /* Adjusted for potentially longer titles */
+            --top-bar-height: 65px;
+            --main-content-max-width: 1000px; 
+        }
+        body { 
+            font-family: 'Inter', sans-serif; /* Assuming Inter is a desired font, otherwise system-ui */
+            background-color: var(--bg-main); 
+            color: var(--text-dark); 
+            line-height: 1.6;
+            margin: 0;
+            padding-top: var(--top-bar-height);
+        }
+
+        .top-bar {
+            position: fixed; top: 0; left: 0; right: 0;
+            height: var(--top-bar-height);
+            background-color: var(--card-bg); 
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center;
+            padding: 0 1rem; 
+            z-index: 1032; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        }
+        .fixed-back-button {
+            background-color: var(--primary-main); color: var(--card-bg); border: 2px solid var(--card-bg);      
+            padding: 0.6rem 1rem; border-radius: 6px; text-decoration: none; 
+            font-weight: 600; font-size: 0.85rem; white-space: nowrap; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15); 
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            margin-left: 5px; 
+        }
+        .fixed-back-button:hover { background-color: var(--accent-orange); border-color: var(--accent-orange); }
+        .hamburger-button {
+            background-color: var(--accent-petroleum-blue); color: var(--card-bg); border: none;
+            padding: 0.6rem 0.8rem; border-radius: 6px; cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15); margin-left: 1.5rem; 
+        }
+        .hamburger-button span { display: block; width: 20px; height: 2px; background-color: var(--card-bg); margin: 4px 0; transition: all 0.3s ease-in-out; }
+        body.sidebar-open .hamburger-button span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+        body.sidebar-open .hamburger-button span:nth-child(2) { opacity: 0; }
+        body.sidebar-open .hamburger-button span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+        .sidebar-nav {
+            position: fixed; top: var(--top-bar-height); 
+            left: calc(-1 * var(--sidebar-width)); 
+            width: var(--sidebar-width); height: calc(100vh - var(--top-bar-height)); 
+            background-color: var(--card-bg); color: var(--text-dark);
+            overflow-y: auto; transition: left 0.3s ease; 
+            z-index: 1030; border-right: 1px solid var(--border-color);
+            box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+        }
+        body.sidebar-open .sidebar-nav { left: 0; }
+        .sidebar-nav h3 {
+            color: var(--accent-petroleum-blue); padding: 1.2rem 1.5rem 0.8rem;
+            margin: 0; font-size: 1.15rem; border-bottom: 1px solid var(--border-color);
+        }
+        .sidebar-nav ul { list-style: none; padding: 0.75rem 0; margin: 0; }
+        .sidebar-nav li a {
+            display: block; padding: 0.75rem 1.5rem; margin: 0.5rem 1rem; 
+            color: var(--card-bg); background-color: var(--primary-main); 
+            border: 1px solid var(--primary-dark); border-radius: 6px;
+            text-decoration: none; font-size: 0.9rem; font-weight: 500;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.07); text-align: left;
+        }
+        .sidebar-nav li a:hover { background-color: var(--accent-orange); border-color: var(--accent-orange); color: var(--card-bg); }
+        .sidebar-nav li a.active {
+            background-color: var(--primary-dark); color: var(--card-bg);
+            border-color: var(--primary-main); font-weight: bold;
+        }
+
+        .main-content { padding: 1.5rem; max-width: var(--main-content-max-width); margin-left: auto; margin-right: auto; }
+        .page-header-within-content {
+            background-color: var(--primary-main); color: var(--card-bg);
+            padding: 2rem 1.5rem; text-align: center; border-radius: 8px; 
+            margin-bottom: 2rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .page-header-within-content h1 { color: var(--card-bg); font-size: 2.2rem; margin:0; } /* Slightly larger for main title */
+        .page-header-within-content p { color: var(--complement-beige); font-size: 1.0rem; margin-top: 0.5rem; }
+
+        .content-section { background-color: var(--card-bg); border-radius: 12px; margin-bottom: 1.5rem; box-shadow: 0 6px 18px rgba(44, 62, 80, 0.08); border: 1px solid var(--border-color); }
+        .content-wrapper { padding: 1.5rem; } 
+        .content-section h2 { border-bottom: 3px solid var(--primary-main); padding-bottom: 0.75rem; margin-bottom: 1.5rem; font-size: 1.8rem; color: var(--accent-petroleum-blue); margin-top:0; } /* Slightly larger H2 for main sections */
+        .content-section h3 { font-size: 1.45rem; margin-top: 1.5rem; margin-bottom: 1rem; color: var(--primary-dark); }
+        .content-section h4 { font-size: 1.2rem; margin-top: 1.2rem; margin-bottom: 0.75rem; color: var(--accent-petroleum-blue); font-weight: 600; } /* Bolder H4 */
+        .content-section h5 { font-size: 1.05rem; margin-top: 1rem; margin-bottom: 0.6rem; color: var(--primary-dark); font-weight: 600; }
+
+        ul, ol { margin-left: 1.5rem; padding-left: 0.5rem; margin-bottom:1em; }
+        li { margin-bottom: 0.5em; }
+        
+        table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.05); font-size: 0.88rem; }
+        th, td { border: 1px solid var(--border-strong); padding: 0.7rem; text-align: left; } 
+        th { background-color: var(--accent-petroleum-blue); color: var(--card-bg); font-weight: 600; }
+        tbody tr:nth-child(even) { background-color: var(--complement-beige); }
+        
+        details { margin-bottom: 1.2rem; border: 1px solid var(--border-color); border-radius: 8px; background-color: var(--card-bg); }
+        details summary { 
+            font-weight: 600; 
+            cursor: pointer; 
+            padding: 0.9rem 1.1rem; 
+            color: var(--primary-dark); 
+            background-color: var(--complement-light-blue); 
+            border-radius: 8px; /* Full radius if not open */
+            font-size: 1.05rem; /* Slightly larger summary */
+            transition: background-color 0.3s ease;
+        }
+        details[open] summary {
+            border-bottom: 1px solid var(--border-color);
+            border-radius: 8px 8px 0 0; /* Top corners rounded when open */
+            background-color: var(--primary-main); /* Change background when open for emphasis */
+            color: var(--card-bg);
+        }
+        summary:hover {
+            background-color: var(--primary-dark);
+            color: var(--card-bg);
+        }
+        details .details-content { padding: 1.2rem; border-top:none; border-radius: 0 0 8px 8px; }
+        
+        .key-point { background-color: var(--complement-light-blue); border-left: 4px solid var(--primary-main); padding: 0.75em 1em; margin: 0.75em 0; border-radius: 4px; }
+        .highlight-tip { background-color: #e7f6fd; border-left: 4px solid #2ECC71; padding: 0.75em 1em; margin: 1em 0; border-radius: 4px; color: var(--text-dark); }
+        .highlight-tip strong { color: var(--primary-dark); }
+        .important-note { background-color: var(--complement-beige); border-left: 4px solid var(--accent-orange); padding: 0.75em 1em; margin: 1em 0; border-radius: 4px; color: var(--text-dark); }
+        .important-note strong { color: var(--accent-orange); }
+
+        footer { text-align: center; padding: 2rem 1.5rem; margin-top: 3rem; border-top: 1px solid var(--border-strong); background-color: var(--accent-petroleum-blue); color: var(--complement-beige); }
+        footer p { color: var(--complement-beige); }
+        html { scroll-behavior: smooth; }
+        
+        @media (max-width: 768px) {
+            .main-content { padding: 1rem; }
+            .page-header-within-content h1 { font-size: 1.8rem; }
+            .content-section h2 { font-size: 1.6rem; }
+            .content-section h3 { font-size: 1.3rem; }
+            .content-section h4 { font-size: 1.1rem; }
+            .sidebar-nav { left: calc(-1 * var(--sidebar-width) - 10px); } /* Ensure it's fully hidden */
+            body.sidebar-open .sidebar-nav { left: 0; }
+            .fixed-back-button { font-size: 0.75rem; padding: 0.5rem 0.8rem; }
+            .hamburger-button { margin-left: 0.75rem; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <a href="Prueba_2_Neuro.html" class="fixed-back-button">Volver al Índice</a>
+        <button class="hamburger-button" aria-label="Abrir/Cerrar Navegación" aria-expanded="false" aria-controls="sidebarNav">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </div>
+
+    <nav class="sidebar-nav" id="sidebarNav" aria-hidden="true" role="navigation">
+        <h3>Epilepsia</h3>
+        <ul>
+            <li><a href="#diagnostico-crisis">I. Diagnóstico de Crisis</a></li>
+            <li><a href="#estudio-eeg">II. Estudio EEG</a></li>
+            <li><a href="#estudio-imagenes">III. Estudio por Imágenes</a></li>
+            <li><a href="#sindromes-epilepticos">IV. Síndromes Específicos</a></li>
+            <li><a href="#manejo-general">V. Manejo General</a></li>
+            <li><a href="#situaciones-especiales">VI. Situaciones Especiales</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <header class="page-header-within-content">
+            <h1>Epilepsia</h1>
+            <p>Apuntes Detallados para el Estudio Integral</p>
+        </header>
+
+        <section id="diagnostico-crisis" class="content-section">
+            <div class="content-wrapper">
+                <h2>I. Diagnóstico de Crisis Epilépticas</h2>
+                <p class="key-point">El proceso diagnóstico sigue un orden: Semiología de la crisis (anamnesis) → Electroencefalograma (EEG) → Síndrome electroclínico.</p>
+                <details>
+                    <summary>A. Preguntas Fundamentales en la Etapa Diagnóstica</summary>
+                    <div class="details-content">
+                        <h4>1. ¿Son realmente crisis epilépticas?</h4>
+                        <ul>
+                            <li>¿Son episodios breves (generalmente &lt;3 minutos) y estereotipados (se repiten de forma similar)?</li>
+                            <li>¿Tiene alguna característica semiológica que oriente a un síndrome epiléptico en particular?</li>
+                        </ul>
+                        <h4>2. ¿Qué tipo de crisis epilépticas son?</h4>
+                        <ul>
+                            <li><strong>Inicio focal:</strong> Comienzan en un área específica del cerebro.
+                                <p class="highlight-tip"><strong>TIP:</strong> Sospechar que una crisis es focal en todo paciente &gt;14 años que debute con una crisis aparentemente de inicio generalizado (por razones epidemiológicas).</p>
+                            </li>
+                            <li><strong>Inicio generalizado:</strong> Comienzan simultáneamente en ambos hemisferios cerebrales.</li>
+                            <li><strong>Inicio desconocido.</strong></li>
+                        </ul>
+                        <p class="highlight-tip"><strong>TIP clínico:</strong> En las crisis de ausencia, solo con la anamnesis, no podemos saber si son de inicio focal o generalizado; se requiere EEG.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>B. Diagnóstico Diferencial de las Crisis Epilépticas</summary>
+                    <div class="details-content">
+                        <p>El primer paso es determinar si el paciente realmente tiene una crisis epiléptica. Los dos principales diagnósticos diferenciales son el síncope y las crisis psicógenas no epilépticas.</p>
+                        <h4>1. Síncope:</h4>
+                        <ul>
+                            <li><strong>Clínica:</strong> El paciente siente que la visión se oscurece de a poco, se pone pálido, sudoroso, puede sentir taquicardia u hormigueo, luego cae y se recupera de inmediato, sin confusión post-ictal significativa. Puede haber pródromos como sensación de calor, escalofríos o náuseas.</li>
+                            <li><strong>Tilt Test:</strong> Si la anamnesis es dudosa, se puede realizar un tilt test (prueba de la mesa basculante) para reproducir un síncope vasovagal/neurocardiogénico. Este test mantiene al paciente de pie por un período prolongado y luego lo somete a bruscos cambios de posición.</li>
+                            <li><strong>Síncope Convulsivo:</strong> Durante un síncope, la disminución del flujo sanguíneo cerebral puede ocasionar secundariamente una breve actividad motora similar a una crisis. Lo más frecuente son 2-3 sacudidas mioclónicas proximales. Esto, per se, es un síncope, no epilepsia.</li>
+                        </ul>
+                        <h4>2. Crisis Psicógenas No Epilépticas (CPNE):</h4>
+                        <ul>
+                            <li>El diagnóstico es muy complejo, incluso para especialistas. No hay un solo signo patognomónico, y los pacientes pueden manifestar síntomas similares a los de crisis epilépticas.</li>
+                            <li>Hasta 1/3 de los pacientes que no responden al tratamiento antiepiléptico podrían tener CPNE.</li>
+                            <li>Signos como la mordedura de lengua o la incontinencia urinaria NO sirven para diferenciar CPNE de crisis epilépticas; no se debe tomar un solo signo como clave diagnóstica.</li>
+                            <li>Un signo que puede orientar (con limitaciones):
+                                <ul>
+                                    <li><strong>Ojos cerrados durante la crisis:</strong> Tienden a verse más en CPNE.</li>
+                                    <li><strong>Ojos abiertos durante la crisis:</strong> Más común en crisis focales de epilepsia (incluyendo las del lóbulo frontal).</li>
+                                </ul>
+                            </li>
+                            <li>El diagnóstico definitivo a menudo requiere <strong>Video-EEG</strong> para correlacionar la semiología con la actividad eléctrica cerebral.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>C. Determinación del Tipo de Crisis (Focal vs. Generalizada) según Semiología</summary>
+                    <div class="details-content">
+                        <h4>1. Crisis de Inicio Focal (Sospechar si hay):</h4>
+                        <ul>
+                            <li>Síntomas motores o conductuales: Movimientos clónicos (sacudidas rítmicas), mioclónicos (sacudidas breves, irregulares), tónicos (rigidez), automatismos (movimientos repetitivos sin propósito), crisis hiperquinética (movimientos amplios y agitados).</li>
+                            <li>Síntomas sensitivos o sensoriales (ej. parestesias, alucinaciones visuales/auditivas/olfatorias).</li>
+                            <li>Síntomas psíquicos (ej. deja vu, jamais vu, miedo ictal).</li>
+                        </ul>
+                        <h4>2. Crisis de Inicio Generalizado (El paciente refiere directamente):</h4>
+                        <ul>
+                            <li>Crisis tónicas (rigidez generalizada).</li>
+                            <li>Crisis clónicas (sacudidas rítmicas generalizadas).</li>
+                            <li>Crisis tónico-clónicas (combinación de las anteriores, es lo más frecuente).</li>
+                            <li>Crisis atónicas (pérdida súbita del tono muscular, causando caídas; son las menos frecuentes y se ven más en niños). Una caída al suelo no es sinónimo de crisis atónica.</li>
+                            <li><strong>Crisis de Ausencia:</strong> No se puede diferenciar si es focal o generalizada solo por la clínica; los pacientes se manifiestan de la misma manera. NO confundir la crisis de ausencia (un tipo de evento semiológico) con la epilepsia tipo ausencia (un síndrome epiléptico específico).</li>
+                        </ul>
+                        <p class="key-point"><strong>Resumen del Enfrentamiento:</strong> Semiología → Tipo de crisis (focal/generalizada) → EEG → Tipo de epilepsia → Imágenes (RNM) → Síndrome epiléptico.</p>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="estudio-eeg" class="content-section">
+            <div class="content-wrapper">
+                <h2>II. Estudio Electroencefalográfico (EEG)</h2>
+                <details>
+                    <summary>A. Fundamentos del EEG</summary>
+                    <div class="details-content">
+                        <ul>
+                            <li>El EEG grafica en el tiempo las diferencias de voltaje entre electrodos colocados sobre el cuero cabelludo (scalp).</li>
+                            <li>Estas diferencias de voltaje provienen de la aparición SINCRÓNICA de potenciales post-sinápticos excitatorios e inhibitorios en las dendritas apicales de las neuronas piramidales de la corteza cerebral.</li>
+                            <li><strong>Limitaciones:</strong>
+                                <ul>
+                                    <li>El EEG de superficie muestra principalmente la actividad eléctrica de las circunvoluciones cerebrales (aproximadamente 30% de la corteza), no de los surcos (70%). Por esta razón, un primer EEG puede ser normal en un paciente con epilepsia.</li>
+                                    <li>Para que una descarga se vea en el EEG, debe ser sincrónica (varias neuronas descargando al mismo tiempo) y afectar un área cortical de más de 8-10 cm².</li>
+                                    <li>Mientras más altas las espículas (ondas agudas) en el EEG, más neuronas están descargando sincrónicamente.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>B. Tipos de Actividad en EEG</summary>
+                    <div class="details-content">
+                        <ul>
+                            <li><strong>Actividad Interictal (entre crisis):</strong>
+                                <ul>
+                                    <li>Actividad epileptiforme (ej. espigas, ondas agudas, complejos espiga-onda).</li>
+                                    <li>Alteraciones inespecíficas (ej. lentificación focal o generalizada).</li>
+                                </ul>
+                            </li>
+                            <li><strong>Actividad Ictal (durante la crisis):</strong>
+                                <ul>
+                                    <li>Es poco común registrarla, pero es muy útil, especialmente en crisis de ausencia, que pueden ser gatilladas por hiperventilación durante el estudio.</li>
+                                    <li>La crisis más probable de encontrar en un EEG ictal es la de ausencia.
+                                        <ul>
+                                            <li>Crisis tipo ausencia de la infancia.</li>
+                                            <li>Status epiléptico no convulsivo: Se define como cualquier situación donde el paciente sigue descargando actividad epiléptica por &gt;5 minutos. Generalmente se asocia a síntomas conductuales, psiquiátricos, afasia, psicosis, más que a crisis convulsivas.</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>C. Tipos de EEG</summary>
+                    <div class="details-content">
+                        <ul>
+                            <li><strong>EEG Estándar:</strong> Registro de corta duración (20-30 minutos). Frecuentemente se agrega registro de video simultáneo.</li>
+                            <li><strong>Monitoreo EEG Diurno Prolongado:</strong> Registro de 2 o más horas para aumentar la probabilidad de detectar anomalías, útil en casos difíciles.</li>
+                            <li><strong>Monitoreo EEG Ambulatorio:</strong> Similar a un Holter cardíaco. El paciente lleva el equipo a casa, permitiendo un registro más largo (24-72 horas) en su ambiente habitual.</li>
+                            <li><strong>Monitoreo Video-EEG Hospitalizado Continuo:</strong> Registro de hasta 5 días. Se realiza en pacientes con epilepsia refractaria a fármacos (que no responden a 2 FAE bien utilizados) para evaluar candidatura a cirugía de epilepsia. Se suelen retirar los medicamentos para inducir crisis y registrar el inicio ictal.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>D. Precauciones e Interpretación del EEG en Epilepsia</summary>
+                    <div class="details-content">
+                        <ul>
+                            <li>Aproximadamente el 50% de los pacientes con epilepsia tienen un primer EEG interictal normal.</li>
+                            <li>Un 10% de los pacientes con epilepsia nunca muestran actividad epileptiforme en el EEG interictal (generalmente epilepsias del lóbulo frontal o de la línea media).</li>
+                            <li>Un 2-7% de los niños sanos sin epilepsia pueden tener descargas benignas en el EEG, como las espigas centrotemporales (rolándicas). El diagnóstico de epilepsia NO se hace solo con el EEG.</li>
+                            <li>Hasta un 3.6% de los pacientes sin epilepsia pueden tener descargas de espiga-onda lenta generalizadas.</li>
+                            <li>Un adecuado uso del EEG supone su integración con el resto de los elementos clínicos y otros estudios imagenológicos.</li>
+                        </ul>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="estudio-imagenes" class="content-section">
+            <div class="content-wrapper">
+                <h2>III. Estudio por Imágenes (Neuroimagen)</h2>
+                <details>
+                    <summary>A. Importancia de la Resonancia Magnética (RNM)</summary>
+                    <div class="details-content">
+                        <ul>
+                            <li>La RNM es el estudio imagenológico de elección en pacientes con epilepsia.</li>
+                            <li>Muchas veces, el debut de un tumor cerebral (especialmente los de crecimiento lento) puede ser una crisis epiléptica.</li>
+                            <li>Cuando se pide una RNM para estudiar epilepsia, se debe solicitar con <strong>protocolo de epilepsia</strong>, que utiliza secuencias, ángulos y grosores de corte específicos (generalmente en un equipo de al menos 1.5 Tesla) para buscar malformaciones del desarrollo cortical y otras lesiones epileptogénicas sutiles. Se requiere un imagenólogo experto para informar estas imágenes.</li>
+                            <li>La única situación en la que se puede pedir un scanner (TAC) en vez de una RNM es en el servicio de urgencias para descartar patología aguda que requiera manejo inmediato.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>B. Tipos de Lesiones Encontradas</summary>
+                    <div class="details-content">
+                        <h4>1. Lesiones que requieren tratamiento por sí mismas (y además producen crisis):</h4>
+                        <ul>
+                            <li>Malformaciones cerebrales (ej. malformaciones arteriovenosas).</li>
+                            <li>Trauma craneoencefálico (hematomas, contusiones).</li>
+                            <li>Tumores cerebrales (primarios o metastásicos).</li>
+                            <li>Malformaciones del desarrollo venoso, cavernomas.</li>
+                            <li>Lesiones infecciosas (abscesos, encefalitis).</li>
+                            <li>Lesiones inflamatorias/autoinmunes (ej. encefalitis autoinmune, vasculitis).</li>
+                            <li>Accidente Cerebrovascular (ACV) (secuelas isquémicas o hemorrágicas).</li>
+                            <li>Enfermedades neurodegenerativas.</li>
+                            <li>Enfermedades desmielinizantes (ej. Esclerosis Múltiple).</li>
+                        </ul>
+                        <h4>2. Lesiones que son la causa intrínseca de la epilepsia (y si se tratan, es principalmente por la epilepsia):</h4>
+                        <ul>
+                            <li><strong>Esclerosis Mesial del Lóbulo Temporal (EMT):</strong> Atrofia y gliosis del hipocampo.</li>
+                            <li><strong>Malformaciones del Desarrollo Cortical (MDC):</strong> Displasias corticales focales, heterotopias, polimicrogiria. Algunos pacientes con MDC presentan epilepsia, otros no.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>C. Manejo Inicial y Hospitalización</summary>
+                    <div class="details-content">
+                        <ul>
+                            <li>Con la clínica de convulsión en urgencias, se puede iniciar tratamiento, pero igualmente se deben realizar los 3 pasos del estudio (semiología, EEG, imágenes) en paralelo.</li>
+                            <li>Una crisis epiléptica aislada en un paciente con epilepsia conocida, que ya pasó y se recuperó, NO es una emergencia médica y no requiere hospitalización necesariamente.</li>
+                        </ul>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="sindromes-epilepticos" class="content-section">
+            <div class="content-wrapper">
+                <h2>IV. Síndromes Epilépticos Específicos</h2>
+                <details>
+                    <summary>A. Esclerosis Mesial Temporal (EMT)</summary>
+                    <div class="details-content">
+                        <p>Es el tipo de epilepsia focal con mayor indicación quirúrgica y con los mejores resultados postoperatorios (hasta 80% de los pacientes pueden quedar libres de crisis). Es importante reconocerla para derivar pronto al paciente.</p>
+                        <h4>Semiología de las Crisis (Crisis Focales con Alteración de Conciencia, originadas en lóbulo temporal medial):</h4>
+                        <ol>
+                            <li><strong>Aura (inicio focal consciente):</strong>
+                                <ul>
+                                    <li>Sensación epigástrica ascendente inespecífica (no es dolor ni ardor).</li>
+                                    <li>Si la crisis progresa, pueden aparecer síntomas autonómicos: náuseas, palidez, rubicundez, taquicardia.</li>
+                                    <li>Diseminación desde la ínsula al lóbulo temporal medial: el paciente puede experimentar deja vu (sensación de haber vivido ya una situación nueva) o jamais vu (sensación de extrañeza ante un lugar familiar).</li>
+                                    <li>Miedo ictal (brusco e intenso) si se compromete la amígdala.</li>
+                                    <li>Sensaciones olfatorias o gustatorias displacenteras (ej. olor a neumático quemado).</li>
+                                    <li>Las crisis pueden consistir solo en estos síntomas (aura aislada) o evolucionar.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Compromiso de Conciencia:</strong> Detención de la actividad en curso con los ojos abiertos ("behavioral arrest"). El paciente puede tener una crisis de ausencia focal.</li>
+                            <li><strong>Automatismos (movimientos involuntarios y repetitivos durante la alteración de conciencia):</strong>
+                                <ul>
+                                    <li>Orales: Masticatorios, deglución, chupeteo.</li>
+                                    <li>Vocales (gemidos, vocalizaciones no verbales).</li>
+                                    <li>Lenguaje ictal (palabras o frases repetitivas, a menudo ininteligibles) si la crisis afecta el hemisferio no dominante del lenguaje.</li>
+                                    <li>Gestuales: Movimientos estereotipados de las manos, como arreglarse la ropa, frotarse las manos. Los automatismos distales de una extremidad superior suelen ser ipsilaterales al origen de la crisis.</li>
+                                    <li>Puede haber postura tónica o flexora de una extremidad, contralateral al origen de la crisis.</li>
+                                </ul>
+                            </li>
+                        </ol>
+                        <h4>Claves Clínicas Adicionales:</h4>
+                        <ul>
+                            <li>Debut típico en adolescentes y adultos jóvenes.</li>
+                            <li>Algunos pacientes pueden tener antecedente de crisis febriles en la infancia (relación no claramente establecida).</li>
+                            <li>Alta tasa de resistencia al tratamiento con fármacos antiepilépticos (éxito solo en ~20% de los casos). Fundamental reconocer y derivar precozmente para evaluación quirúrgica.</li>
+                        </ul>
+                        <h4>RNM:</h4>
+                        <p>Puede mostrar atrofia y aumento de señal en T2/FLAIR en el hipocampo. Como se achica el hipocampo, el cuerno temporal del ventrículo lateral ipsilateral puede verse más grande.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>B. Epilepsia Rolándica (o Epilepsia Benigna de la Infancia con Puntas Centrotemporales)</summary>
+                    <div class="details-content">
+                        <ul>
+                            <li>Crisis que aparecen típicamente entre los 4-11 años de edad.</li>
+                            <li>Son crisis focales breves que se presentan característicamente durante el sueño o al despertar.</li>
+                        </ul>
+                        <h4>Semiología:</h4>
+                        <p>Actividad tónica o clónica unilateral de la lengua, garganta o hemicara inferior, que puede producir sonidos guturales o salivación. Puede evolucionar a una crisis tónico-clónica generalizada secundaria. El paciente suele estar consciente durante la parte focal.</p>
+                        <h4>EEG:</h4>
+                        <p>Actividad interictal focal muy característica con espigas u ondas agudas de alta amplitud en las regiones centrotemporales (rolándicas), que se activan con el sueño.</p>
+                        <h4>RNM:</h4>
+                        <p>Es normal.</p>
+                        <h4>Pronóstico y Tratamiento:</h4>
+                        <p>Considerada una epilepsia "benigna" porque en la gran mayoría de los casos las crisis son autolimitadas y ceden espontáneamente en la pubertad. Antiguamente no se trataban, pero ahora se sabe que podrían tener implicancias en el neurodesarrollo (aunque leves), por lo que se tiende a tratar si las crisis son frecuentes o interfieren con la calidad de vida. El tratamiento suele ser de corta duración.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>C. Síndromes Epilépticos Generalizados Idiopáticos (EGI)</summary>
+                    <div class="details-content">
+                        <p>Se llaman generalizados porque la semiología de las crisis y el EEG son concordantemente generalizados (descargas bilaterales, sincrónicas y simétricas).</p>
+                        <p>Comparten un origen genético (poligénico), no completamente conocido. Son las "epilepsias idiopáticas generalizadas".</p>
+                        <h4>Clínica:</h4>
+                        <p>Presentan una combinación variable de tres tipos de crisis principales: ausencias, crisis mioclónicas y crisis tónico-clónicas generalizadas (CTCG).</p>
+                        <p>Se presentan típicamente en la niñez y adolescencia.</p>
+                        <p>Algunas responden muy bien al tratamiento con FAE, y muchas tienden a ser autolimitadas en el tiempo, aunque algunas requieren tratamiento de por vida.</p>
+                        
+                        <h5>1. Epilepsia Tipo Ausencia de la Infancia (EAI):</h5>
+                        <ul>
+                            <li>Es la más conocida de las EGI. Es distinto tener "crisis de ausencia" (un tipo de evento) a tener "epilepsia tipo ausencia" (un síndrome específico, que es generalizado).</li>
+                            <li><strong>Crisis de Ausencia Típicas:</strong>
+                                <ul>
+                                    <li>Inicio y término brusco (característico de afectación frontal, aunque aquí es generalizado).</li>
+                                    <li>Duración breve (3-20 segundos).</li>
+                                    <li>Pérdida súbita de conciencia con interrupción de la actividad en curso, mirada fija, sin caída.</li>
+                                    <li>Pueden acompañarse de automatismos sutiles (orales como chupeteo, manuales como jugueteo), parpadeos, mioclonías palpebrales o periorales.</li>
+                                    <li>Frecuentemente vienen en salvas (múltiples episodios al día).</li>
+                                    <li>Gatilladas característicamente por hiperventilación.</li>
+                                    <li>Recuperación ad-integrum (inmediata y completa, sin periodo postictal).</li>
+                                </ul>
+                            </li>
+                            <li><strong>EEG:</strong>
+                                <ul>
+                                    <li>Actividad interictal puede ser normal o mostrar descargas generalizadas breves.</li>
+                                    <li><strong>Actividad ictal (diagnóstica):</strong> Descargas generalizadas de complejos espiga-onda lenta a 3 Hz (3 ciclos por segundo).</li>
+                                </ul>
+                            </li>
+                            <li><strong>Pronóstico y Tratamiento:</strong> Autolimitadas en el 60% de los casos. Es una de las pocas excepciones donde se tratan los hallazgos del EEG ictal (si se registran las descargas típicas, se trata). Fármacos de elección: Etosuximida, Ácido Valproico.</li>
+                        </ul>
+
+                        <h5>2. Epilepsia Mioclónica Juvenil (EMJ):</h5>
+                        <ul>
+                            <li>Es la epilepsia generalizada idiopática más frecuente de aparición en la juventud o adultez temprana. Suele pasarse por alto inicialmente.</li>
+                            <li><strong>Clínica (Tríada, pero la mioclonía es la clave):</strong>
+                                <ul>
+                                    <li><strong>Crisis Mioclónicas:</strong> Sacudidas musculares breves, súbitas, simétricas o asimétricas, que afectan principalmente hombros y brazos ("como un saltito con los brazos"). Ocurren característicamente <strong>después de despertar</strong> (en la mañana) o en situaciones de cansancio o privación de sueño. Los pacientes pueden dejar caer objetos.</li>
+                                    <li><strong>Crisis Tónico-Clónicas Generalizadas (CTCG):</strong> Presentes en la mayoría de los pacientes, a menudo precedidas por una salva de mioclonías.</li>
+                                    <li><strong>Crisis de Ausencia:</strong> Pueden ocurrir en un subgrupo de pacientes.</li>
+                                </ul>
+                            </li>
+                            <li><strong>EEG:</strong> Descargas de espiga-onda o poliespiga-onda lenta generalizadas, a menudo &gt;3 Hz, activadas por la fotoestimulación y el sueño.</li>
+                            <li><strong>Tratamiento:</strong> Responden bien al FAE correcto (Ácido Valproico es de elección). Requieren tratamiento de por vida. <p class="important-note"><strong>OJO:</strong> Carbamazepina y otros bloqueadores de canales de sodio pueden empeorar las mioclonías. Precaución con Ácido Valproico en mujeres en edad fértil por teratogenicidad.</p></li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>D. Síndromes Epilépticos Graves (Encefalopatías Epilépticas y del Desarrollo)</summary>
+                    <div class="details-content">
+                        <p>Aparecen en la niñez o adolescencia. Se caracterizan por crisis frecuentes y/o actividad EEG muy anormal que contribuyen a un deterioro cognitivo y del neurodesarrollo. No se nos pueden pasar por alto.</p>
+                        <h5>1. Síndrome de West (Espasmos Infantiles):</h5>
+                        <ul>
+                            <li>Crisis particulares: <strong>espasmos infantiles</strong>, que son contracciones tónicas súbitas en flexión (o extensión) del cuello, tronco y extremidades. Pueden venir en salvas (clusters) y aparecen durante el primer año de vida.</li>
+                            <li>Se asocia a retraso o regresión del desarrollo psicomotor y deterioro cognitivo.</li>
+                            <li><strong>EEG (interictal):</strong> Patrón caótico y desorganizado de ondas lentas de alto voltaje y espigas multifocales, conocido como <strong>hipsarritmia</strong>. Es clásico de este síndrome.</li>
+                            <li><strong>Tratamiento:</strong> Si se diagnostica precozmente, se trata con ACTH (hormona adrenocorticotropa) o Vigabatrina. El tratamiento es diferente a otros tipos de epilepsia debido a la inmadurez cerebral.</li>
+                            <li><strong>Etiología:</strong> Puede ser idiopático, sintomático (por diversas causas como esclerosis tuberosa, daño cerebral perinatal) o criptogénico. En ~20% se puede encontrar una causa curable (ej. cavernoma que se reseca).</li>
+                            <li>Si no se detecta o trata, puede evolucionar a un Síndrome de Lennox-Gastaut.</li>
+                        </ul>
+
+                        <h5>2. Síndrome de Lennox-Gastaut (SLG):</h5>
+                        <ul>
+                            <li>Evolución de un Síndrome de West u otra encefalopatía epiléptica. Aparece a partir del segundo año de vida (típicamente entre 1-7 años).</li>
+                            <li><strong>Tríada Clásica:</strong>
+                                <ol>
+                                    <li>Múltiples tipos de crisis epilépticas refractarias, especialmente <strong>crisis tónicas axiales</strong> (durante el sueño son características) y <strong>crisis atónicas</strong> ("drop attacks", los niños se caen súbitamente). También pueden tener ausencias atípicas y CTCG.</li>
+                                    <li><strong>EEG:</strong> Descargas de punta-onda lenta generalizadas de baja frecuencia (&lt;2.5 Hz) en vigilia, y actividad paroxística rápida generalizada en sueño. Ya no hay hipsarritmia.</li>
+                                    <li>Deterioro cognitivo y problemas de conducta.</li>
+                                </ol>
+                            </li>
+                            <li>Mal pronóstico: Las crisis suelen ser resistentes al tratamiento y la evolución neurocognitiva es variable pero generalmente desfavorable.</li>
+                        </ul>
+
+                        <h5>3. Síndrome de Dravet (Epilepsia Mioclónica Severa de la Infancia):</h5>
+                        <ul>
+                            <li>MUY malo. Inicio en el primer año de vida en niños previamente sanos.</li>
+                            <li><strong>Clínica:</strong> Crisis febriles prolongadas o status febriles, luego aparecen otros tipos de crisis como mioclonías, ausencias atípicas, crisis focales, y <strong>crisis hemiclónicas que alternan de un lado a otro del cuerpo</strong>.</li>
+                            <li>Producen alteraciones progresivas del desarrollo cognitivo y motor.</li>
+                            <li>MUY resistente al tratamiento farmacológico. Es el único síndrome epiléptico para el que la FDA ha aprobado el uso de cannabis (cannabidiol).</li>
+                            <li><strong>Genética:</strong> Muchos casos se deben a una mutación en el gen del canal de sodio SCN1A, aunque no todos los pacientes con esta mutación desarrollan el síndrome.</li>
+                            <li>Aparece entre los 8-18 años (Nota: Fuente indica 8-18 años, pero clásicamente el inicio es en el primer año de vida, esta edad podría referirse a la consolidación del síndrome o ser un error).</li>
+                        </ul>
+                        
+                        <h5>4. Encefalopatías Epilépticas o del Desarrollo (en general):</h5>
+                        <ul>
+                            <li>Grupo de síndromes caracterizados por múltiples tipos de crisis y/o actividad EEG muy anormal que producen déficits cognitivos y del lenguaje progresivos.</li>
+                            <li>En estos casos, también hay que tratar el EEG, ya que la actividad epiléptica mantenida en el tiempo produce daño cerebral.</li>
+                        </ul>
+
+                        <h5>5. Epilepsias Mioclónicas Progresivas (EMP):</h5>
+                        <ul>
+                            <li>Grupo heterogéneo de enfermedades raras, la mayoría por fallas en el metabolismo o de base genética.</li>
+                            <li><strong>Clínica:</strong> El paciente se desarrolla bien inicialmente, pero en la infancia tardía o adolescencia comienzan con mioclonías (que pueden ser el síntoma predominante), acompañadas de deterioro motor y cognitivo progresivo, signos cerebelosos (ataxia), y a veces alteración de la sensibilidad. Aparece en un paciente que previamente NO tenía compromiso cognitivo.</li>
+                            <li>Sospecharla en un paciente con diagnóstico previo de epilepsia que iba bien y luego empieza con crisis mioclónicas y deterioro.</li>
+                            <li><strong>EEG:</strong> Actividad epiléptica lenta.</li>
+                        </ul>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="manejo-general" class="content-section">
+            <div class="content-wrapper">
+                <h2>V. Manejo General de la Epilepsia</h2>
+                <details>
+                    <summary>A. Objetivos del Tratamiento</summary>
+                    <div class="details-content">
+                        <ol>
+                            <li><strong>Completo control de las crisis</strong> (idealmente libre de crisis).</li>
+                            <li><strong>Detección y manejo activo de los eventuales efectos adversos de los fármacos (FAE)</strong>. Son una gran causa de mala calidad de vida. Hay que buscarlos dirigidamente e informar al paciente. Ej: Levetiracetam puede producir problemas psiquiátricos graves, que se recuperan al suspenderlo.</li>
+                            <li><strong>Detección y manejo activo de eventuales comorbilidades psiquiátricas.</strong> En niños, TDAH; en adultos, síndrome depresivo y ansiedad son frecuentes.</li>
+                            <li><strong>Manejo de los estigmas y los factores psicosociales.</strong> Lo único que no puede hacer un paciente con epilepsia bien controlada son deportes de alto riesgo (paracaidismo, buceo sin supervisión, etc.).</li>
+                        </ol>
+                    </div>
+                </details>
+                <details>
+                    <summary>B. Tratamiento Farmacológico (Fármacos Anticrisis - FAC, o Antiepilépticos - FAE)</summary>
+                    <div class="details-content">
+                        <p>Los FAE controlan las crisis (son anticrisis), pero no son antiepileptogénicos (no curan la epilepsia ni previenen su desarrollo).</p>
+                        <h4>Mecanismos de Acción:</h4>
+                        <p>Actúan sobre mecanismos que afectan la excitabilidad neuronal:</p>
+                        <ul>
+                            <li>Bloqueo de canales de Sodio (Na⁺) voltaje-dependientes (el más común).</li>
+                            <li>Bloqueo de canales de Calcio (Ca²⁺) tipo T.</li>
+                            <li>Potenciación de la inhibición mediada por GABA.</li>
+                            <li>Reducción de la excitación mediada por Glutamato.</li>
+                            <li>Modulación de la liberación de vesículas presinápticas (ej. Levetiracetam, proteína SV2A).</li>
+                        </ul>
+                        <h4>Resistencia a Fármacos y Cirugía:</h4>
+                        <ul>
+                            <li>Un paciente se considera candidato a cirugía de epilepsia si ha utilizado <strong>dos FAE correctamente indicados, en dosis máximas toleradas, y no ha logrado control de crisis</strong>. Este paciente debe ser derivado a un centro especializado.</li>
+                            <li>2/3 de los pacientes responden al tratamiento farmacológico. Del tercio restante (epilepsia refractaria), un subgrupo puede ser tratado quirúrgicamente, con posibilidad de libertad de crisis (80% de éxito en esclerosis mesial temporal; 30-50% en otros casos).</li>
+                        </ul>
+                        <h4>Elección de FAE según Tipo de Crisis:</h4>
+                        <ul>
+                            <li><strong>Crisis de Inicio Focal:</strong>
+                                <ul>
+                                    <li>Primera línea: Lamotrigina, Levetiracetam.</li>
+                                    <li>Carbamazepina es igual de eficaz, pero requiere más control por efectos hematológicos y otras interacciones, por lo que no se prefiere tanto.</li>
+                                    <li>Lamotrigina tiene un efecto positivo sobre el ánimo (se usa en trastorno bipolar). Titular lentamente para evitar rash cutáneo benigno (riesgo bajo de DRESS/Stevens-Johnson). Puede simular un síndrome mononucleósico.</li>
+                                    <li>Levetiracetam puede tener efectos secundarios psiquiátricos (depresión es el más frecuente).</li>
+                                </ul>
+                            </li>
+                            <li><strong>Crisis de Inicio Generalizado:</strong>
+                                <ul>
+                                    <li>Fármaco de elección: Ácido Valproico.</li>
+                                    <li>Otra opción: Levetiracetam (tiene efecto tanto en crisis focales como generalizadas). Lamotrigina también es una opción para algunos tipos de crisis generalizadas (ej. ausencias, CTCG).</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <h4>Consideraciones Generales de los FAE:</h4>
+                        <ul>
+                            <li>Las dosis no se regulan por el nivel plasmático del fármaco (excepto casos puntuales como fenitoína), sino en base al control de síntomas y tolerancia.</li>
+                            <li>Cualquier FAE puede generar una respuesta paradojal (empeoramiento de crisis).</li>
+                            <li>Todos los FAE deben titularse gradualmente ("start low and go slow").</li>
+                            <li>Al analizar poblaciones, ningún FAE es consistentemente superior a otro en cuanto al control global de crisis si se elige adecuadamente según el tipo de epilepsia. La elección se basa más en perfil de efectos adversos, interacciones, comorbilidades y características del paciente.</li>
+                            <li>Factores a evaluar para elegir FAE: Farmacocinética, distribución, metabolismo (hepático, renal), unión a proteínas plasmáticas.</li>
+                            <li>Las Benzodiacepinas (BZD) son excelentes FAE agudos, pero su uso crónico está limitado por efectos adversos (sedación, ataxia), desarrollo de dependencia y taquifilaxia (pérdida de efecto a largo plazo).</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>C. Casos donde se Trata el EEG y No Solo al Paciente</summary>
+                    <div class="details-content">
+                        <ol>
+                            <li>Epilepsia tipo ausencia de la infancia.</li>
+                            <li>Encefalopatía epiléptica (donde la actividad EEG contribuye al deterioro).</li>
+                            <li>Status epiléptico no convulsivo.</li>
+                        </ol>
+                    </div>
+                </details>
+                <details>
+                    <summary>D. Manejo de Crisis no Controladas</summary>
+                    <div class="details-content">
+                        <ul>
+                            <li>Si no se logra control de crisis con el primer FAE, la conducta más adecuada es <strong>revisar el diagnóstico</strong> (¿es realmente epilepsia? ¿es el tipo correcto de crisis/síndrome?).</li>
+                            <li>Si no se obtiene control con el segundo FAE (correctamente elegido y dosificado), hay que <strong>derivar lo antes posible a un centro especializado</strong> donde se practique cirugía de epilepsia para evaluación por experto y consideración de candidatura quirúrgica.</li>
+                        </ul>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="situaciones-especiales" class="content-section">
+            <div class="content-wrapper">
+                <h2>VI. Situaciones Especiales</h2>
+                <details>
+                    <summary>A. Epilepsia en Mujeres en Edad Fértil</summary>
+                    <div class="details-content">
+                        <p>Una mujer con epilepsia NO tiene contraindicación absoluta de embarazarse.</p>
+                        <h4>Embarazo:</h4>
+                        <ul>
+                            <li>Se evita el <strong>Ácido Valproico</strong> por su alta teratogenicidad (riesgo de espina bífida y otros defectos del tubo neural, además de problemas del neurodesarrollo). Sin embargo, hay casos en que se debe usar igual, pero en las dosis más bajas posibles y monitorizando.</li>
+                            <li>Riesgo de malformaciones congénitas mayores en población general: 1-2%. En pacientes con epilepsia en tratamiento con FAE adecuado: 2-4% (mayor con politerapia y ciertos FAE como valproato, fenitoína, fenobarbital, carbamazepina).</li>
+                            <li>FAE con menor riesgo teratogénico conocido: Lamotrigina y Levetiracetam. Se prefieren sobre valproato en mujer embarazada o que planea embarazo.</li>
+                            <li>Se recomienda suplementar con <strong>5 mg de Ácido Fólico</strong> preconcepcional y durante el primer trimestre para prevenir defectos del tubo neural.</li>
+                            <li>El hijo de una madre o padre con epilepsia tiene un riesgo de tener epilepsia del 4%, máximo 10% (depende del tipo de epilepsia).</li>
+                            <li><strong>NO se suspende el tratamiento antiepiléptico durante el embarazo</strong> si es necesario para controlar las crisis, ya que las crisis (especialmente CTCG) pueden ser peligrosas para la madre y el feto. Se busca monoterapia con la dosis efectiva más baja del FAE más seguro.</li>
+                        </ul>
+                        <h4>Anticoncepción:</h4>
+                        <ul>
+                            <li>Algunos FAE inductores enzimáticos (ej. Carbamazepina, Fenitoína, Fenobarbital, Topiramato en altas dosis) pueden disminuir la efectividad de los anticonceptivos hormonales orales (ACO) con estrógeno.</li>
+                            <li>Lamotrigina tiene una interacción bidireccional con ACO con estrógeno: los estrógenos pueden disminuir el nivel de lamotrigina (hasta la mitad), y la lamotrigina puede afectar levemente la efectividad del ACO. Si una paciente toma Lamotrigina y ACO con estrógeno, puede necesitar ajuste de dosis de Lamotrigina si inicia/suspende el ACO.</li>
+                            <li>Si se necesita Lamotrigina u otros FAE con interacciones, se prefieren métodos anticonceptivos no hormonales o con progestágenos solos (ej. DIU, implante de progestágeno).</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>B. Estatus Epiléptico (EE)</summary>
+                    <div class="details-content">
+                        <h4>1. Estatus Epiléptico Convulsivo (EEC):</h4>
+                        <ul>
+                            <li>Crisis tónico-clónicas generalizadas continuas o que recurren sin recuperación completa de la conciencia entre ellas.</li>
+                            <li><strong>Definición Operacional (para iniciar tratamiento):</strong> Una crisis convulsiva que dura <strong>≥5 minutos</strong>.</li>
+                            <li><strong>Definición Fisiopatológica (inicio de daño cerebral):</strong> A los <strong>30 minutos</strong> de actividad convulsiva continua se inicia el daño neuronal irreversible. Se diagnostica a los 5 minutos para tener ~25 minutos para detenerlo.</li>
+                            <li>Es una <strong>URGENCIA MÉDICA</strong>.</li>
+                            <li><strong>Enfrentamiento Inicial:</strong>
+                                <ul>
+                                    <li><strong>Ambiente Ambulatorio/Prehospitalario:</strong> Cualquier Benzodiacepina (BZD) disponible. Idealmente Midazolam por vía no endovenosa (intranasal, bucal/sublingual, intramuscular) para evitar aspiración y facilitar administración. Diazepam rectal también es opción.</li>
+                                    <li><strong>Ambiente Hospitalario:</strong>
+                                        <ul>
+                                            <li>1ª Línea: BZD endovenosa (Lorazepam IV es de elección; Diazepam IV o Midazolam IM si no disponible Lorazepam).</li>
+                                            <li>2ª Línea (si no cede con BZD): FAE endovenoso de carga (Fenitoína/Fosfenitoína, Ácido Valproico, Levetiracetam).</li>
+                                            <li>3ª Línea (EEC refractario): Anestesia general (Midazolam en infusión continua, Propofol, Tiopental) en UCI con monitoreo EEG continuo para asegurar control de actividad epiléptica eléctrica y ventilatorio.</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <h4>2. Estatus Epiléptico No Convulsivo (EENC):</h4>
+                        <ul>
+                            <li>Actividad epiléptica eléctrica continua o muy frecuente en el EEG que resulta en un cambio persistente del estado mental (compromiso cualitativo de conciencia, cuadro confusional subagudo, síntomas psiquiátricos con evolución atípica) sin las manifestaciones motoras prominentes del EEC.</li>
+                            <li>A menudo se confunde con cuadros psiquiátricos o encefalopatías metabólicas/tóxicas.</li>
+                            <li>Requiere alta sospecha y confirmación con EEG.</li>
+                            <li><strong>EEG:</strong> Actividad lenta y epileptiforme con patrones muy variables: descargas de espigas, puntas, espiga-onda lenta, punta-onda lenta, con una frecuencia ≥3Hz o patrones rítmicos específicos.</li>
+                            <li>El EENC NO es una urgencia vital como el EEC convulsivo, pero requiere tratamiento para evitar secuelas cognitivas a largo plazo.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>C. ¿Qué Hacer Frente a una Crisis Tónico-Clónica Generalizada? (Manejo por un observador)</summary>
+                    <div class="details-content">
+                        <ul>
+                            <li><strong>Intervenir lo menos posible</strong>, solo asegurar que el paciente no se dañe.</li>
+                            <li>Observar la crisis y NO tocar innecesariamente al paciente.</li>
+                            <li><strong>NO poner nada en la boca</strong> (riesgo de aspiración, fractura dental, mordedura al auxiliador).</li>
+                            <li>Al final de la crisis (fase postictal), es posible que presente algo de cianosis, que no implica un riesgo vital inmediato si la vía aérea está permeable.</li>
+                            <li>Cuando las convulsiones cesan, poner al paciente de costado (posición lateral de seguridad) para facilitar la respiración y evitar aspiración de secreciones. Poner algo blando bajo su cabeza.</li>
+                            <li>En el período post-ictal, testear al paciente con preguntas inicialmente simples y luego más complejas para evaluar la recuperación del nivel de conciencia (ej. ¿cómo se llama? ¿puede sacar la lengua?).</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>D. Criterios de Consulta a Urgencias</summary>
+                    <div class="details-content">
+                        <ol>
+                            <li>Si el paciente tiene una epilepsia conocida y presenta una crisis habitual que cede espontáneamente y se recupera bien, NO es una emergencia médica. Debe permanecer en reposo en casa y contactar a su médico tratante. NO tiene que ir a urgencias necesariamente.</li>
+                            <li>Si es una <strong>primera crisis</strong> o no hay antecedentes claros de epilepsia, el paciente TIENE que ir al servicio de urgencia para descartar que se trate de una crisis sintomática aguda (ej. ACV, tumor, infección, trastorno metabólico). Se suele realizar un TAC de cerebro en urgencias en este contexto.</li>
+                            <li>Si un paciente con epilepsia conocida presenta <strong>dos o más crisis el mismo día (crisis en cluster)</strong>, o una crisis inusualmente prolongada, o no recupera completamente la conciencia entre crisis, es necesario que acuda al SU porque podría estar progresando hacia un estatus epiléptico.</li>
+                        </ol>
+                    </div>
+                </details>
+                <details>
+                    <summary>E. Estigma y Aspectos Psicosociales</summary>
+                    <div class="details-content">
+                        <ul>
+                            <li>Hay que indagar dirigidamente sobre los posibles estigmas que pueden existir, ya que rara vez son mencionados espontáneamente por el paciente o la familia.</li>
+                            <li>Evitar utilizar el término "epiléptico" para referirse a los pacientes; es preferible "persona con epilepsia".</li>
+                            <li>Principales fuentes de estigma: el mismo paciente, la familia, el personal de salud.</li>
+                        </ul>
+                    </div>
+                </details>
+            </div>
+        </section>
+        
+        <footer>
+            <p>&copy; 2024-2025 Guía Interactiva sobre Epilepsia. Creado para fines educativos.</p>
+        </footer>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const hamburgerButton = document.querySelector('.hamburger-button');
+            const sidebar = document.getElementById('sidebarNav');
+            const body = document.body;
+            const topBarHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--top-bar-height')) || 65;
+
+            if (hamburgerButton && sidebar) {
+                hamburgerButton.addEventListener('click', function () {
+                    body.classList.toggle('sidebar-open');
+                    const isExpanded = body.classList.contains('sidebar-open');
+                    hamburgerButton.setAttribute('aria-expanded', isExpanded);
+                    sidebar.setAttribute('aria-hidden', !isExpanded);
+                });
+            }
+
+            const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
+            sidebarLinks.forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        // Calculate position considering the top bar and a small offset
+                        const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - topBarHeight - 15; 
+                        window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+                        
+                        // Close sidebar on link click on mobile
+                        if (window.innerWidth < 768 && body.classList.contains('sidebar-open')) {
+                           body.classList.remove('sidebar-open');
+                           hamburgerButton.setAttribute('aria-expanded', 'false');
+                           sidebar.setAttribute('aria-hidden', 'true');
+                        }
+                    }
+                });
+            });
+
+            const sections = document.querySelectorAll('.main-content section[id]');
+            function highlightSidebarLink() {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTopMargin = parseFloat(window.getComputedStyle(section).marginTop) || 0;
+                    // Effective top considering the section's own margin and the fixed top bar.
+                    // Adjusted the offset to -20 to ensure highlighting slightly before the section fully reaches the top.
+                    const sectionEffectiveTop = section.getBoundingClientRect().top + window.pageYOffset - topBarHeight - sectionTopMargin - 20; 
+
+                    if (window.pageYOffset >= sectionEffectiveTop) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                sidebarLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').substring(1) === current) {
+                        link.classList.add('active');
+                    }
+                });
+                 // If no section is 'current' (e.g., at the very top or between sections),
+                 // try to highlight the first one if we are near the top of the page.
+                if (!current && sections.length > 0 && window.pageYOffset < (sections[0].getBoundingClientRect().top + window.pageYOffset - topBarHeight - 20)) {
+                     const firstLink = document.querySelector('.sidebar-nav a[href="#' + sections[0].id + '"]');
+                     if (firstLink) firstLink.classList.add('active');
+                }
+            }
+            window.addEventListener('scroll', highlightSidebarLink);
+            highlightSidebarLink(); // Initial call to set active link on page load
+        });
+    </script>
+</body>
+</html>

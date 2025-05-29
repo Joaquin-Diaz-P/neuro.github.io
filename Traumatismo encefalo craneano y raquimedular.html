@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEC y TRM: Guía de Estudio</title>
+    <style>
+        :root {
+            --primary-main: #1ABC9C; 
+            --primary-dark: #16A085; 
+            --accent-orange: #E67E22; 
+            --accent-petroleum-blue: #2C3E50; 
+            --alert-red: #E74C3C; 
+            --complement-light-blue: #AED6F1; 
+            --complement-beige: #F5EFEB; 
+            --text-dark: #212529; 
+            --text-medium: #495057; 
+            --text-light: #6C757D; 
+            --bg-main: #F8F9FA; 
+            --card-bg: #FFFFFF; 
+            --border-color: #DEE2E6; 
+            --border-strong: #CED4DA;
+            --sidebar-width: 300px; /* Adjusted for potentially longer titles */
+            --top-bar-height: 65px;
+            --main-content-max-width: 1000px; 
+        }
+        body { 
+            font-family: 'Inter', sans-serif; /* Assuming Inter is a preferred font like in TAB.html */
+            background-color: var(--bg-main); 
+            color: var(--text-dark); 
+            line-height: 1.6;
+            margin: 0;
+            padding-top: var(--top-bar-height);
+        }
+
+        .top-bar {
+            position: fixed; top: 0; left: 0; right: 0;
+            height: var(--top-bar-height);
+            background-color: var(--card-bg); 
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center;
+            padding: 0 1rem; 
+            z-index: 1032; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        }
+        .fixed-back-button { /* Placeholder, actual link would depend on context */
+            background-color: var(--primary-main); color: var(--card-bg); border: 2px solid var(--card-bg);      
+            padding: 0.6rem 1rem; border-radius: 6px; text-decoration: none; 
+            font-weight: 600; font-size: 0.85rem; white-space: nowrap; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15); 
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            margin-left: 5px; 
+        }
+        .fixed-back-button:hover { background-color: var(--accent-orange); border-color: var(--accent-orange); }
+        
+        .hamburger-button {
+            background-color: var(--accent-petroleum-blue); color: var(--card-bg); border: none;
+            padding: 0.6rem 0.8rem; border-radius: 6px; cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15); margin-left: 1.5rem; 
+        }
+        .hamburger-button span { display: block; width: 20px; height: 2px; background-color: var(--card-bg); margin: 4px 0; transition: all 0.3s ease-in-out; }
+        body.sidebar-open .hamburger-button span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+        body.sidebar-open .hamburger-button span:nth-child(2) { opacity: 0; }
+        body.sidebar-open .hamburger-button span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+        .sidebar-nav {
+            position: fixed; top: var(--top-bar-height); 
+            left: calc(-1 * var(--sidebar-width)); 
+            width: var(--sidebar-width); height: calc(100vh - var(--top-bar-height)); 
+            background-color: var(--card-bg); color: var(--text-dark);
+            overflow-y: auto; transition: left 0.3s ease; 
+            z-index: 1030; border-right: 1px solid var(--border-color);
+            box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+        }
+        body.sidebar-open .sidebar-nav { left: 0; }
+        .sidebar-nav h3 { /* Title within sidebar */
+            color: var(--accent-petroleum-blue); padding: 1.2rem 1.5rem 0.8rem;
+            margin: 0; font-size: 1.15rem; border-bottom: 1px solid var(--border-color);
+        }
+        .sidebar-nav ul { list-style: none; padding: 0.75rem 0; margin: 0; }
+        .sidebar-nav li a {
+            display: block; padding: 0.75rem 1.5rem; margin: 0.5rem 1rem; 
+            color: var(--card-bg); background-color: var(--primary-main); 
+            border: 1px solid var(--primary-dark); border-radius: 6px;
+            text-decoration: none; font-size: 0.9rem; font-weight: 500;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.07); text-align: left;
+        }
+        .sidebar-nav li a:hover { background-color: var(--accent-orange); border-color: var(--accent-orange); color: var(--card-bg); }
+        .sidebar-nav li a.active {
+            background-color: var(--primary-dark); color: var(--card-bg);
+            border-color: var(--primary-main); font-weight: bold;
+        }
+
+        .main-content { padding: 1.5rem; max-width: var(--main-content-max-width); margin-left: auto; margin-right: auto; }
+        .page-header-within-content { /* Main page title header */
+            background-color: var(--accent-petroleum-blue); /* Darker header like TAB.html */
+            color: var(--card-bg);
+            padding: 2rem 1.5rem; text-align: center; border-radius: 8px; 
+            margin-bottom: 2rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .page-header-within-content h1 { color: var(--card-bg); font-size: 2rem; margin:0; font-weight: 600;} 
+        .page-header-within-content p { color: var(--complement-beige); font-size: 1.1rem; margin-top: 0.5rem; }
+
+        .content-section { background-color: var(--card-bg); border-radius: 12px; margin-bottom: 1.5rem; box-shadow: 0 6px 18px rgba(44, 62, 80, 0.08); border: 1px solid var(--border-color); }
+        .content-wrapper { padding: 1.5rem 2rem; } 
+        .content-section h2 { /* Main section titles (I, II, III...) */
+            border-bottom: 3px solid var(--primary-main); 
+            padding-bottom: 0.75rem; margin-bottom: 1.75rem; 
+            font-size: 1.85rem; color: var(--accent-petroleum-blue); 
+            margin-top:0; font-weight: 600; /* Like TAB.html */
+        }
+        .content-section h3 { /* Sub-section titles (A, B, C...) */
+            font-size: 1.5rem; margin-top: 1.75rem; 
+            margin-bottom: 1rem; color: var(--primary-dark);
+            font-weight: 600; /* Like TAB.html */
+        }
+        .content-section h4 { /* Further sub-divisions (1, 2, 3...) */
+            font-size: 1.2rem; margin-top: 1.5rem; 
+            margin-bottom: 0.75rem; color: var(--text-dark); 
+            font-weight: 500; /* Like TAB.html */
+        }
+         .content-section h5 {
+            font-size: 1.05rem; margin-top: 1.2rem; 
+            margin-bottom: 0.6rem; color: var(--accent-petroleum-blue); 
+            font-weight: 500;
+        }
+        
+        ul, ol { padding-left: 20px; margin-bottom: 1rem;}
+        li { margin-bottom: 0.5rem; }
+
+        table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.05); font-size: 0.90rem; }
+        th, td { border: 1px solid var(--border-strong); padding: 0.8rem 1rem; text-align: left; } 
+        th { background-color: var(--accent-petroleum-blue); color: var(--card-bg); font-weight: 600; }
+        tbody tr:nth-child(even) { background-color: var(--complement-beige); }
+        tbody tr:hover { background-color: var(--complement-light-blue); }
+
+        details {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 1.2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        }
+        summary { 
+            font-weight: 600; cursor: pointer; 
+            padding: 1rem 1.25rem; 
+            color: var(--primary-dark); 
+            background-color: var(--complement-light-blue); 
+            border-radius: 7px; /* Apply to summary when details is closed */
+            font-size: 1.05rem; 
+            transition: background-color 0.3s ease, color 0.3s ease;
+            list-style-position: inside;
+        }
+        details[open] summary {
+            border-bottom: 1px solid var(--border-color);
+            border-radius: 7px 7px 0 0; /* Keep top rounded corners */
+        }
+        summary:hover {
+            background-color: var(--primary-main);
+            color: var(--card-bg);
+        }
+        .details-content { 
+            padding: 1.25rem; 
+            background-color: var(--card-bg); 
+            border-radius: 0 0 7px 7px; 
+        }
+        
+        footer { text-align: center; padding: 2rem 1.5rem; margin-top: 3rem; border-top: 1px solid var(--border-strong); background-color: var(--accent-petroleum-blue); color: var(--complement-beige); }
+        footer p { color: var(--complement-beige); }
+        html { scroll-behavior: smooth; }
+        
+        .citation { 
+            font-size: 0.70em; 
+            color: var(--primary-main); 
+            margin-left: 1px; 
+            vertical-align: super; 
+            font-weight: bold;
+            cursor: help;
+        }
+        .key-point { background-color: var(--complement-beige); border-left: 4px solid var(--accent-orange); padding: 0.75em 1em; margin: 1em 0; border-radius: 4px; font-weight: 500;}
+        .highlight-tip { background-color: var(--complement-light-blue); border-left: 4px solid var(--primary-main); padding: 0.5em 0.8em; margin: 0.5em 0; border-radius: 4px; color: var(--text-dark); }
+        .text-red-emphasis { color: var(--alert-red); font-weight: bold; }
+        .text-green-emphasis { color: var(--primary-dark); font-weight: bold; }
+
+        .table-responsive { overflow-x: auto; }
+         /* Specific styles for GCS table for better readability */
+        .gcs-table th:nth-child(1), .gcs-table td:nth-child(1) { min-width: 150px; } /* Response type */
+        .gcs-table th:nth-child(2), .gcs-table td:nth-child(2) { min-width: 250px; } /* Criteria */
+        .gcs-table th:nth-child(3), .gcs-table td:nth-child(3) { text-align: center; } /* Score */
+        
+        /* Specific styles for Concussion Grade table */
+        .concussion-grade-table th:nth-child(1) { min-width: 80px; } /* Grade */
+        .concussion-grade-table th:nth-child(2) { min-width: 200px; } /* Cantu */
+        .concussion-grade-table th:nth-child(3) { min-width: 200px; } /* AAN */
+
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <a href="Prueba_2_Neuro.html" class="fixed-back-button">Volver al Índice</a>
+        <button class="hamburger-button" aria-label="Abrir/Cerrar Navegación" aria-expanded="false" aria-controls="sidebarNav">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </div>
+
+    <nav class="sidebar-nav" id="sidebarNav" aria-hidden="true" role="navigation">
+        <h3>TEC y TRM</h3>
+        <ul>
+            <li><a href="#tec-main-title">Parte I: TEC</a></li>
+            <li><a href="#tec-intro-epi">TEC: Introducción y Epidemiología</a></li>
+            <li><a href="#tec-fisiopato">TEC: Fisiopatología</a></li>
+            <li><a href="#tec-clasificacion">TEC: Clasificación</a></li>
+            <li><a href="#tec-conmocion">TEC: Concusión / TEC Leve</a></li>
+            <li><a href="#tec-danos-asociados">TEC: Daños Asociados (Grave)</a></li>
+            <li><a href="#tec-estudio-manejo">TEC: Estudio y Manejo General</a></li>
+            <li><a href="#trm-main-title">Parte II: TRM</a></li>
+            <li><a href="#trm-intro-epi">TRM: Introducción y Epidemiología</a></li>
+            <li><a href="#trm-fisiopato">TRM: Fisiopatología</a></li>
+            <li><a href="#trm-presentacion">TRM: Presentación Clínica</a></li>
+            <li><a href="#trm-evaluacion-manejo-inicial">TRM: Evaluación y Manejo Inicial</a></li>
+            <li><a href="#trm-diagnostico-img">TRM: Diagnóstico por Imágenes</a></li>
+            <li><a href="#trm-manejo-clinico-comp">TRM: Manejo Clínico y Complicaciones</a></li>
+            <li><a href="#trm-manejo-paliativo">TRM: Manejo Paliativo y a Largo Plazo</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <header class="page-header-within-content">
+            <h1>Traumatismo Encefalocraneano (TEC) y Traumatismo Raquimedular (TRM)</h1>
+            <p>Guía de Estudio Detallada</p>
+        </header>
+
+        <section id="tec-main-title" class="content-section" style="background-color: var(--primary-dark); text-align: center;">
+             <div class="content-wrapper" style="padding: 1rem;">
+                <h2 style="color: var(--card-bg); border-bottom: none; margin-bottom: 0;">Parte I: Traumatismo Encefalocraneano (TEC)</h2>
+            </div>
+        </section>
+
+        <section id="tec-intro-epi" class="content-section">
+            <div class="content-wrapper">
+                <h2>I. Introducción y Epidemiología (TEC)</h2>
+                <p>El Traumatismo Encefalocraneano (TEC) y el término en inglés "Traumatic Brain Injury" (TBI) se utilizan habitualmente como sinónimos, aunque no son exactamente iguales<span class="citation" title="Source 1 (Apunte TEC y TRM)"></span>.</p>
+                <p>El TEC se define como un daño estructural y/o alteración funcional del encéfalo secundario a una fuerza externa, que se asocia a la aparición de síntomas o signos clínicos como<span class="citation" title="Source 3 (Apunte TEC y TRM)"></span>:</p>
+                <ul>
+                    <li>Pérdida o disminución del nivel de conciencia<span class="citation" title="Source 4 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Amnesia del evento o previa (retrógrada o anterógrada)<span class="citation" title="Source 4 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Alteración del estado mental<span class="citation" title="Source 4 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Déficit neurológico<span class="citation" title="Source 4 (Apunte TEC y TRM)"></span>.</li>
+                </ul>
+                <p class="key-point">El TEC es la primera causa de mortalidad, morbilidad y discapacidad a nivel mundial en gente joven<span class="citation" title="Source 2 (Apunte TEC y TRM)"></span>.</p>
+                
+                <h3>Datos Epidemiológicos:</h3>
+                <ul>
+                    <li>El trauma es la cuarta causa de muerte en USA<span class="citation" title="Source 4 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Un tercio (30%) de las muertes por trauma son debidas a TEC<span class="citation" title="Source 4 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Es más frecuente en países con medianos/bajos ingresos<span class="citation" title="Source 4 (Apunte TEC y TRM)"></span>.</li>
+                    <li>La relación hombres:mujeres es de 2-2.8:1<span class="citation" title="Source 4 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Las causas más frecuentes son las caídas (32-47%) y los accidentes de tráfico (19%)<span class="citation" title="Source 4 (Apunte TEC y TRM)"></span>.</li>
+                    <li>La incidencia va en aumento<span class="citation" title="Source 4 (Apunte TEC y TRM)"></span>.</li>
+                    <li>El alcohol (OH) está involucrado en el 50% de los TEC<span class="citation" title="Source 4 (Apunte TEC y TRM)"></span>.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="tec-fisiopato" class="content-section">
+            <div class="content-wrapper">
+                <h2>II. Fisiopatología (TEC)</h2>
+                
+                <h3>A. Mecanismos de Daño Encefálico por Trauma</h3>
+                <p>El encéfalo puede dañarse por diversos mecanismos en un trauma:</p>
+                <ol>
+                    <li><strong>Trauma directo:</strong> Ej. balazo, martillazo<span class="citation" title="Source 5 (Apunte TEC y TRM)"></span>.</li>
+                    <li><strong>Movimientos de aceleración/desaceleración</strong><span class="citation" title="Source 5 (Apunte TEC y TRM)"></span>.</li>
+                    <li><strong>Fuerzas rotacionales:</strong> Ej. un golpe en el boxeo que compromete la formación reticular causando inconsciencia<span class="citation" title="Source 5 (Apunte TEC y TRM)"></span>.</li>
+                    <li><strong>Daño por estallido:</strong> Ej. heridas a bala, donde la velocidad del proyectil supera la elasticidad de los tejidos, haciéndolos estallar<span class="citation" title="Source 6 (Apunte TEC y TRM)"></span>.</li>
+                    <li><strong>Daño vascular</strong><span class="citation" title="Source 7 (Apunte TEC y TRM)"></span>.</li>
+                </ol>
+
+                <h3>B. Injuria Primaria vs. Injuria Secundaria</h3>
+                <details>
+                    <summary>Injuria Primaria</summary>
+                    <div class="details-content">
+                        <p>Ocurre en el momento del impacto inicial y es <strong class="text-red-emphasis">IRREVERSIBLE</strong><span class="citation" title="Source 8, 10 (Apunte TEC y TRM)"></span>. Puede producir tres fenómenos no excluyentes:</p>
+                        <ul>
+                            <li><strong>Hematoma intracraneal</strong><span class="citation" title="Source 8 (Apunte TEC y TRM)"></span>.</li>
+                            <li><strong>Injuria tisular (mecánica, contusión):</strong> Destrucción de la corteza y sustancia blanca subyacente por la fuerza mecánica del impacto<span class="citation" title="Source 8 (Apunte TEC y TRM)"></span>.</li>
+                            <li><strong>Disfunción axonal (Daño Axonal Difuso - DAI):</strong> El cráneo golpeado se deforma, produciendo estiramiento de la sustancia blanca y los axones<span class="citation" title="Source 8, 9 (Apunte TEC y TRM)"></span>. Se puede observar en la RNM<span class="citation" title="Source 9 (Apunte TEC y TRM)"></span>.</li>
+                        </ul>
+                        <p>El daño primario puede ser difuso (injuria axonal difusa, injuria vascular difusa) o focal (hematomas, daño axonal, contusión, laceración)<span class="citation" title="Source 10, 16 (Apunte TEC y TRM)"></span>.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>Injuria Secundaria</summary>
+                    <div class="details-content">
+                        <p>Procesos bioquímicos y moleculares que se desencadenan a partir de la injuria primaria y donde la intervención médica <strong class="text-green-emphasis">puede tener un impacto</strong><span class="citation" title="Source 8, 11 (Apunte TEC y TRM)"></span>. Incluye:</p>
+                        <ul>
+                            <li>Isquemia, inflamación, sobrecarga intracelular de calcio, estrés oxidativo<span class="citation" title="Source 12 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Disfunción sináptica, edema celular, disrupción de la barrera hematoencefálica, activación de la expresión de genes<span class="citation" title="Source 12, 13 (Apunte TEC y TRM)"></span>.</li>
+                            <li>La vía final común de necrosis y apoptosis también ocurre en el TEC<span class="citation" title="Source 14 (Apunte TEC y TRM)"></span>.</li>
+                        </ul>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="tec-clasificacion" class="content-section">
+            <div class="content-wrapper">
+                <h2>III. Clasificación del TEC</h2>
+
+                <h3>A. Según Severidad (Escala de Glasgow - GCS)</h3>
+                <p>Se utiliza la Escala de Glasgow (GCS) para clasificar la severidad del TEC<span class="citation" title="Source 17 (Apunte TEC y TRM)"></span>. El puntaje mínimo es 3 (no 0)<span class="citation" title="Source 17 (Apunte TEC y TRM)"></span>. Fue diseñada para evaluar la evolución de los TEC, pero se usa también en otras pérdidas de conciencia (aunque no debería ser su uso primario)<span class="citation" title="Source 18 (Apunte TEC y TRM)"></span>. <strong class="highlight-tip">Siempre prima el criterio clínico</strong><span class="citation" title="Source 19 (Apunte TEC y TRM)"></span>.</p>
+                <ul>
+                    <li><strong>TEC Leve:</strong> Glasgow 13-15<span class="citation" title="Source 20 (Apunte TEC y TRM)"></span>.</li>
+                    <li><strong>TEC Moderado:</strong> Glasgow 9-12<span class="citation" title="Source 20 (Apunte TEC y TRM)"></span>.</li>
+                    <li><strong>TEC Severo:</strong> Glasgow 3-8<span class="citation" title="Source 20 (Apunte TEC y TRM)"></span>.</li>
+                </ul>
+                
+                <h4>Escala de Coma de Glasgow (GCS)<span class="citation" title="Source 21, 22 (Apunte TEC y TRM)"></span>:</h4>
+                <div class="table-responsive">
+                    <table class="gcs-table">
+                        <thead>
+                            <tr>
+                                <th>Respuesta</th>
+                                <th>Criterio</th>
+                                <th>Puntaje</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td rowspan="4"><strong>Apertura Ocular</strong> (Eye opening response)</td>
+                                <td>Espontánea</td>
+                                <td>4</td>
+                            </tr>
+                            <tr>
+                                <td>A la orden verbal (To speech)</td>
+                                <td>3</td>
+                            </tr>
+                            <tr>
+                                <td>Al dolor (To pain)</td>
+                                <td>2</td>
+                            </tr>
+                            <tr>
+                                <td>Ninguna (No response)</td>
+                                <td>1</td>
+                            </tr>
+                            <tr>
+                                <td rowspan="5"><strong>Mejor Respuesta Verbal</strong> (Best verbal response)</td>
+                                <td>Orientado (tiempo, lugar, persona)</td>
+                                <td>5</td>
+                            </tr>
+                            <tr>
+                                <td>Confuso</td>
+                                <td>4</td>
+                            </tr>
+                            <tr>
+                                <td>Palabras inapropiadas</td>
+                                <td>3</td>
+                            </tr>
+                            <tr>
+                                <td>Sonidos incomprensibles</td>
+                                <td>2</td>
+                            </tr>
+                            <tr>
+                                <td>Ninguna</td>
+                                <td>1</td>
+                            </tr>
+                            <tr>
+                                <td rowspan="6"><strong>Mejor Respuesta Motora</strong> (Best motor response)</td>
+                                <td>Obedece órdenes</td>
+                                <td>6</td>
+                            </tr>
+                            <tr>
+                                <td>Localiza el dolor (Moves to localized pain)</td>
+                                <td>5</td>
+                            </tr>
+                            <tr>
+                                <td>Retirada al dolor (Flexion withdrawal from pain)</td>
+                                <td>4</td>
+                            </tr>
+                            <tr>
+                                <td>Flexión anormal (decorticación)</td>
+                                <td>3</td>
+                            </tr>
+                            <tr>
+                                <td>Extensión anormal (descerebración)</td>
+                                <td>2</td>
+                            </tr>
+                            <tr>
+                                <td>Ninguna</td>
+                                <td>1</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2"><strong>Puntaje Total</strong></td>
+                                <td><strong>3-15</strong><span class="citation" title="Source 22 (Apunte TEC y TRM)"></span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                 <p>Puntaje total: Máximo 15 (mejor respuesta), 8 o menos (comatoso), 3 (totalmente no responsivo)<span class="citation" title="Source 22 (Apunte TEC y TRM)"></span>.</p>
+
+                <h3>B. Según Tipo de Lesión<span class="citation" title="Source 28, 29 (Apunte TEC y TRM)"></span></h3>
+                
+                <details>
+                    <summary>1. Fracturas de Cráneo</summary>
+                    <div class="details-content">
+                        <ul>
+                            <li><strong>Abierta vs. Cerrada:</strong> Depende de si la duramadre está o no abierta (no si el cráneo visiblemente lo está)<span class="citation" title="Source 29, 30 (Apunte TEC y TRM)"></span>.</li>
+                            <li><strong>Lineal:</strong> En la convexidad o base del cráneo; rara vez quirúrgica<span class="citation" title="Source 29, 30 (Apunte TEC y TRM)"></span>.</li>
+                            <li><strong>Estrellada</strong><span class="citation" title="Source 29 (Apunte TEC y TRM)"></span>.</li>
+                            <li><strong>Deprimida o conminuta:</strong> Requieren cirugía si la depresión es &gt;1cm, mayor al espesor del cráneo, hay compromiso del seno frontal, necesidad de aseo, defecto cosmético o lesión asociada<span class="citation" title="Source 29, 30 (Apunte TEC y TRM)"></span>.</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <h4>2. Lesiones Intracraneales Focales:</h4>
+                <details>
+                    <summary>Contusión</summary>
+                    <div class="details-content">
+                        <ul>
+                            <li>En la gran mayoría de los casos es hemorrágica<span class="citation" title="Source 31 (Apunte TEC y TRM)"></span>. Son lesiones en el encéfalo o sustancia blanca subcortical por aceleración o desaceleración (ej. choque de auto), donde el encéfalo se golpea contra el cráneo y sus prominencias óseas<span class="citation" title="Source 23, 31 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Más frecuentes en lóbulos temporales y frontales (regiones anteriores o posteriores)<span class="citation" title="Source 23, 26 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Generalmente no tienen indicación quirúrgica a menos que: exista Hipertensión Endocraneana (HTE), el volumen de tejido necrohemorrágico sea &gt;50cc, o haya una desviación de la línea media &gt;5mm<span class="citation" title="Source 24, 25 (Apunte TEC y TRM)"></span>.</li>
+                            <li><strong class="highlight-tip">Una hemorragia pequeña puede evolucionar y no debe considerarse sinónimo de algo leve</strong><span class="citation" title="Source 27 (Apunte TEC y TRM)"></span>.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>Hematoma Extradural (o Epidural)</summary>
+                    <div class="details-content">
+                        <ul>
+                            <li>Sangrado encapsulado entre el cráneo y la duramadre (por fuera de la duramadre)<span class="citation" title="Source 32, 33 (Apunte TEC y TRM)"></span>. Actúa como un tumor de sangre<span class="citation" title="Source 32 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Ocurre en el 2% de todos los TEC<span class="citation" title="Source 34 (Apunte TEC y TRM)"></span>.</li>
+                            <li>70-90% asociados a fractura de cráneo con compromiso de surcos arteriales (habitualmente se rompe la arteria meníngea media)<span class="citation" title="Source 34 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Ubicación más frecuente: región temporal<span class="citation" title="Source 35 (Apunte TEC y TRM)"></span>.</li>
+                            <li><strong class="key-point">NO sobrepasa las líneas de sutura craneales</strong>, ya que la duramadre está muy adherida a ellas<span class="citation" title="Source 36 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Puede presentar un <strong>intervalo lúcido:</strong> pérdida de conciencia inicial por el golpe (compromiso formación reticular), seguida de recuperación de la conciencia, y luego nuevo deterioro por el desarrollo del hematoma<span class="citation" title="Source 37 (Apunte TEC y TRM)"></span>.</li>
+                            <li>En el scanner, se ve como una colección <strong>bicóncava</strong> (o lenticular) hiperdensa (sangre fresca)<span class="citation" title="Source 38 (Apunte TEC y TRM)"></span>.</li>
+                            <li><strong>Indicaciones de cirugía:</strong> Volumen &gt;30cm³, espesor &gt;15mm, desviación línea media &gt;5mm, Glasgow &lt;8, o si es sintomático<span class="citation" title="Source 39 (Apunte TEC y TRM)"></span>. En la gran mayoría, la resolución es quirúrgica<span class="citation" title="Source 39 (Apunte TEC y TRM)"></span>.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>Hematoma Subdural (HSD)</summary>
+                    <div class="details-content">
+                        <ul>
+                            <li>Colección de sangre localizada por debajo de la duramadre y por encima del parénquima (entre parénquima y duramadre, NO en espacio subaracnoideo)<span class="citation" title="Source 42 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Causado por mecanismos de aceleración y desaceleración, produciendo sangramientos venosos por el movimiento de la masa encefálica (no por fracturas o ruptura arterial)<span class="citation" title="Source 43, 44 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Ubicaciones frecuentes: convexidad frontal y parietal<span class="citation" title="Source 43 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Puede ser <strong>agudo, subagudo o crónico</strong><span class="citation" title="Source 44, 47 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Más frecuente en pacientes adultos mayores y alcohólicos (por atrofia cerebral de base y vasos más débiles)<span class="citation" title="Source 45 (Apunte TEC y TRM)"></span>.</li>
+                            <li><strong>Clínica:</strong> Clásicamente, el paciente comienza con dolor de cabeza y focalidad neurológica a la semana del impacto<span class="citation" title="Source 46 (Apunte TEC y TRM)"></span>.</li>
+                            <li><strong>Imágenes (TAC):</strong>
+                                <ul>
+                                    <li>Forma de <strong>media luna (cóncavo-convexa)</strong><span class="citation" title="Source 40 (Apunte TEC y TRM)"></span>.</li>
+                                    <li><strong class="key-point">Puede sobrepasar las líneas de sutura</strong><span class="citation" title="Source 41 (Apunte TEC y TRM)"></span>.</li>
+                                    <li>Densidad en TAC cambia con el tiempo:
+                                        <ul>
+                                            <li>Agudo (1-3 días): Hiperdenso (blanco)<span class="citation" title="Source 42, 47 (Apunte TEC y TRM)"></span>.</li>
+                                            <li>Subagudo (4 días - 2/3 semanas): Isodenso<span class="citation" title="Source 47 (Apunte TEC y TRM)"></span>.</li>
+                                            <li>Crónico (&gt;3 semanas): Hipodenso (negro, aproximándose a densidad de LCR)<span class="citation" title="Source 42, 47, 48 (Apunte TEC y TRM)"></span>. Puede volverse lenticular con el tiempo<span class="citation" title="Source 47 (Apunte TEC y TRM)"></span>.</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li><strong>Indicaciones quirúrgicas:</strong>
+                                <ul>
+                                    <li>Agudo: Si espesor &gt;10mm o Desviación Línea Media (DLM) &gt;5mm; o con deterioro del Glasgow, asimetría pupilar, HTE<span class="citation" title="Source 50 (Apunte TEC y TRM)"></span>. Los hiperagudos suelen tener indicación de cirugía inmediata<span class="citation" title="Source 49 (Apunte TEC y TRM)"></span>.</li>
+                                    <li>Crónico: Si es sintomático con &gt;1cm de espesor, o cuando se evidencia crecimiento<span class="citation" title="Source 50 (Apunte TEC y TRM)"></span>.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>Hemorragia Subaracnoidea Traumática (HSA-T)</summary>
+                    <div class="details-content">
+                        <ul>
+                            <li>Sangre libre circulando por el espacio subaracnoideo, producida fundamentalmente por lesiones de la corteza que dañan arteriolas<span class="citation" title="Source 51, 52 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Tienden a ser más periféricas que las HSA por ruptura de aneurismas<span class="citation" title="Source 53 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Es una hemorragia en la superficie de la corteza<span class="citation" title="Source 54 (Apunte TEC y TRM)"></span>. Se asocia a otras lesiones intracraneanas focales y difusas<span class="citation" title="Source 54 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Es un <strong class="text-red-emphasis">predictor independiente de mal pronóstico</strong><span class="citation" title="Source 54 (Apunte TEC y TRM)"></span>. El paciente debe ser observado<span class="citation" title="Source 54 (Apunte TEC y TRM)"></span>.</li>
+                            <li>No se opera para evacuar la sangre, ya que no es la sangre en sí la que causa el daño principal en este contexto (a diferencia del vasoespasmo en HSA aneurismática)<span class="citation" title="Source 55 (Apunte TEC y TRM)"></span>.</li>
+                            <li><strong>Conducta:</strong> Hospitalizar al paciente para seguimiento<span class="citation" title="Source 55 (Apunte TEC y TRM)"></span>.</li>
+                            <li><strong>Scanner:</strong> No suele desviar la línea media porque la sangre tiene espacio para fluir<span class="citation" title="Source 56 (Apunte TEC y TRM)"></span>. Se ve hiperdensa (sangre fresca) rellenando o dibujando los surcos<span class="citation" title="Source 57 (Apunte TEC y TRM)"></span>.</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <h4>3. Lesiones Intracraneales Difusas:</h4>
+                <details>
+                    <summary>Daño Axonal Difuso (DAI)</summary>
+                    <div class="details-content">
+                        <ul>
+                            <li>Resultado de fuerzas de cizallamiento (paralelas), tensión y angulación que afectan a los axones y vasos pequeños<span class="citation" title="Source 60 (Apunte TEC y TRM)"></span>. Es la lesión intracraneal más frecuente en TEC<span class="citation" title="Source 60 (Apunte TEC y TRM)"></span>.</li>
+                            <li><strong>Clínica:</strong> El paciente tiene un evento traumático, pérdida de conciencia y evoluciona sin recuperar conciencia (coma) a pesar de que los hallazgos del scanner son "limpios" o no explican el coma<span class="citation" title="Source 58, 61, 62 (Apunte TEC y TRM)"></span>. Rápida progresión al coma en ausencia de lesiones focales específicas visibles en TAC<span class="citation" title="Source 62 (Apunte TEC y TRM)"></span>.</li>
+                            <li>El TAC no tiene la resolución para ver edema y ruptura axonal; la RNM sí puede mostrar estas lesiones en la sustancia blanca<span class="citation" title="Source 9, 59, 61 (Apunte TEC y TRM)"></span>. Los axones no toleran el estiramiento<span class="citation" title="Source 61 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Lesiones se ubican preferentemente en zonas con más densidad de sustancia blanca: regiones cortico-subcorticales (frontal y temporal), cápsula interna, cuerpo calloso y núcleos profundos<span class="citation" title="Source 63 (Apunte TEC y TRM)"></span>.</li>
+                            <li><strong>Tractografía (RM con difusión):</strong> Permite seguir los trayectos axonales. En DAI se observa que los axones están cortados, explicando la falta de funcionamiento cortical a pesar de que la corteza pueda estar intacta<span class="citation" title="Source 64, 65, 66 (Apunte TEC y TRM)"></span>.</li>
+                            <li>El paciente suele quedar en un estado de mínima conciencia (más frecuente que no obedezca órdenes pero tenga ciclo sueño-vigilia) y menos frecuentemente en coma persistente<span class="citation" title="Source 66 (Apunte TEC y TRM)"></span>.</li>
+                        </ul>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="tec-conmocion" class="content-section">
+            <div class="content-wrapper">
+                <h2>IV. Concusión / TEC Leve (Conmoción Cerebral)</h2>
+                <p>Síntomas autolimitados que se producen en un TEC, asociados más frecuentemente a fuerzas rotatorias agudas (ej. pelotazo, golpe) que causan pérdida transitoria de conciencia<span class="citation" title="Source 70 (Apunte TEC y TRM)"></span>.</p>
+                <p>Altamente prevalente en población joven y deportiva<span class="citation" title="Source 71 (Apunte TEC y TRM)"></span>. Mujeres tienen más riesgo de concusión importante, a pesar de tener un cráneo más grueso<span class="citation" title="Source 71 (Apunte TEC y TRM)"></span>.</p>
+
+                <details>
+                    <summary>Síntomas Comunes</summary>
+                    <div class="details-content">
+                        <p>Incluyen: Dolor de cabeza, disminución transitoria de conciencia, vómitos, eventual crisis convulsiva, desorientación, problemas de memoria, fatiga, adormecimiento, hiperosmia, depresión, mareos, fotofobia, fonofobia, irritabilidad, etc.<span class="citation" title="Source 72, 73 (Apunte TEC y TRM)"></span>.</p>
+                    </div>
+                </details>
+
+                <details>
+                    <summary>Clasificación (Grados según Cantu System / American Academy of Neurology - AAN)</summary>
+                    <div class="details-content">
+                        <div class="table-responsive">
+                            <table class="concussion-grade-table">
+                                <thead>
+                                    <tr>
+                                        <th>Grado</th>
+                                        <th>Cantu System<span class="citation" title="Source 75 (Apunte TEC y TRM)"></span></th>
+                                        <th>AAN (American Academy of Neurology)<span class="citation" title="Source 74, 75 (Apunte TEC y TRM)"></span></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Grado 1 (Leve)</strong></td>
+                                        <td>Amnesia postraumática (PTA) &lt;30 min, sin pérdida de conciencia (LOC).</td>
+                                        <td>Confusión transitoria, sin LOC, síntomas resueltos en &lt;15 min.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Grado 2 (Moderada)</strong></td>
+                                        <td>LOC &lt;5 min o PTA &gt;30 min.</td>
+                                        <td>Síntomas duran &gt;15 min, pero sin LOC.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Grado 3 (Severa)</strong></td>
+                                        <td>LOC &gt;5 min o PTA &gt;24 hr.</td>
+                                        <td>Cualquier grado de LOC (breve o prolongada). PTA es común.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </details>
+
+                <details>
+                    <summary>Manejo (ej. en deportes)</summary>
+                    <div class="details-content">
+                        <ul>
+                            <li>Leve (&lt;15 min síntomas, sin LOC): Retirar del juego, examinar; si está bien, podría retomar<span class="citation" title="Source 76 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Moderada (&gt;15 min síntomas, sin LOC): No puede retomar el juego por el resto del día<span class="citation" title="Source 77 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Severa (con LOC): Examen neurológico en hospital; no siempre requiere imagen. Debe estar 1-2 semanas sin jugar<span class="citation" title="Source 78, 79 (Apunte TEC y TRM)"></span>.</li>
+                            <li><strong class="highlight-tip">Siempre indicar reposo a todos los pacientes</strong><span class="citation" title="Source 81 (Apunte TEC y TRM)"></span>.</li>
+                        </ul>
+                        <p>La gran mayoría de los pacientes se recuperan<span class="citation" title="Source 79 (Apunte TEC y TRM)"></span>.</p>
+                    </div>
+                </details>
+                
+                <details>
+                    <summary>Síndrome Post-Concusión</summary>
+                    <div class="details-content">
+                        <p>Persistencia de síntomas neurológicos inespecíficos, cognitivos y de atención (cefalea, fatiga, mareos, alteraciones cognitivas/atención/memoria, insomnio, irritabilidad, mala tolerancia al estrés)<span class="citation" title="Source 79, 81, 83 (Apunte TEC y TRM)"></span>.</p>
+                        <ul>
+                            <li>Puede durar días o semanas después del TEC<span class="citation" title="Source 83 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Mayor riesgo en mujeres, personas con antecedentes de cuadros ansiosos, con daño corporal importante<span class="citation" title="Source 82 (Apunte TEC y TRM)"></span>. Considerar perspectiva judicial, estatus socioeconómico, cefalea o TEC previos<span class="citation" title="Source 82 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Los síntomas tienden a ser más prolongados si la concusión ocurre en situaciones laborales versus deportivas<span class="citation" title="Source 80 (Apunte TEC y TRM)"></span>.</li>
+                        </ul>
+                        <p><strong>Diagnósticos Diferenciales<span class="citation" title="Source 83 (Apunte TEC y TRM)"></span>:</strong> Dolor de cabeza severo (disección arteria vertebral, neuralgia occipital), migraña post-traumática, hematoma epidural/subdural, fractura de cráneo, enfermedad disco cervical, latigazo cervical, ACV, VPPB, depresión/ansiedad, TEPT.</p>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="tec-danos-asociados" class="content-section">
+            <div class="content-wrapper">
+                <h2>V. Daños Asociados a TEC Grave</h2>
+                <p>Todo paciente con TEC grave (ej. Glasgow &lt;8) tiene alto riesgo de daño en otras estructuras y órganos, que debe ser descartado<span class="citation" title="Source 68, 69 (Apunte TEC y TRM)"></span>.</p>
+                <ul>
+                    <li>56-60% tiene daño de 1 o más órganos<span class="citation" title="Source 69 (Apunte TEC y TRM)"></span>.</li>
+                    <li>25% tiene alguna lesión de resolución quirúrgica (no neurológica)<span class="citation" title="Source 69 (Apunte TEC y TRM)"></span>.</li>
+                </ul>
+                <p class="key-point">Gran asociación con <strong>trauma raquimedular (TRM)</strong>, que debe sospecharse siempre<span class="citation" title="Source 69 (Apunte TEC y TRM)"></span>.</p>
+            </div>
+        </section>
+
+        <section id="tec-estudio-manejo" class="content-section">
+            <div class="content-wrapper">
+                <h2>VI. Estudio y Manejo General del TEC</h2>
+
+                <h3>A. Indicaciones de Neuroimagen (TAC de Cerebro)</h3>
+                <p class="highlight-tip"><strong>Siempre indicado en TEC moderado o severo (según GCS) o ante presencia de focalidad neurológica</strong><span class="citation" title="Source 85 (Apunte TEC y TRM)"></span>.</p>
+                <p><strong>En TEC leve (90% de los TEC):</strong> La decisión de tomar imagen depende de factores como examen físico, energía del evento, signos de alarma, uso de anticoagulantes<span class="citation" title="Source 86, 87 (Apunte TEC y TRM)"></span>. &lt;10% de TEC leves tienen hallazgos en TAC y &lt;2% requieren neurocirugía<span class="citation" title="Source 87 (Apunte TEC y TRM)"></span>.</p>
+                
+                <details>
+                    <summary>Indicaciones de TAC en TEC (incluye criterios para TEC leve con riesgo)<span class="citation" title="Source 88, 89, 90 (Apunte TEC y TRM)"></span></summary>
+                    <div class="details-content">
+                        <ul>
+                            <li>Evidencia de fractura de cráneo (basal, deprimida, abierta)<span class="citation" title="Source 89, 90 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Examen neurológico anormal<span class="citation" title="Source 89, 90 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Crisis convulsiva post-traumática<span class="citation" title="Source 89, 90 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Más de un episodio de vómito desde el traumatismo<span class="citation" title="Source 89, 90 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Mecanismo de alta energía (ej. eyección de vehículo, atropello, caída &gt;5 escaleras o 3 pies/&gt;1m)<span class="citation" title="Source 89, 90, 91 (Apunte TEC y TRM)"></span>.</li>
+                            <li>GCS descendiendo o persistentemente &lt;15 (a las 2 horas post-injuria)<span class="citation" title="Source 89, 90 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Edad &gt;60 o &gt;65 años<span class="citation" title="Source 90, 91 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Amnesia anterógrada persistente o retrógrada &gt;30 min<span class="citation" title="Source 90, 91 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Coagulopatía (incluye uso de AAS) o historia de trastorno de sangrado/coagulación<span class="citation" title="Source 88, 90, 91 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Intoxicación (examen no confiable)<span class="citation" title="Source 90 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Pérdida de conciencia &gt;30 min (aunque AAN Grado 3 es *cualquier* LOC)<span class="citation" title="Source 90 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Factores sociales (ej. abuso, barreras idiomáticas)<span class="citation" title="Source 90 (Apunte TEC y TRM)"></span>.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>Tiempos para TAC</summary>
+                    <div class="details-content">
+                        <ul>
+                            <li><strong>Urgente (&lt;1 hora desde ingreso):</strong> GCS &lt;13 inicial, GCS &lt;15 a las 2h post-injuria, sospecha fractura abierta/deprimida, signos fractura base cráneo, convulsión post-trauma, déficit focal, &gt;1 vómito<span class="citation" title="Source 84, 90 (Apunte TEC y TRM)"></span>.</li>
+                            <li><strong>Dentro de 8 horas:</strong> Uso de warfarina; o LOC/amnesia + (edad &gt;65, coagulopatía, mecanismo peligroso, amnesia retrógrada &gt;30 min)<span class="citation" title="Source 91 (Apunte TEC y TRM)"></span>.</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <h3>B. Principios de Tratamiento</h3>
+                <ol>
+                    <li><strong>Evitar el daño secundario</strong><span class="citation" title="Source 94 (Apunte TEC y TRM)"></span>. Las principales causas de daño secundario son el mal manejo de la hipotensión y la hipoxia<span class="citation" title="Source 95 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Remover lesiones con efecto masa<span class="citation" title="Source 94 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Evitar hipoxemia (SaO2 &lt;90%) e hipotensión (Presión Sistólica (PS) &lt;90mmHg)<span class="citation" title="Source 91, 94, 95 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Tratar Presión Intracraneana (PIC) elevada (objetivo PIC &lt;22 mmHg)<span class="citation" title="Source 92, 105 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Mantener Presión de Perfusión Cerebral (PPC) idealmente entre 60-70 mmHg<span class="citation" title="Source 105 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Mantener PS ≥100 mmHg en 50-69 años, y ≥110 mmHg en 14-49 o &gt;70 años<span class="citation" title="Source 105 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Corregir coagulopatías<span class="citation" title="Source 92 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Dar analgesia y sedación<span class="citation" title="Source 92 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Prevención de convulsiones: El uso profiláctico de anticonvulsivantes no tiene evidencia sólida general, pero en Chile se indica si hay hemorragia en zonas epileptogénicas (frontal, temporal)<span class="citation" title="Source 91, 92, 93 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Decidir manejo médico o neuroquirúrgico (ej. craneotomía descompresiva)<span class="citation" title="Source 92 (Apunte TEC y TRM)"></span>.</li>
+                </ol>
+
+                <h3>C. Indicaciones de Intubación</h3>
+                <p>Debe ser realizada por personal con entrenamiento, por posible daño a columna cervical<span class="citation" title="Source 96 (Apunte TEC y TRM)"></span>.</p>
+                <ol>
+                    <li>Siempre Glasgow &lt;9<span class="citation" title="Source 96 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Glasgow &gt;9 con falta de protección de vía aérea (ej. traumatismo craneofacial)<span class="citation" title="Source 96 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Saturación O2 &lt;90% a pesar de terapia con O2 (o &lt;60% mencionado antes)<span class="citation" title="Source 96 (Apunte TEC y TRM)"></span>. Hipoxia SaO2&lt;90%<span class="citation" title="Source 95 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Pacientes muy graves<span class="citation" title="Source 96 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Con signos de herniación intracraneana<span class="citation" title="Source 96 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Evidencia de aspiración<span class="citation" title="Source 96 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Tiempo prolongado de traslado<span class="citation" title="Source 96 (Apunte TEC y TRM)"></span>.</li>
+                </ol>
+                <p>Si no se puede intubar: máscara-bolsa de O2<span class="citation" title="Source 96 (Apunte TEC y TRM)"></span>.</p>
+
+                <h3>D. Manejo de Fluidos</h3>
+                <p>Para corregir la hemodinámica se usan soluciones isotónicas, <strong class="text-red-emphasis">NO soluciones hiperosmolares</strong> (en la fase inicial de corrección hemodinámica)<span class="citation" title="Source 97 (Apunte TEC y TRM)"></span>.</p>
+
+                <h3>E. Rol de la Radiografía de Cráneo</h3>
+                <p>Según el documento, la radiografía de cráneo no tiene utilidad en la actualidad para el TEC. Se recomienda pasar directamente al scanner, aunque la guía GES podría decir lo contrario<span class="citation" title="Source 97 (Apunte TEC y TRM)"></span>.</p>
+
+                <h3>F. Factores de Riesgo y Signos de Alarma para Hospitalización/Estudio Adicional (Guías GES)<span class="citation" title="Source 98, 99, 100, 104 (Apunte TEC y TRM)"></span></h3>
+                <details>
+                    <summary>Factores de Riesgo (Considerar siempre, independiente del Glasgow)</summary>
+                    <div class="details-content">
+                        <ul>
+                            <li><strong>Antecedentes del accidente:</strong> Mecanismos de alta energía, muerte de otro accidentado, sospecha lesión penetrante<span class="citation" title="Source 104 (Apunte TEC y TRM)"></span>.</li>
+                            <li><strong>Antecedentes del paciente:</strong> Edad &gt;65 años, epilepsia, tratamiento anticoagulante oral o coagulopatía previa, enfermedad neuroquirúrgica previa, alcoholismo crónico, abuso de drogas, paciente sin apoyo social<span class="citation" title="Source 104 (Apunte TEC y TRM)"></span>.</li>
+                            <li><strong>Anamnesis:</strong> Segunda consulta por el mismo TEC, pérdida de conciencia &gt;5 minutos, cefalea intensa y progresiva, vómitos explosivos, convulsiones, amnesia pre o postraumática ("lacuna")<span class="citation" title="Source 104 (Apunte TEC y TRM)"></span>.</li>
+                            <li><strong>Examen Físico:</strong> Déficit neurológico, otorragia, rinorraquia (puede ser LCR), signos de fractura de base de cráneo (ojos de mapache, signo de Battle), agitación psicomotora<span class="citation" title="Source 104 (Apunte TEC y TRM)"></span>.</li>
+                            <li><strong>Radiológico (si se hizo):</strong> Presencia de fractura de cráneo<span class="citation" title="Source 104 (Apunte TEC y TRM)"></span>.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>Signos de Alarma (OJO)</summary>
+                    <div class="details-content">
+                        <ul>
+                            <li>Deterioro progresivo de conciencia y/o disminución GCS ≥2 puntos<span class="citation" title="Source 101 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Signos de focalidad neurológica<span class="citation" title="Source 101 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Cefalea progresiva<span class="citation" title="Source 101 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Vómitos explosivos recurrentes<span class="citation" title="Source 101 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Agitación psicomotora<span class="citation" title="Source 101 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Convulsiones<span class="citation" title="Source 102 (Apunte TEC y TRM)"></span>.</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <h3>G. Criterios de TAC Anormal</h3>
+                <ul>
+                    <li>Desviación de línea media<span class="citation" title="Source 103 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Hemorragia subaracnoidea<span class="citation" title="Source 103 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Compresión de cisternas peritroncales<span class="citation" title="Source 103 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Lesiones parenquimatosas y/o colección hemorrágica<span class="citation" title="Source 103 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Borramiento de los surcos<span class="citation" title="Source 103 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Neumoencéfalo<span class="citation" title="Source 103 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Fracturas de cráneo<span class="citation" title="Source 103 (Apunte TEC y TRM)"></span>.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="trm-main-title" class="content-section" style="background-color: var(--primary-dark); text-align: center;">
+            <div class="content-wrapper" style="padding: 1rem;">
+                <h2 style="color: var(--card-bg); border-bottom: none; margin-bottom: 0;">Parte II: Traumatismo Raquimedular (TRM)</h2>
+            </div>
+        </section>
+
+        <section id="trm-intro-epi" class="content-section">
+            <div class="content-wrapper">
+                <h2>I. Introducción y Epidemiología (TRM)</h2>
+                
+                <h3>A. Generalidades</h3>
+                <ul>
+                    <li>El TRM es considerado una epidemia en la actualidad<span class="citation" title="Source 105 (Apunte TEC y TRM), Source 140 (Mindmap TRM)"></span>.</li>
+                    <li>Se asocia a discapacidad severa y permanente<span class="citation" title="Source 105 (Apunte TEC y TRM), Source 140 (Mindmap TRM)"></span>.</li>
+                    <li>Afecta principalmente a adultos jóvenes<span class="citation" title="Source 105 (Apunte TEC y TRM), Source 141 (Mindmap TRM)"></span>.</li>
+                    <li>En Chile, se estima que hay 800 (Fuente A) o casi 800 (Fuente B) personas con daño medular traumático<span class="citation" title="Source 105 (Apunte TEC y TRM), Source 141 (Mindmap TRM)"></span>.</li>
+                    <li>La médula espinal está adosada a un canal óseo que es más flexible que el cráneo, pero igualmente vulnerable a daño severo<span class="citation" title="Source 105 (Apunte TEC y TRM)"></span>.</li>
+                </ul>
+
+                <h3>B. Causas y Factores de Riesgo</h3>
+                <ul>
+                    <li><strong>Causas más frecuentes:</strong> Accidentes de vehículos motorizados (48%) &gt; caídas (incluye piqueros) &gt; violencia (especialmente armas de fuego, 12%) &gt; accidentes deportivos (10%) &gt; otros (14%)<span class="citation" title="Source 106 (Apunte TEC y TRM), Source 141 (Mindmap TRM)"></span>.</li>
+                    <li><strong>Factores de Riesgo:</strong> Predominantemente hombres (77-80%), asociación con alcohol (25%) y factores médicos preexistentes<span class="citation" title="Source 105 (Apunte TEC y TRM), Source 141 (Mindmap TRM)"></span>.</li>
+                </ul>
+
+                <h3>C. Condiciones de Mayor Susceptibilidad al Daño Medular</h3>
+                <ul>
+                    <li>Espondilosis cervical<span class="citation" title="Source 107 (Apunte TEC y TRM), Source 141 (Mindmap TRM)"></span>.</li>
+                    <li>Inestabilidad atlanto-axoidea<span class="citation" title="Source 107 (Apunte TEC y TRM), Source 141 (Mindmap TRM)"></span>.</li>
+                    <li>Condiciones congénitas con daño previo o limitaciones a la flexibilidad<span class="citation" title="Source 107 (Apunte TEC y TRM), Source 141 (Mindmap TRM)"></span>.</li>
+                    <li>Osteoporosis<span class="citation" title="Source 107 (Apunte TEC y TRM), Source 141 (Mindmap TRM)"></span>.</li>
+                    <li>Artropatías espinales como espondilitis anquilosante<span class="citation" title="Source 107 (Apunte TEC y TRM), Source 141 (Mindmap TRM)"></span>.</li>
+                    <li>Desproporción de fuerzas implicadas en el accidente<span class="citation" title="Source 107 (Apunte TEC y TRM), Source 141 (Mindmap TRM)"></span>.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="trm-fisiopato" class="content-section">
+            <div class="content-wrapper">
+                <h2>II. Fisiopatología (TRM)</h2>
+                
+                <h3>A. Mecanismos de Daño Medular</h3>
+                <p>El daño de la médula espinal se produce habitualmente concomitante al daño de la columna vertebral<span class="citation" title="Source 108 (Apunte TEC y TRM), Source 141 (Mindmap TRM)"></span>. Esto puede incluir:</p>
+                <ul>
+                    <li>Fractura de uno o más elementos óseos<span class="citation" title="Source 108 (Apunte TEC y TRM), Source 141 (Mindmap TRM)"></span>.</li>
+                    <li>Luxación de una o más articulaciones<span class="citation" title="Source 108 (Apunte TEC y TRM), Source 141 (Mindmap TRM)"></span>.</li>
+                    <li>Desgarro de ligamentos<span class="citation" title="Source 108 (Apunte TEC y TRM), Source 141 (Mindmap TRM)"></span>.</li>
+                    <li>Ruptura y/o herniación del disco intervertebral<span class="citation" title="Source 108 (Apunte TEC y TRM), Source 141 (Mindmap TRM)"></span>.</li>
+                    <li>Puede ser una combinación de los anteriores<span class="citation" title="Source 108 (Apunte TEC y TRM), Source 141 (Mindmap TRM)"></span>.</li>
+                </ul>
+                <p>La injuria refleja la fuerza y dirección del evento traumático (rotación, flexión, extensión)<span class="citation" title="Source 109 (Apunte TEC y TRM), Source 142 (Mindmap TRM)"></span>.</p>
+                <p>Mecanismos directos de daño a la médula:</p>
+                <ul>
+                    <li>Compresión<span class="citation" title="Source 110, 112 (Apunte TEC y TRM), Source 142 (Mindmap TRM)"></span>.</li>
+                    <li>Contusión<span class="citation" title="Source 110, 112 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Laceración parcial de la médula<span class="citation" title="Source 110, 112 (Apunte TEC y TRM), Source 142 (Mindmap TRM)"></span>.</li>
+                    <li>Laceración total de la médula<span class="citation" title="Source 110, 112 (Apunte TEC y TRM), Source 142 (Mindmap TRM)"></span>.</li>
+                    <li>Distracción, Cizallamiento<span class="citation" title="Source 112 (Apunte TEC y TRM)"></span>.</li>
+                </ul>
+
+                <h3>B. Lesión Primaria y Secundaria en TRM</h3>
+                <p>Al igual que en el TEC, existen lesiones primarias (mecánicas e inmediatas) y secundarias (evitables, que evolucionan con el tiempo)<span class="citation" title="Source 110, 111, 112 (Apunte TEC y TRM)"></span>.</p>
+                <details>
+                    <summary>Lesión Primaria</summary>
+                    <div class="details-content">
+                        <p>Compresión/contusión, desplazamiento óseo/discal, fractura/luxación<span class="citation" title="Source 111 (Apunte TEC y TRM)"></span>. Hemorragia inmediata, aumento de lactato (acidosis), edema vasogénico<span class="citation" title="Source 112 (Apunte TEC y TRM)"></span>.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>Lesión Secundaria (evoluciona en minutos, horas, días)</summary>
+                    <div class="details-content">
+                        <p>Hipooxia/isquemia, disregulación iónica (gradiente de Na+), excitotoxicidad glutamatérgica, radicales libres y peroxidación lipídica, disrupción de la barrera hematoespinal, respuesta inflamatoria (activación microglial y de macrófagos), apoptosis y necrosis<span class="citation" title="Source 111, 112 (Apunte TEC y TRM)"></span>. Vasoespasmo microvascular, edema citotóxico<span class="citation" title="Source 112 (Apunte TEC y TRM)"></span>.</p>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="trm-presentacion" class="content-section">
+            <div class="content-wrapper">
+                <h2>III. Presentación Clínica (TRM)</h2>
+                <ul>
+                    <li><strong>Dolor en el sitio de la fractura:</strong> Su ausencia no descarta lesión<span class="citation" title="Source 112 (Apunte TEC y TRM), Source 142 (Mindmap TRM)"></span>.</li>
+                    <li>Asociación frecuente con compromiso encefálico y sistémico<span class="citation" title="Source 112 (Apunte TEC y TRM), Source 142 (Mindmap TRM)"></span>.</li>
+                    <li><strong>Nivel de Lesión:</strong> 50% de los casos son a nivel cervical<span class="citation" title="Source 112 (Apunte TEC y TRM), Source 142 (Mindmap TRM)"></span>.</li>
+                </ul>
+
+                <h3>Síndromes Medulares (Formas de compromiso medular)<span class="citation" title="Source 112, 121 (Apunte TEC y TRM), Source 142 (Mindmap TRM)"></span>:</h3>
+                <details>
+                    <summary>Sección Completa Transversal</summary>
+                    <div class="details-content">
+                        <p>Pérdida de todas las funciones (motora, sensitiva de vibración/propiocepción, y termoalgésica) desde el nivel de la lesión hacia abajo<span class="citation" title="Source 112, 121 (Apunte TEC y TRM), Source 142 (Mindmap TRM)"></span>.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>Síndrome Hemicordonal (Brown-Séquard)</summary>
+                    <div class="details-content">
+                        <p>Daño de la mitad del cordón espinal<span class="citation" title="Source 113, 121 (Apunte TEC y TRM), Source 142 (Mindmap TRM)"></span>.</p>
+                        <ul>
+                            <li>Pérdida motora (vía corticoespinal) y de la sensibilidad vibratoria y propioceptiva (cordones posteriores) <strong>ipsilateral</strong> a la lesión (estas vías decusan en el bulbo)<span class="citation" title="Source 114, 122 (Apunte TEC y TRM)"></span>.</li>
+                            <li>Pérdida de la sensibilidad termoalgésica (dolor y temperatura - vía espinotalámica) <strong>contralateral</strong> a la lesión (esta vía decusa al ingresar a la médula)<span class="citation" title="Source 114, 122 (Apunte TEC y TRM)"></span>.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>Síndrome Centromedular</summary>
+                    <div class="details-content">
+                        <p>Compromiso preferente del tracto piramidal de las manos y de la sensibilidad termoalgésica de manera suspendida (afectando principalmente extremidades superiores)<span class="citation" title="Source 115, 121 (Apunte TEC y TRM), Source 142 (Mindmap TRM)"></span>. Se da fundamentalmente por desplazamiento traumático del núcleo pulposo<span class="citation" title="Source 115 (Apunte TEC y TRM)"></span>.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>Síndrome Cordonal Posterior</summary>
+                    <div class="details-content">
+                        <p>Pérdida de la sensibilidad vibratoria y el sentido posicional (propiocepción) bilateralmente por debajo de la lesión<span class="citation" title="Source 116, 121, 122 (Apunte TEC y TRM)"></span>.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>Síndrome Cordonal Anterior</summary>
+                    <div class="details-content">
+                        <p>Pérdida de la función motora (tracto corticoespinal) y de la sensibilidad termoalgésica (tracto espinotalámico) bilateralmente por debajo de la lesión, con preservación de la sensibilidad vibratoria y propioceptiva<span class="citation" title="Source 117, 121, 122 (Apunte TEC y TRM)"></span>.</p>
+                    </div>
+                </details>
+                
+                <p class="key-point"><strong>Choque Espinal:</strong> Fase aguda de arreflexia y flacidez muscular por debajo del nivel de la lesión<span class="citation" title="Source 118 (Apunte TEC y TRM), Source 142 (Mindmap TRM)"></span>.</p>
+            </div>
+        </section>
+
+        <section id="trm-evaluacion-manejo-inicial" class="content-section">
+            <div class="content-wrapper">
+                <h2>IV. Evaluación y Manejo Inicial (TRM)</h2>
+
+                <h3>A. En el Lugar del Accidente (Campo)<span class="citation" title="Source 129 (Apunte TEC y TRM), Source 140 (Mindmap TRM)"></span></h3>
+                <ul>
+                    <li><strong>ABCD:</strong> Airway (vía aérea), Breathing (ventilación), Circulation (circulación), Disability (evaluación neurológica inicial)<span class="citation" title="Source 130 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Evaluación neurológica: eventual intubación o máscara de oxígeno (realizado por personal capacitado)<span class="citation" title="Source 130 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Si el paciente está inconsciente, se asume lesión medular. Si hay dolor o debilidad, pensar lo mismo<span class="citation" title="Source 131 (Apunte TEC y TRM)"></span>.</li>
+                    <li><strong>Minimizar los movimientos de la columna:</strong> Uso de técnica de "logroll" (al menos 4 personas para rotación lateral sin rotación axial) y tabla espinal con collar cervical<span class="citation" title="Source 126, 132 (Apunte TEC y TRM), Source 140 (Mindmap TRM)"></span>.</li>
+                </ul>
+
+                <h3>B. En la Unidad de Urgencia<span class="citation" title="Source 133 (Apunte TEC y TRM), Source 140 (Mindmap TRM)"></span></h3>
+                <ul>
+                    <li>Tratar complicaciones según rango de compromiso vital<span class="citation" title="Source 133 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Evaluar intubación en pacientes con compromiso cervical: 1/3 lo requieren en las primeras 24 horas. Debe ser con asistencia para mantener la linealidad de la columna cervical<span class="citation" title="Source 119, 133 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Si no se sabe intubar y se necesita oxígeno, administrar por mascarilla<span class="citation" title="Source 120 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Prevenir hipoxia, hipotensión, vejiga neurogénica, tromboembolismo<span class="citation" title="Source 120 (Apunte TEC y TRM)"></span>.</li>
+                    <li>En la mayoría de los casos se puede hacer un PanTAC (TAC de cuerpo entero) sin sacar al paciente de la tabla<span class="citation" title="Source 127 (Apunte TEC y TRM)"></span>.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="trm-diagnostico-img" class="content-section">
+            <div class="content-wrapper">
+                <h2>V. Diagnóstico por Imágenes (TRM)<span class="citation" title="Source 134 (Apunte TEC y TRM), Source 140 (Mindmap TRM)"></span></h2>
+                <ul>
+                    <li><strong>Radiografía cervical AP-L:</strong> Se puede realizar sin retiro del collar cervical<span class="citation" title="Source 134 (Apunte TEC y TRM)"></span>.</li>
+                    <li><strong>TAC:</strong> De cráneo, cervical y toracolumbar según sospecha clínica<span class="citation" title="Source 134 (Apunte TEC y TRM)"></span>. Permite ver fracturas, como compresión en cuña, fractura en estallido, fractura-dislocación<span class="citation" title="Source 123, 124, 125, 129 (Apunte TEC y TRM)"></span>.</li>
+                    <li><strong>RNM (Resonancia Magnética):</strong> Podría ser diferida, pero es muy útil para ver la médula y lesiones ligamentosas/discales<span class="citation" title="Source 134 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Ecografía abdominopelviana (para descartar otras lesiones)<span class="citation" title="Source 134 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Rx de extremidades (si se sospechan fracturas)<span class="citation" title="Source 134 (Apunte TEC y TRM)"></span>.</li>
+                    <li>Sospechar hematoma extradural de columna cervical si el paciente empeora tras estabilización inicial<span class="citation" title="Source 135 (Apunte TEC y TRM)"></span>.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="trm-manejo-clinico-comp" class="content-section">
+            <div class="content-wrapper">
+                <h2>VI. Manejo Clínico y Complicaciones (TRM)</h2>
+
+                <h3>A. Monitorización y Estabilización</h3>
+                <ul>
+                    <li>Monitorización de signos vitales (SV), frecuencia cardíaca (FC), saturación de oxígeno (PO2) y signos neurológicos<span class="citation" title="Source 136, 139 (Mindmap TRM)"></span>.</li>
+                    <li>Estabilización y descompresión quirúrgica si está indicada: la cirugía busca descomprimir y alinear la columna (reducción cerrada &gt; cirugía)<span class="citation" title="Source 120 (Apunte TEC y TRM), Source 136, 139 (Mindmap TRM)"></span>.</li>
+                    <li>Tratamiento efectivo del dolor: no manejarlo es factor de mal pronóstico<span class="citation" title="Source 119 (Apunte TEC y TRM)"></span>.</li>
+                </ul>
+
+                <h3>B. Manejo de Complicaciones</h3>
+                <details>
+                    <summary>Complicaciones Cardiovasculares</summary>
+                    <div class="details-content">
+                        <p>Bradicardia, hipotensión (importante evitar isquemia secundaria por hipoperfusión), disautonomía<span class="citation" title="Source 136, 139 (Mindmap TRM)"></span>.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>Complicaciones Respiratorias</summary>
+                    <div class="details-content">
+                        <p>Son las complicaciones médicas más frecuentes y de mayor riesgo vital. Incluyen falla respiratoria, edema pulmonar, neumonía<span class="citation" title="Source 136, 138, 139 (Mindmap TRM)"></span>.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>Otras Complicaciones</summary>
+                    <div class="details-content">
+                        <ul>
+                            <li>Tromboembolismo Pulmonar (TEP)<span class="citation" title="Source 136, 139 (Mindmap TRM)"></span>.</li>
+                            <li>Vejiga neurogénica<span class="citation" title="Source 120 (Apunte TEC y TRM), Source 138, 139 (Mindmap TRM)"></span>.</li>
+                            <li>Disfunción intestinal<span class="citation" title="Source 138, 139 (Mindmap TRM)"></span>.</li>
+                            <li>Prevención de escaras<span class="citation" title="Source 138, 139 (Mindmap TRM)"></span>.</li>
+                            <li>Complicaciones psiquiátricas: depresión, ideación suicida, abuso de sustancias, estrés postraumático (detección y manejo precoz)<span class="citation" title="Source 138, 139 (Mindmap TRM)"></span>.</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <h3>C. Uso de Corticoides</h3>
+                <ul>
+                    <li>El uso de corticoides (metilprednisolona) depende de los protocolos del centro<span class="citation" title="Source 137, 139 (Mindmap TRM)"></span>.</li>
+                    <li>Algunos trabajos demuestran que dosis muy altas de metilprednisolona administradas antes de las 6 horas podrían tener utilidad, mientras que otros indican que no hay que usarlos<span class="citation" title="Source 137 (Mindmap TRM)"></span>.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="trm-manejo-paliativo" class="content-section">
+            <div class="content-wrapper">
+                <h2>VII. Manejo Paliativo y a Largo Plazo (TRM)</h2>
+                <ul>
+                    <li>Es una condición ampliamente devastante para la persona, la familia y la sociedad<span class="citation" title="Source 138, 139 (Mindmap TRM)"></span>.</li>
+                    <li>Una buena parte de las complicaciones las manejan los médicos generales<span class="citation" title="Source 138, 139 (Mindmap TRM)"></span>.</li>
+                    <li>Requiere un enfrentamiento multidisciplinario<span class="citation" title="Source 138, 139 (Mindmap TRM)"></span>.</li>
+                </ul>
+            </div>
+        </section>
+        
+        <footer>
+            <p>&copy; 2024-2025 Guía Interactiva TEC y TRM. Creado para fines educativos.</p>
+        </footer>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const hamburgerButton = document.querySelector('.hamburger-button');
+            const sidebar = document.getElementById('sidebarNav');
+            const body = document.body;
+            const topBarHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--top-bar-height')) || 65;
+
+            if (hamburgerButton && sidebar) {
+                hamburgerButton.addEventListener('click', function () {
+                    body.classList.toggle('sidebar-open');
+                    const isExpanded = body.classList.contains('sidebar-open');
+                    hamburgerButton.setAttribute('aria-expanded', isExpanded);
+                    sidebar.setAttribute('aria-hidden', !isExpanded);
+                });
+            }
+
+            const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
+            sidebarLinks.forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        // Adjusted to ensure the title of the section is fully visible below the top bar
+                        const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - topBarHeight - 15; // 15px buffer
+                        window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+                        
+                        // Close sidebar on link click on mobile if it's open
+                        if (window.innerWidth < 768 && body.classList.contains('sidebar-open')) { // 768px is a common breakpoint for mobile
+                           body.classList.remove('sidebar-open');
+                           hamburgerButton.setAttribute('aria-expanded', 'false');
+                           sidebar.setAttribute('aria-hidden', 'true');
+                        }
+                    }
+                });
+            });
+
+            // Active link highlighting in sidebar
+            const sections = document.querySelectorAll('.main-content section[id]');
+            function highlightSidebarLink() {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTopMargin = parseFloat(window.getComputedStyle(section).marginTop) || 0;
+                    // Adjust offset for highlighting to consider the top bar and a small buffer
+                    const sectionEffectiveTop = section.getBoundingClientRect().top + window.pageYOffset - topBarHeight - sectionTopMargin - 20; // 20px buffer
+                
+                    if (window.pageYOffset >= sectionEffectiveTop) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                sidebarLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').substring(1) === current) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+            window.addEventListener('scroll', highlightSidebarLink);
+            highlightSidebarLink(); // Initial call to highlight link on load
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Médula Espinal y Cerebelo - Apuntes de Estudio</title>
+    <style>
+        :root {
+            --primary-main: #1ABC9C;
+            --primary-dark: #16A085;
+            --accent-orange: #E67E22;
+            --accent-petroleum-blue: #2C3E50;
+            --alert-red: #E74C3C;
+            --complement-light-blue: #AED6F1;
+            --complement-beige: #F5EFEB;
+            --text-dark: #212529;
+            --text-medium: #495057;
+            --text-light: #6C757D;
+            --bg-main: #F8F9FA;
+            --card-bg: #FFFFFF;
+            --border-color: #DEE2E6;
+            --border-strong: #CED4DA;
+            --sidebar-width: 300px; /* Adjusted for potentially longer titles */
+            --top-bar-height: 65px;
+            --main-content-max-width: 1000px;
+        }
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; /* Common, clean font */
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            line-height: 1.6;
+            margin: 0;
+            padding-top: var(--top-bar-height);
+        }
+
+        .top-bar {
+            position: fixed; top: 0; left: 0; right: 0;
+            height: var(--top-bar-height);
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center;
+            padding: 0 1rem;
+            z-index: 1032;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        }
+        .fixed-back-button { /* MODIFICADO: Ahora es visible por defecto */
+            background-color: var(--primary-main); color: var(--card-bg); border: 2px solid var(--card-bg);
+            padding: 0.6rem 1rem; border-radius: 6px; text-decoration: none;
+            font-weight: 600; font-size: 0.85rem; white-space: nowrap;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            margin-left: 5px; /* Como en ACV hemorrágico.html */
+            margin-right: 10px; /* Añadido: Espacio entre este botón y el de hamburguesa */
+            display: flex; /* MODIFICADO: Cambiado de 'none' a 'flex' para hacerlo visible */
+            align-items: center; /* Para centrar el texto verticalmente si el padding lo permite */
+        }
+        .fixed-back-button:hover { background-color: var(--accent-orange); border-color: var(--accent-orange); }
+        .hamburger-button {
+            background-color: var(--accent-petroleum-blue); color: var(--card-bg); border: none;
+            padding: 0.6rem 0.8rem; border-radius: 6px; cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+            /* margin-left: 1.5rem;  MODIFICADO: Ajustado o eliminado ya que el fixed-back-button ahora tiene margin-right */
+        }
+        .hamburger-button span { display: block; width: 20px; height: 2px; background-color: var(--card-bg); margin: 4px 0; transition: all 0.3s ease-in-out; }
+        body.sidebar-open .hamburger-button span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+        body.sidebar-open .hamburger-button span:nth-child(2) { opacity: 0; }
+        body.sidebar-open .hamburger-button span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+        .sidebar-nav {
+            position: fixed; top: var(--top-bar-height);
+            left: calc(-1 * var(--sidebar-width));
+            width: var(--sidebar-width); height: calc(100vh - var(--top-bar-height));
+            background-color: var(--card-bg); color: var(--text-dark);
+            overflow-y: auto; transition: left 0.3s ease;
+            z-index: 1030; border-right: 1px solid var(--border-color);
+            box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+        }
+        body.sidebar-open .sidebar-nav { left: 0; }
+        .sidebar-nav h3 {
+            color: var(--accent-petroleum-blue); padding: 1.2rem 1.5rem 0.8rem;
+            margin: 0; font-size: 1.1rem; border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+        }
+        .sidebar-nav ul { list-style: none; padding: 0.75rem 0; margin: 0; }
+        .sidebar-nav li a {
+            display: block; padding: 0.65rem 1.5rem; margin: 0.4rem 1rem;
+            color: var(--card-bg); background-color: var(--primary-main);
+            border: 1px solid var(--primary-dark); border-radius: 6px;
+            text-decoration: none; font-size: 0.85rem; font-weight: 500;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.07); text-align: left;
+        }
+        .sidebar-nav li a:hover { background-color: var(--accent-orange); border-color: var(--accent-orange); color: var(--card-bg); }
+        .sidebar-nav li a.active {
+            background-color: var(--primary-dark); color: var(--card-bg);
+            border-color: var(--primary-main); font-weight: bold;
+        }
+        .sidebar-nav ul ul { padding-left: 1rem; margin-top: 0.2rem; margin-bottom: 0.5rem;}
+        .sidebar-nav ul ul li a {
+            font-size: 0.8rem;
+            padding: 0.5rem 1.5rem;
+            background-color: var(--complement-beige);
+            color: var(--text-dark);
+            border-color: var(--border-color);
+        }
+        .sidebar-nav ul ul li a:hover {
+             background-color: var(--complement-light-blue);
+             border-color: var(--primary-main);
+        }
+         .sidebar-nav ul ul li a.active {
+            background-color: var(--accent-petroleum-blue);
+            color: var(--card-bg);
+            border-color: var(--accent-petroleum-blue);
+        }
+
+
+        .main-content { padding: 1.5rem; max-width: var(--main-content-max-width); margin-left: auto; margin-right: auto; }
+        .page-header-within-content {
+            background-color: var(--primary-main); color: var(--card-bg);
+            padding: 1.8rem 1.5rem; text-align: center; border-radius: 8px;
+            margin-bottom: 2rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .page-header-within-content h1 { color: var(--card-bg); font-size: 2rem; margin:0; font-weight: 700; }
+        .page-header-within-content p { color: var(--complement-beige); font-size: 1.1rem; margin-top: 0.5rem; }
+
+        .content-section { background-color: var(--card-bg); border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 6px 18px rgba(44, 62, 80, 0.08); border: 1px solid var(--border-color); }
+        .content-wrapper { padding: 1.5rem 2rem; }
+        .content-section > h2 { /* For Part I, Part II titles */
+            background-color: var(--accent-petroleum-blue);
+            color: var(--card-bg);
+            font-size: 1.6rem;
+            padding: 0.8rem 1.5rem;
+            margin: 0;
+            border-radius: 11px 11px 0 0; /* Match card radius */
+            font-weight: 600;
+        }
+        .content-section h3 { /* For A, B, C titles */
+             border-bottom: 3px solid var(--primary-main);
+             padding-bottom: 0.6rem; margin-bottom: 1.2rem;
+             font-size: 1.4rem; color: var(--accent-petroleum-blue);
+             margin-top: 0; /* Reset top margin if it's the first element in content-wrapper */
+             font-weight: 600;
+        }
+         .content-section h4 { /* For 1, 2, 3 titles under A, B, C */
+            font-size: 1.15rem; margin-top: 1rem; margin-bottom: 0.6rem;
+            color: var(--primary-dark); font-weight: 600;
+        }
+
+        ul, ol { padding-left: 20px; margin-top: 0.5em; margin-bottom: 1em;}
+        li { margin-bottom: 0.5em; }
+        ul ul, ol ol, ul ol, ol ul { margin-top: 0.3em; margin-bottom: 0.3em; padding-left: 25px;}
+
+        details {
+            background-color: var(--complement-beige);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        }
+        summary {
+            font-weight: 600;
+            cursor: pointer;
+            padding: 0.8rem 1.25rem;
+            color: var(--text-dark);
+            background-color: var(--complement-light-blue);
+            border-radius: 7px; /* Slightly less if details has 8px */
+            transition: background-color 0.3s ease;
+            list-style-position: inside; /* For better alignment of the marker */
+        }
+        details[open] summary {
+            background-color: var(--primary-main);
+            color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            border-radius: 7px 7px 0 0;
+        }
+        summary:hover {
+            background-color: var(--primary-dark);
+            color: var(--card-bg);
+        }
+        details .details-content {
+            padding: 1.25rem;
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            border-radius: 0 0 7px 7px;
+        }
+
+        .key-point { background-color: var(--complement-light-blue); border-left: 4px solid var(--primary-main); padding: 0.75em 1em; margin: 1em 0; border-radius: 4px; }
+        .highlight-tip { background-color: #e7f6fd; border-left: 4px solid #2ECC71; padding: 0.75em 1em; margin: 1em 0; border-radius: 4px; color: var(--text-dark); }
+        strong { color: var(--primary-dark); }
+
+        footer { text-align: center; padding: 2rem 1.5rem; margin-top: 3rem; border-top: 1px solid var(--border-strong); background-color: var(--accent-petroleum-blue); color: var(--complement-beige); }
+        footer p { color: var(--complement-beige); }
+        html { scroll-behavior: smooth; }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <a href="Prueba_2_Neuro.html" class="fixed-back-button">Volver al Índice</a>
+        <button class="hamburger-button" aria-label="Abrir/Cerrar Navegación" aria-expanded="false" aria-controls="sidebarNav">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </div>
+
+    <nav class="sidebar-nav" id="sidebarNav" aria-hidden="true" role="navigation">
+        <h3>Temario</h3>
+        <ul>
+            <li>
+                <a href="#parte1">Parte I: Médula Espinal</a>
+                <ul>
+                    <li><a href="#medula-anatomia">A. Anatomía y Generalidades</a></li>
+                    <li><a href="#medula-sindrome-general">B. Síndrome Medular: Generalidades</a></li>
+                    <li><a href="#medula-sindromes-especificos">C. Síndromes Medulares Específicos</a></li>
+                    <li><a href="#medula-mielopatias">D. Mielopatías</a></li>
+                    <li><a href="#medula-mielopatias-infecciosas">E. Mielopatías Infecciosas y Paraneoplásicas</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#parte2">Parte II: Cerebelo</a>
+                <ul>
+                    <li><a href="#cerebelo-anatomia">A. Anatomía y Generalidades</a></li>
+                    <li><a href="#cerebelo-funciones-regiones">B. Funciones Cerebelosas por Regiones</a></li>
+                    <li><a href="#cerebelo-funciones-adicionales">C. Funciones Generales Adicionales</a></li>
+                    <li><a href="#cerebelo-examen">D. Examen Físico Cerebeloso</a></li>
+                    <li><a href="#cerebelo-hallazgos">E. Hallazgos en Lesión Cerebelosa</a></li>
+                    <li><a href="#cerebelo-etiologias">F. Etiologías del Síndrome Cerebeloso</a></li>
+                    <li><a href="#cerebelo-sindrome-topografia">G. Síndrome Cerebeloso según Topografía</a></li>
+                    <li><a href="#cerebelo-consideraciones">H. Consideraciones Finales</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <header class="page-header-within-content">
+            <h1>Médula Espinal y Cerebelo</h1>
+            <p>Apuntes Detallados de Estudio</p>
+        </header>
+
+        <section id="parte1" class="content-section">
+            <h2>I. Médula Espinal</h2>
+            <div class="content-wrapper">
+                <section id="medula-anatomia">
+                    <h3>A. Anatomía y Generalidades</h3>
+                    <details>
+                        <summary>1. Función General</summary>
+                        <div class="details-content">
+                            <ul>
+                                <li>La médula espinal se encarga de controlar la musculatura voluntaria del tronco y las extremidades.</li>
+                                <li>Recibe la información sensitiva de estas mismas áreas.</li>
+                            </ul>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>2. Características Morfológicas</summary>
+                        <div class="details-content">
+                            <ul>
+                                <li>Tiene forma cilíndrica, aplanada en su diámetro anteroposterior.</li>
+                                <li>Comienza en la región caudal del bulbo raquídeo.</li>
+                                <li>Se ubica en el canal raquídeo y se ancla a través del filum terminale.</li>
+                                <li><strong>Dimensiones en adultos:</strong>
+                                    <ul>
+                                        <li>Mide 42-45 cm de largo (45 cm en hombres, 43 cm en mujeres) y pesa aproximadamente 35 gramos.</li>
+                                        <li>El extremo caudal (cono medular) se ubica a nivel de las vértebras L1-L2.</li>
+                                        <li>Presenta variaciones en su ancho, con <strong>intumescencias</strong> (ensanchamientos) a nivel cervical y lumbar para la inervación de las extremidades superiores e inferiores, respectivamente. El ancho es de aproximadamente 1.27 cm a nivel cervical y lumbar, y 0.64 cm (6.4mm, corrección probable de la fuente original que podría haber querido decir 6.4mm y no 64mm) en la región dorsal.</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>3. Segmentos Medulares</summary>
+                        <div class="details-content">
+                            <ul>
+                                <li>Existen 31 segmentos medulares: 8 cervicales (C), 12 dorsales (o torácicos, T), 5 lumbares (L), 5 sacros (S) y 1 coccígeo (Co).</li>
+                                <li>Cada segmento presenta un par de nervios dorsales (con aferencias sensitivas) y ventrales (con eferencias motoras).</li>
+                                <li>Los nervios sensitivos parten de C2 en adelante; no hay nervio sensitivo C1 (pregunta frecuente para confundir).</li>
+                            </ul>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>4. Correspondencia entre Niveles Medulares y Vertebrales</summary>
+                        <div class="details-content">
+                            <ul>
+                                <li>Los niveles de la médula espinal y los cuerpos vertebrales NO se corresponden exactamente debido a diferencias en las velocidades de crecimiento durante el desarrollo embrionario.</li>
+                                <li>Reglas aproximadas de correspondencia:
+                                    <ul>
+                                        <li>Segmentos medulares C1 a C4 son equivalentes a sus vértebras.</li>
+                                        <li>Segmentos medulares C5 a C8: el nivel medular es uno más alto que el nivel vertebral.</li>
+                                        <li>Región dorsal alta (T1-T6 aprox.): el nivel medular es dos más alto que el vertebral.</li>
+                                        <li>Región dorsal baja (T7-T12 aprox.) y lumbar: el nivel medular es tres más alto que el vertebral.</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>5. Estructura Interna (Sustancia Gris y Blanca)</summary>
+                        <div class="details-content">
+                            <h4>Fibras Ascendentes (Sensitivas): Llevan información desde la médula hacia el encéfalo.</h4>
+                            <ul>
+                                <li><strong>Tracto Espinotalámico (lateral y anterior):</strong> Conduce termalgesia (dolor y temperatura) y tacto protopático. Son axones de pequeño tamaño. Las fibras decusan (cruzan al lado opuesto) a nivel de la comisura anterior de la médula, pocos segmentos por encima de su entrada.</li>
+                                <li><strong>Tracto de la Columna Dorsal (Fascículos Grácil y Cuneiforme):</strong> Conduce sensibilidad vibratoria, propiocepción (sentido de posición) y discriminación de dos puntos (tacto epicrítico). Las fibras ascienden ipsilateralmente y decusan a nivel del bulbo raquídeo (en los núcleos grácil y cuneiforme).</li>
+                                <li><strong>Tracto Espinocerebeloso (dorsal y ventral):</strong> Lleva información propioceptiva inconsciente al cerebelo.</li>
+                            </ul>
+                            <h4>Fibras Descendentes (Motoras y Moduladoras): Llevan información desde el encéfalo hacia la médula.</h4>
+                            <ul>
+                                <li><strong>Tracto Corticoespinal (Piramidal):</strong> Es el más importante y de mayor tamaño. Envía información desde la corteza frontal (área motora primaria, premotora, suplementaria) para la inervación motora voluntaria de las extremidades y el tronco. Sus fibras decusan en su mayoría a nivel del bulbo raquídeo, en las pirámides (formando el tracto corticoespinal lateral), mientras una pequeña porción no decusa y forma el tracto corticoespinal anterior.</li>
+                                <li>Otros tractos descendentes: Tracto Rubroespinal, Fascículo Vestibuloespinal, Tracto Reticuloespinal, Tracto Tectoespinal.</li>
+                            </ul>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>6. Dermatomas</summary>
+                        <div class="details-content">
+                            <p>Un dermatoma es un área de piel cuyos nervios sensitivos provienen todos de una única raíz nerviosa espinal. Conocer los dermatomas permite determinar el nivel sensitivo de una lesión medular.</p>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>7. Irrigación Medular</summary>
+                        <div class="details-content">
+                            <p>Se compone de dos sistemas principales:</p>
+                            <ul>
+                                <li><strong>Una Arteria Espinal Anterior:</strong> Irriga los 2/3 anteriores de la médula espinal. Se forma por la unión de ramas de las arterias vertebrales y discurre por la fisura media anterior.</li>
+                                <li><strong>Dos Arterias Espinales Posteriores:</strong> Irrigan el 1/3 posterior de la médula (cordones posteriores). Se originan generalmente de las arterias vertebrales o de las arterias cerebelosas inferiores posteriores (PICA).</li>
+                            </ul>
+                            <p><strong>Arterias Radiculares y Medulares Segmentarias:</strong> Complementan la irrigación. Provienen de ramas espinales de arterias cervicales, intercostales posteriores y lumbares. Hay más arterias en las intumescencias medulares debido a la mayor demanda.</p>
+                            <ul>
+                                <li>La <strong>Arteria Radicular Magna Anterior (Arteria de Adamkiewicz)</strong> es crucial. Generalmente única y unilateral (más frecuente en el lado izquierdo), se localiza a nivel de T9-L2 (más comúnmente T9-T12). Refuerza la circulación de los dos tercios inferiores de la médula, incluyendo la intumescencia lumbosacra. Su lesión (ej. en cirugía aórtica abdominal) puede causar un infarto medular extenso con paraplejia.</li>
+                            </ul>
+                            <p>La región torácica media es la que menos irrigación recibe (zona de vulnerabilidad vascular).</p>
+                            <p>Generalmente, cuando hay un infarto espinal, se afecta la arteria espinal anterior, ya que el sistema posterior tiene dos arterias y mayor capacidad de suplencia.</p>
+                        </div>
+                    </details>
+                </section>
+
+                <section id="medula-sindrome-general">
+                    <h3>B. Síndrome Medular: Generalidades</h3>
+                    <details>
+                        <summary>1. Cuándo Sospechar un Síndrome Medular</summary>
+                        <div class="details-content">
+                            <ul>
+                                <li>Ante un trastorno de la marcha de inicio agudo, subagudo o crónico que se manifieste por paraparesia, monoparesia o tetraparesia.</li>
+                                <li>Cuando se acompaña de compromiso esfinteriano (urinario o fecal) y/o compromiso sensitivo.</li>
+                                <li>La presencia de un <strong>nivel sensitivo</strong> es característica y localiza la lesión en la médula espinal. El paciente lo refiere como un "cinturón sensible que aprieta", adormecimiento y parestesias por debajo de la lesión. El nivel sensitivo se define como el dermatoma más caudal en que se mantiene intacta la discriminación del tacto fino y la algesia.</li>
+                            </ul>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>2. Síntomas a Investigar</summary>
+                        <div class="details-content">
+                            <ul>
+                                <li>Incontinencia urinaria o retención de orina.</li>
+                                <li>Constipación de reciente aparición.</li>
+                                <li>Disfunción eréctil.</li>
+                                <li>Dolor en faja o cinturón: muy orientador de patología inflamatoria o compresiva de la médula.</li>
+                            </ul>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>3. Consideraciones Diagnósticas y Terapéuticas</summary>
+                        <div class="details-content">
+                            <ul>
+                                <li>Hay etiologías que requieren tratamiento urgente para evitar paresias o tetraplejia irreversibles, como las <strong>mielopatías compresivas</strong> (considerar cirugía de urgencia para descomprimir).</li>
+                                <li>Una vez descartadas las causas quirúrgicas, es necesario identificar causas tratables médicamente, como el déficit de vitamina B12.</li>
+                                <li>Es fundamental establecer un patrón clínico neurológico que oriente al diagnóstico etiológico.</li>
+                            </ul>
+                        </div>
+                    </details>
+                </section>
+
+                <section id="medula-sindromes-especificos">
+                    <h3>C. Síndromes Medulares Específicos</h3>
+                     <p class="highlight-tip">A continuación se listan los posibles síndromes medulares:</p>
+                    <details>
+                        <summary>1. Sección Medular Completa</summary>
+                        <div class="details-content">
+                            <p>Interrupción de TODAS las vías sensitivas, motoras y autonómicas desde el nivel de la lesión hacia abajo.</p>
+                            <h4>Clínica:</h4>
+                            <ul>
+                                <li><strong>Plejia:</strong> Parálisis motora completa por debajo del nivel de la lesión (paraplejia o tetraplejia).</li>
+                                <li><strong>Anestesia o hipoestesia:</strong> Pérdida de todas las modalidades de sensibilidad en todos los dermatomas, generalmente 1 a 2 niveles por debajo de la lesión anatómica debido a la forma en que ascienden los tractos.</li>
+                                <li><strong>Shock Espinal (o medular):</strong> Fase inicial de una lesión medular aguda, caracterizada por hipotonía y arreflexia bajo el nivel medular comprometido. Puede durar días a semanas y lentamente evoluciona a un estado de hipertonía espástica e hiperreflexia (signos de lesión de primera motoneurona). Si la lesión es cervical, el shock espinal puede asociarse a hipotensión arterial refractaria al aporte de volumen (por pérdida del tono simpático), que se maneja con drogas vasoactivas.</li>
+                                <li><strong>Pérdida del control de esfínteres:</strong> Retención urinaria (globo vesical), incontinencia por rebalse, constipación, diarrea por rebalse. Se debe medir el residuo post-miccional.</li>
+                                <li><strong>Respuesta plantar extensora bilateral</strong> (Signo de Babinski bilateral) habitualmente presente tras la fase de shock espinal.</li>
+                            </ul>
+                            <h4>Signos clínicos orientadores adicionales:</h4>
+                            <ul>
+                                <li>La vía piramidal desciende por los cordones laterales con distribución somatotópica (de medial a lateral: rostro-brazo-tronco-pierna).</li>
+                                <li><strong>Signo de Beevor:</strong> Ascenso del ombligo al solicitar al paciente que intente sentarse desde decúbito dorsal sin usar los brazos. Localiza la lesión a nivel de T10 (contracción de abdominales superiores, pero no inferiores).</li>
+                                <li>Lesión C5-C8: Puede haber pérdida de la tos efectiva (músculos intercostales y abdominales desaferentados), favoreciendo atelectasias y neumonía.</li>
+                                <li>Lesión C3-C5: Afectación del nervio frénico (inervación del diafragma). Evaluar extensión del cuello (músculos con mismos miotomas).</li>
+                                <li><strong>Espasmos flexores:</strong> En pacientes con paraplejia crónica, son espasmos en EEII (más frecuentes) y/o EESS, dolorosos, recurrentes y sincrónicos. Se gatillan por cualquier proceso doloroso, infeccioso o inflamatorio bajo el nivel sensitivo (ej. ITU, cólico renal).</li>
+                            </ul>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>2. Síndrome Hemimedular (de Brown-Séquard)</summary>
+                        <div class="details-content">
+                            <p>Se produce por una lesión que afecta la mitad transversal de la médula espinal.</p>
+                            <h4>Clínica (Disociación de déficits):</h4>
+                            <ul>
+                                <li><strong>Lesión del tracto corticoespinal (motor) y cordones posteriores (vibración, propiocepción):</strong> Debilidad muscular y pérdida de percepción de vibración y posición <strong>ipsilateral</strong> a la lesión, por debajo de esta.</li>
+                                <li><strong>Lesión del tracto espinotalámico (termoalgesia):</strong> Déficit sensitivo (pérdida de dolor y temperatura) <strong>contralateral</strong> a la lesión, comenzando 1-2 niveles por debajo de la lesión.</li>
+                                <li>Puede haber una banda de disestesia o hiperestesia en el dermatoma correspondiente al nivel de la lesión, ipsilateralmente ("disestesia suspendida en el primer dermatoma ipsilateral comprometido").</li>
+                            </ul>
+                            <p>Es infrecuente observar un síndrome de Brown-Séquard completo y puro.</p>
+                            <p><strong>Causas:</strong> La más frecuente es traumática por herida penetrante (ej. acuchillamiento). Otras causas: lesiones desmielinizantes (EM), tumores que compriman lateralmente la médula.</p>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>3. Síndrome de Cordones Posteriores</summary>
+                        <div class="details-content">
+                            <p>Daño aislado de la vía de los cordones posteriores (fascículos grácil y cuneiforme).</p>
+                            <h4>Clínica:</h4>
+                            <p>Compromiso aislado de la sensibilidad vibratoria, propioceptiva y tacto fino epicrítico (discriminación de dos puntos) por debajo del nivel de la lesión.</p>
+                            <h4>Degeneración Combinada Subaguda (Síndrome Posterolateral):</h4>
+                            <p>A veces se asocia a compromiso piramidal (tracto corticoespinal lateral).</p>
+                            <ul>
+                                <li>Causas: Déficit de Vitamina B12 (ej. por cirugías bariátricas, vegetarianismo estricto), déficit de cobre, mielopatía vacuolar por VIH, mielopatía por HTLV-1, toxicidad por metotrexato.</li>
+                            </ul>
+                            <p>Motivo de consulta habitual: Dificultad en la marcha (marcha inestable, atáxica), que empeora en la oscuridad (al perder la aferencial visual compensatoria). Para el equilibrio se requieren 3 vías aferentes: sensibilidad profunda, vestibular y visión.</p>
+                            <h4>Examen Físico:</h4>
+                            <p>Ataxia de la marcha con aumento de la base de sustentación, que empeora al cerrar los ojos (<strong>Signo de Romberg positivo</strong>).</p>
+                            <h4>Signo de Lhermitte:</h4>
+                            <p>Si la lesión se localiza en los segmentos cervicales, puede haber una sensación de descarga eléctrica descendente por la columna vertebral y a veces hacia las extremidades, al flexionar el cuello. Causas: Esclerosis Múltiple, mielitis, mielopatía por déficit de B12, mielopatía por cisplatino, metástasis vertebral cervical, fractura vertebral cervical.</p>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>4. Síndrome de Cuernos Anteriores</summary>
+                        <div class="details-content">
+                            <p>Daño selectivo de las neuronas motoras (segunda motoneurona) localizadas en el cuerno anterior de la médula espinal, a nivel de la lesión.</p>
+                            <h4>Clínica (a nivel de la lesión):</h4>
+                            <p>Paresia o parálisis flácida, atrofia muscular, fasciculaciones y arreflexia en los músculos inervados por los segmentos afectados.</p>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>5. Síndrome de Arteria Espinal Anterior</summary>
+                        <div class="details-content">
+                            <p>Causado más frecuentemente por un infarto de la arteria espinal anterior, que irriga los 2/3 anteriores de la médula.</p>
+                            <p>Se pierden todas las funciones de la médula espinal <strong>con excepción de las conducidas por los cordones posteriores</strong> (vibración, propiocepción, tacto fino).</p>
+                            <h4>Clínica:</h4>
+                            <p>Inicio súbito, con dolor intenso en el nivel del infarto ("como una acuchillada"). Plejia (paraplejia o tetraplejia) desde el nivel motor afectado. Signo de Babinski bilateral. Anestesia termoalgésica con nivel sensitivo marcado. Compromiso de esfínteres.</p>
+                            <p><strong>RNM de médula:</strong> Puede mostrar un hallazgo característico de "ojos de serpiente" o "ojos de búho" en cortes axiales (hiperintensidad en T2 en los cuernos anteriores).</p>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>6. Síndrome de Arterias Espinales Posteriores</summary>
+                        <div class="details-content">
+                             <p>Es lo contrario al anterior; se conservan todas las modalidades excepto las que van por los cordones posteriores.</p>
+                            <p>Mucho menos frecuente que el síndrome de la arteria espinal anterior, debido a la presencia de dos arterias espinales posteriores y mejor circulación colateral.</p>
+                            <h4>Clínica:</h4>
+                            <p>Dolor ictal a nivel del infarto. Pérdida de sensibilidad profunda (vibración, propiocepción, tacto fino) con nivel sensitivo. SIN compromiso motor, de esfínteres o de sensibilidad superficial (dolor y temperatura).</p>
+                            <p><strong>Causas:</strong> Inyección de fármacos intratecal, vasculitis sistémica, sífilis.</p>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>7. Síndrome Medular Central</summary>
+                        <div class="details-content">
+                            <p>Afectación selectiva de la parte central de la médula espinal, comprometiendo la decusación de las fibras que forman los tractos espinotalámicos laterales (que conducen dolor y temperatura y decusan en el mismo nivel medular).</p>
+                            <h4>Clínica:</h4>
+                            <p>Pérdida de la sensibilidad superficial (térmica y dolorosa) con un <strong>nivel suspendido</strong> (afecta solo ciertos dermatomas correspondientes al nivel de la lesión, con preservación de la sensibilidad por encima y por debajo de estos niveles). A esto se le llama "disociación siringomiélica".</p>
+                            <p><strong>Causas:</strong> Son raras; incluyen tumores en el canal medular central, <strong>siringomielia</strong> (formación de una cavidad o quiste -syrinx- en la médula espinal, a menudo asociada a malformación de Arnold-Chiari). La siringomielia puede causar además compromiso de astas anteriores y cordonal, y su resolución suele ser quirúrgica.</p>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>8. Síndrome de Cono Medular</summary>
+                        <div class="details-content">
+                             <p>Lesión del extremo caudal de la médula espinal (cono medular), que corresponde a los segmentos sacros S1-S5 y coccígeo.</p>
+                            <h4>Clínica:</h4>
+                            <ul>
+                                <li>Déficit motor y sensitivo por debajo del nivel T12-L1, habitualmente <strong>simétrico</strong>.</li>
+                                <li>Signo de Babinski bilateral.</li>
+                                <li>Compromiso de esfínteres (vesical, anal) y disfunción sexual: suele ser <strong>precoz, menos doloroso y más simétrico</strong> que en el síndrome de cola de caballo.</li>
+                                <li><strong>Anestesia en silla de montar:</strong> Pérdida de sensibilidad en la región glútea, periné, escroto/vulva y pene; es muy característica.</li>
+                            </ul>
+                            <p><strong>Causas:</strong> Mielitis, trauma raquimedular, infarto espinal, tumores.</p>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>9. Síndrome de Cola de Caballo (Cauda Equina)</summary>
+                        <div class="details-content">
+                            <p>Lesión de las raíces nerviosas lumbosacras que se encuentran dentro del canal vertebral por debajo del cono medular (la "cola de caballo"). Es una lesión de nervios periféricos (raíces), no de la médula espinal propiamente tal.</p>
+                            <h4>Clínica:</h4>
+                            <p>Cuadro clínico similar al síndrome de cono medular, pero con diferencias importantes:</p>
+                            <ul>
+                                <li><strong>Más dolor radicular</strong>, a menudo severo e irradiado a las extremidades inferiores.</li>
+                                <li>Déficits motores y sensitivos suelen ser <strong>asimétricos</strong>.</li>
+                                <li>Compromiso de esfínteres es más <strong>tardío</strong> y puede ser menos completo.</li>
+                                <li><strong>SIN reflejo plantar extensor</strong> (Babinski ausente), ya que es una lesión de segunda motoneurona (raíces). Puede haber arreflexia aquiliana y/o rotuliana.</li>
+                            </ul>
+                            <p><strong>Causas:</strong> Hernia discal lumbar masiva, tumores (ej. metástasis leptomeníngeas), polirradiculitis infecciosa (en pacientes con VIH o infección por CMV), trauma, estenosis espinal severa.</p>
+                        </div>
+                    </details>
+                </section>
+
+                <section id="medula-mielopatias">
+                    <h3>D. Mielopatías (Enfermedades de la Médula Espinal)</h3>
+                    <p class="key-point">Causas de mielopatía por frecuencia (excluyendo trauma, que es la causa más probable globalmente):</p>
+                    <ol>
+                        <li><strong>Mielopatía Espondilótica (Cervical es la más común) (24%):</strong>
+                            <ul>
+                                <li>Compresión de la médula por cambios degenerativos del cuerpo vertebral, discos intervertebrales y ligamentos que ocupan y estrechan el canal raquídeo.</li>
+                                <li>Más frecuente en adultos y adultos mayores.</li>
+                                <li>Inicio insidioso, en la región cervical con síntomas como marcha espástica, compromiso sensitivo y paresia.</li>
+                                <li>RNM puede mostrar protrusión discal (ej. C5-C7) que comprime la médula.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Mielitis Transversa</strong> (inflamación de un segmento de la médula).</li>
+                        <li><strong>Esclerosis Múltiple (18%)</strong> (placas desmielinizantes en la médula).</li>
+                        <li><strong>Mielitis Viral.</strong></li>
+                        <li><strong>Absceso Epidural</strong> (infección que comprime la médula).</li>
+                        <li><strong>Infarto Medular.</strong></li>
+                        <li><strong>Malformación Vascular Espinal.</strong></li>
+                        <li><strong>Degeneración Combinada Subaguda</strong> (déficit de B12).</li>
+                        <li>Otras menos frecuentes: Mielopatía por radiación (terapéutica), Siringomielia, Tumores intramedulares y metástasis epidurales (16%), Esclerosis Lateral Amiotrófica (ELA) (4%).</li>
+                    </ol>
+                </section>
+
+                <section id="medula-mielopatias-infecciosas">
+                    <h3>E. Mielopatías Infecciosas y Paraneoplásicas</h3>
+                     <h4>Infecciosas:</h4>
+                    <ul>
+                        <li>Absceso epidural (compresiva).</li>
+                        <li>Mielitis aguda viral:
+                            <ul>
+                                <li>Compromiso principal de sustancia gris: Poliovirus, Coxsackie, Enterovirus.</li>
+                                <li>Compromiso principal transverso: Citomegalovirus (CMV), Varicela-Zóster, Hepatitis C, Epstein-Barr.</li>
+                            </ul>
+                        </li>
+                        <li>Mielopatía por VIH: Mielopatía vacuolar.</li>
+                        <li>HTLV-1 (de transmisión sexual).</li>
+                        <li>Sífilis (mielopatía sifilítica, tabes dorsal).</li>
+                        <li>Parasitarias (raro).</li>
+                    </ul>
+                    <h4>Paraneoplásicas:</h4>
+                    <ul>
+                        <li>Síndrome de motoneurona asociado a linfoma.</li>
+                        <li>Mielopatía necrotizante aguda.</li>
+                        <li>Encefalomielitis.</li>
+                    </ul>
+                </section>
+            </div>
+        </section>
+
+        <section id="parte2" class="content-section">
+            <h2>II. Cerebelo</h2>
+            <div class="content-wrapper">
+                <section id="cerebelo-anatomia">
+                    <h3>A. Anatomía y Generalidades</h3>
+                    <details>
+                        <summary>1. Introducción</summary>
+                        <div class="details-content">
+                            <p>El cerebelo (del latín "pequeño cerebro") es un sistema fundamental para el control y la regulación de la vía piramidal y el movimiento.</p>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>2. Funciones Principales</summary>
+                        <div class="details-content">
+                            <ul>
+                                <li>Coordinación de los movimientos, especialmente los voluntarios.</li>
+                                <li>Control de la postura y la marcha.</li>
+                                <li>Regulación del tono muscular.</li>
+                                <li>Aprendizaje motor, y contribuciones a funciones cognitivas y afectivas.</li>
+                            </ul>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>3. Estructura Macroscópica</summary>
+                        <div class="details-content">
+                             <ul>
+                                <li>Se compone de dos <strong>hemisferios cerebelosos</strong> y una porción medial llamada <strong>vermis</strong>.</li>
+                                <li>Presenta surcos importantes como la <strong>fisura primaria</strong> (que divide el lóbulo anterior del posterior) y la <strong>fisura posterolateral</strong> (que separa el cuerpo del cerebelo del lóbulo floculonodular).</li>
+                                <li>Se fija al tronco encefálico a través de tres pares de <strong>pedúnculos cerebelosos</strong>: superiores (conexión principal con mesencéfalo y tálamo), medios (conexión principal con puente, vía fibras pontocerebelosas) e inferiores (conexión principal con bulbo raquídeo y médula espinal).</li>
+                            </ul>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>4. Clasificación Funcional y Anatómica</summary>
+                        <div class="details-content">
+                            <ul>
+                                <li><strong>Arquicerebelo (Vestibulocerebelo):</strong> Corresponde al lóbulo floculonodular. Es el más antiguo filogenéticamente.</li>
+                                <li><strong>Paleocerebelo (Espinocerebelo):</strong> Corresponde principalmente al vermis y las zonas paravermianas del lóbulo anterior.</li>
+                                <li><strong>Neocerebelo (Cerebrocerebelo o Pontocerebelo):</strong> Corresponde a la mayor parte de los hemisferios cerebelosos (lóbulo posterior). Es la porción más nueva y desarrollada en humanos.
+                                    <br><em>Nota sobre Discrepancia en Fuentes: El texto original menciona una discrepancia entre fuentes sobre si el Neocerebelo corresponde al Lóbulo Posterior o Anterior. Se ha optado por Lóbulo Posterior para Neocerebelo, ya que es la asociación más extendida en la literatura neuroanatómica funcional.</em>
+                                </li>
+                            </ul>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>5. Estructura Microscópica (Corteza y Núcleos)</summary>
+                        <div class="details-content">
+                            <h4>Corteza Cerebelosa (Sustancia Gris Periférica): Consta de tres capas:</h4>
+                            <ol>
+                                <li>Capa Externa o Molecular: Contiene axones de células granulares (fibras paralelas), interneuronas (células estrelladas y en cesta) y dendritas de células de Purkinje.</li>
+                                <li>Capa Intermedia o de las Células de Purkinje: Contiene los somas de las células de Purkinje, que son las únicas neuronas eferentes de la corteza cerebelosa (inhibitorias, GABAérgicas).</li>
+                                <li>Capa Interna o Granulosa: Muy densa, contiene células granulares (excitatorias) y células de Golgi (inhibitorias).</li>
+                            </ol>
+                            <h4>Núcleos Grises Profundos (Sustancia Blanca Central): De medial a lateral son:</h4>
+                            <ol>
+                                <li>Núcleo Fastigio (o del techo).</li>
+                                <li>Núcleo Globoso.</li>
+                                <li>Núcleo Emboliforme. (Globoso + Emboliforme = Núcleo Interpuesto).</li>
+                                <li>Núcleo Dentado: Es el más grande y lateral. Uno de los sitios típicos de localización de hemorragia intraparenquimatosa hipertensiva.</li>
+                            </ol>
+                        </div>
+                    </details>
+                </section>
+
+                <section id="cerebelo-funciones-regiones">
+                    <h3>B. Funciones Cerebelosas por Regiones</h3>
+                    <details>
+                        <summary>1. Arquicerebelo (Vestibulocerebelo / Lóbulo Floculonodular)</summary>
+                        <div class="details-content">
+                            <ul>
+                                <li>Recibe aferencias de los núcleos vestibulares y envía eferencias a ellos.</li>
+                                <li><strong>Función:</strong> Controla los movimientos oculares y el equilibrio corporal, tanto estático (de pie) como dinámico (durante la marcha).</li>
+                                <li><strong>Lesión:</strong> Se expresa con síntomas y signos de una lesión vestibular central. Los dos principales son:
+                                    <ul>
+                                        <li><strong>Nistagmo Central:</strong> Movimientos oculares rítmicos, rápidos e involuntarios. Características del nistagmo central: no fatigable (no disminuye con la mirada sostenida), puede ser vertical, horizontal o rotatorio, es persistente, a menudo aumenta con la fijación de la mirada (el periférico disminuye), puede cambiar de dirección con la mirada (gaze-evoked nystagmus), y puede durar días o semanas.</li>
+                                        <li><strong>Opsoclono:</strong> Movimientos oculares conjugados, caóticos, multidireccionales, rápidos y de alta frecuencia ("ojos danzantes"), que no desaparecen con el sueño. Es como una exageración de un nistagmo central.</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>2. Paleocerebelo (Espinocerebelo / Vermis y Lóbulo Anterior)</summary>
+                        <div class="details-content">
+                            <ul>
+                                <li>Recibe información propioceptiva de las vías espinocerebelosas ascendentes.</li>
+                                <li><strong>Función:</strong> Responsable del control postural (regulación del tono muscular axial y de las extremidades proximales), la coordinación de la marcha bípeda y de la capacidad de reacción ante una caída inminente (ej. poner las manos para protegerse).</li>
+                                <li><strong>Lesión:</strong> Se traduce como ataxia de la marcha con aumento de la base de sustentación, equilibrio precario y caídas frecuentes. La coordinación de las extremidades superiores suele estar mucho menos afectada.</li>
+                                <li>Ejemplo de afectación: degeneración cerebelosa en alcoholismo crónico inveterado.</li>
+                            </ul>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>3. Neocerebelo (Cerebrocerebelo / Lóbulo Posterior y Hemisferios Laterales)</summary>
+                        <div class="details-content">
+                            <ul>
+                                <li>Es la región de mayor extensión anatómica y desarrollo en la especie humana.</li>
+                                <li>Recibe información de la corteza cerebral (vía núcleos pontinos) y proyecta de vuelta a la corteza (vía núcleo dentado, núcleo rojo, tálamo) -> Vía dento-rubro-tálamo-cortical.</li>
+                                <li>Las vías cerebelosas se cruzan dos veces, por lo que una lesión de un hemisferio cerebeloso produce clínica <strong>ipsilateral</strong> al lado de la lesión.</li>
+                                <li><strong>Función:</strong> Participa en la iniciación, planificación, temporización (timing) y coordinación de los movimientos voluntarios finos y precisos, especialmente de las extremidades (componente apendicular).</li>
+                            </ul>
+                        </div>
+                    </details>
+                </section>
+
+                <section id="cerebelo-funciones-adicionales">
+                    <h3>C. Funciones Generales del Cerebelo Adicionales</h3>
+                    <p class="key-point">Además de la coordinación motora, el cerebelo participa en:</p>
+                    <ul>
+                        <li><strong>Taxia:</strong> Capacidad de realizar un movimiento coordinado. La falta de coordinación se denomina ataxia. Un movimiento voluntario requiere la contracción coordinada de músculos agonistas, antagonistas, sinergistas y fijadores; esta coordinación depende del sistema nervioso-cerebelo-espinal.</li>
+                        <li><strong>Propiocepción:</strong> Aunque la información propioceptiva llega al cerebelo, este la usa para modular el movimiento más que para la percepción consciente.</li>
+                        <li><strong>Sistema Global de Corrección:</strong> Compara la intención del movimiento (desde la corteza) con la ejecución real (feedback sensorial) y envía señales correctoras para anticipar y rectificar errores.</li>
+                        <li><strong>Funciones No Motoras:</strong> Creciente evidencia de su rol en la cognición (funciones ejecutivas, lenguaje, aprendizaje espacial) y el afecto (regulación emocional).</li>
+                    </ul>
+                </section>
+
+                <section id="cerebelo-examen">
+                    <h3>D. Examen Físico Cerebeloso</h3>
+                    <p>Evalúa:</p>
+                    <ul>
+                        <li><strong>Equilibrio:</strong>
+                            <ul>
+                                <li>Estático: Examen de pie (control de tronco, búsqueda de oscilaciones). Prueba de Romberg (paciente de pie, pies juntos, se observa estabilidad con ojos abiertos y luego cerrados; si empeora o cae al cerrar los ojos sugiere ataxia sensorial, si ya es inestable con ojos abiertos puede ser cerebeloso. En lesión cerebelosa, tiende a lateralizar hacia el lado afectado en Romberg).</li>
+                                <li>Dinámico: Marcha normal (observar base de sustentación, regularidad de pasos, braceo), marcha en tándem (talón-punta).</li>
+                            </ul>
+                        </li>
+                        <li><strong>Coordinación Apendicular:</strong>
+                            <ul>
+                                <li>Metría (precisión del movimiento): Pruebas índice-nariz, talón-rodilla.</li>
+                                <li>Diadococinesia (habilidad para realizar movimientos alternantes rápidos): Ej. pronación-supinación rápida de manos, golpeteo alterno de palma y dorso de la mano sobre el muslo.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Otros:</strong> Tono muscular (en alteración cerebelosa suele estar disminuido - hipotonía), nistagmo, temblor (de intención o postural), habla (búsqueda de disartria).</li>
+                    </ul>
+                </section>
+
+                <section id="cerebelo-hallazgos">
+                    <h3>E. Hallazgos al Examen Neurológico en Lesión Cerebelosa</h3>
+                    <details>
+                        <summary>1. Trastornos de la Motilidad Ocular</summary>
+                        <div class="details-content">
+                            <ul>
+                                <li>Nistagmo central, síndrome vestibular central.</li>
+                                <li>Opsoclono.</li>
+                                <li>Dismetría ocular: Incapacidad para fijar la mirada con precisión en un blanco al mover los ojos de un punto a otro; se observan movimientos oscilatorios correctores (hiper o hipométricos) al intentar la fijación.</li>
+                            </ul>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>2. Trastornos del Habla</summary>
+                        <div class="details-content">
+                            <p><strong>Disartria cerebelosa (o escandida):</strong> Habla lenta, irregular, con descomposición silábica, a menudo con variaciones en el volumen ("habla ebriosa"). Se altera la articulación y prosodia del lenguaje.</p>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>3. Hipotonía</summary>
+                        <div class="details-content">
+                            <p>Disminución del tono muscular. Se manifiesta por mayor amplitud en el desplazamiento pasivo de la extremidad explorada y aumento de la flexibilidad articular.</p>
+                            <p><strong>Reflejos Osteotendinosos (ROT) pendulares:</strong> Al percutir un reflejo (ej. rotuliano), la extremidad oscila más veces de lo normal (5 o más ciclos) antes de volver al reposo, en lugar de los 2-3 ciclos habituales. La amplitud del reflejo puede estar incrementada.</p>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>4. Ataxia</summary>
+                        <div class="details-content">
+                            <p>Incapacidad de realizar movimientos coordinados; desorden y perturbación de la coordinación. Es la manifestación más destacada de una enfermedad cerebelosa.</p>
+                            <p>La ataxia puede tener origen en lesiones corticales, talámicas, cerebelosas (la más característica), laberínticas (vestibular periférica), medulares (cordones posteriores) o periféricas (neuropatía sensitiva).</p>
+                            <p>La ataxia cerebelosa incluye los siguientes fenómenos:</p>
+                            <ul>
+                                <li><strong>Disinergia:</strong> Asincronía en la contracción-relajación de los músculos agonistas y antagonistas durante un movimiento complejo.
+                                    <ul>
+                                        <li><em>Axial:</em> (Técnica de Babinski) Se pide al paciente de pie que doble el tronco hacia atrás; normally hay una flexión compensatoria de rodillas, que está ausente o es torpe en la disinergia axial.</li>
+                                        <li><em>Apendicular:</em> <strong>Prueba de Stewart-Holmes (o del rebote):</strong> Se pide al paciente que flexione el codo contra resistencia del examinador; al soltar súbitamente la resistencia, el paciente con disinergia no puede frenar el movimiento y su mano puede golpearle la cara o el pecho. Otra forma: paciente sentado con EESS extendidas en prono y ojos cerrados; al empujar el dorso de la mano hacia abajo, se observa una amplia oscilación.</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Dismetría:</strong> Dificultad para alcanzar un blanco con la precisión necesaria al desplazar un segmento corporal. Hay una falla en la correcta aceleración y desaceleración del movimiento, resultando en que el movimiento sobrepasa (hipermetría) o no alcanza (hipometría) el objetivo.
+                                    <ul>
+                                        <li><em>Prueba índice-nariz:</em> Se pide tocar alternativamente la punta de su nariz y el dedo del examinador. Los pacientes con dismetría suelen iniciar bien el movimiento pero se descoordinan al aproximarse al objetivo, con oscilaciones o correcciones (diferente del temblor de reposo del Parkinson).</li>
+                                        <li><em>Prueba talón-rodilla:</em> En decúbito supino, se pide tocar la rodilla contralateral con el talón y luego deslizarlo por la espina de la tibia hasta el tobillo.</li>
+                                        <li>Dibujar un número 8 en el aire con la EESS o hacer círculos con la mano puede evidenciar imprecisión.</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Disdiadococinesia o Adiadococinesia:</strong> Discapacidad (lentitud, torpeza) o incapacidad para realizar movimientos rápidos en forma rítmica y alternante.
+                                    <ul>
+                                        <li>Pruebas: "atornillar una ampolleta" imaginaria, golpear alternadamente la palma y el dorso de una mano sobre la otra o sobre el muslo, movimientos rápidos de pronación-supinación de las manos.</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Alteraciones de la Marcha y el Control Postural:</strong>
+                                    <ul>
+                                        <li><strong>Marcha Atáxica (o "marcha del ebrio"):</strong> Aumento de la base de sustentación (piernas separadas), pasos irregulares en longitud y dirección, inestabilidad con tendencia a desviarse o caer (pulsiones) hacia el lado de la lesión cerebelosa si es unilateral.</li>
+                                        <li><strong>Ataxia de Tronco:</strong> Inestabilidad postural al estar sentado o de pie, que en grados extremos puede impedir mantenerse sentado sin apoyo.</li>
+                                        <li><strong>Temblor o titubeo de la cabeza y tronco:</strong> En lesiones del cerebelo axial (vermis).</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </details>
+                </section>
+
+                <section id="cerebelo-etiologias">
+                    <h3>F. Etiologías del Síndrome Cerebeloso</h3>
+                    <p class="highlight-tip">Las causas de un síndrome cerebeloso son variadas:</p>
+                    <ul>
+                        <li>Ataxias degenerativas (esporádicas o hereditarias, ej. Ataxia de Friedreich, ataxias espinocerebelosas - SCAs).</li>
+                        <li>Esclerosis Múltiple (si hay placas desmielinizantes en el cerebelo o sus vías).</li>
+                        <li>Tumores (primarios en niños como meduloblastoma o astrocitoma pilocítico; metástasis en adultos).</li>
+                        <li>Accidente Cerebrovascular (ACV): Isquémico (ej. infarto de PICA, AICA, SCA) o hemorrágico (hematoma cerebeloso). <em>OJO: el infarto de PICA es un gran imitador de vértigo periférico; siempre descartar en vértigo agudo en pacientes >60 años con factores de riesgo cardiovascular.</em></li>
+                        <li>Tóxicos: Alcohol (degeneración cerebelosa alcohólica, afecta principalmente vermis), fármacos (Fenitoína, Carbamazepina, Litio, algunos quimioterápicos).</li>
+                        <li>Infecciones: Abscesos cerebelosos, encefalitis virales (ej. por Varicela-Zóster, Epstein-Barr), VIH, sífilis (neurosífilis).</li>
+                        <li>Traumatismo craneoencefálico con lesión cerebelosa.</li>
+                        <li>Síndromes Paraneoplásicos (ej. degeneración cerebelosa paraneoplásica asociada a anticuerpos anti-Yo, anti-Hu).</li>
+                        <li>Causas Metabólicas (ej. hipotiroidismo, enfermedad celíaca con ataxia por gluten).</li>
+                    </ul>
+                </section>
+
+                <section id="cerebelo-sindrome-topografia">
+                    <h3>G. Síndrome Cerebeloso según Topografía de la Lesión</h3>
+                    <p>El patrón de síntomas puede orientar a la localización de la lesión dentro del cerebelo.</p>
+                    <details>
+                        <summary>1. Síndrome Vermiano (o de la Línea Media)</summary>
+                        <div class="details-content">
+                            <p>Afecta principalmente el vermis y el lóbulo floculonodular (paleo y arquicerebelo).</p>
+                            <h4>Clínica:</h4>
+                            <p>Predominio de ataxia de la marcha con aumento de la base de sustentación e inestabilidad postural (ataxia truncal), disartria escandida, nistagmo, hipotonía (puede ser ipsilateral si hay leve extensión a hemisferio). Los signos apendiculares (dismetría, disdiadococinesia en extremidades) suelen ser mínimos o ausentes.</p>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>2. Síndrome Hemisférico Cerebeloso</summary>
+                        <div class="details-content">
+                             <p>Afecta uno de los hemisferios cerebelosos (neocerebelo).</p>
+                            <h4>Clínica:</h4>
+                            <p>Los signos son <strong>ipsilaterales</strong> a la lesión hemisférica (ya que las vías cerebelosas se cruzan dos veces). Predominan:</p>
+                            <ul>
+                                <li>Dismetría apendicular (en pruebas índice-nariz, talón-rodilla).</li>
+                                <li>Adiadococinesia o disdiadococinesia.</li>
+                                <li>Hipotonía ipsilateral.</li>
+                                <li>Temblor de intención ipsilateral.</li>
+                                <li>Puede haber disartria y nistagmo.</li>
+                            </ul>
+                            <p>Causa frecuente: infarto cerebeloso (ej. de la PICA).</p>
+                        </div>
+                    </details>
+                    <details>
+                        <summary>3. Síndrome Pancerebeloso</summary>
+                        <div class="details-content">
+                            <p>Afectación global de todo el cerebelo (vermis y ambos hemisferios).</p>
+                            <h4>Clínica:</h4>
+                            <p>Se mezclan los síntomas de los síndromes vermiano y hemisféricos: hipotonía generalizada, disartria severa, ataxia de tronco y de la marcha, dismetría y disdiadococinesia bilateral, nistagmo, etc.</p>
+                            <p><strong>Causas Principales:</strong> Tóxicos (alcohol, fármacos), Encefalopatía de Wernicke (déficit de Tiamina/B1, con tríada clásica: (1) Ataxia de la marcha + (2) Oftalmoparesia/nistagmo + (3) Síndrome confusional), infartos extensos, procesos degenerativos difusos.</p>
+                        </div>
+                    </details>
+                </section>
+
+                <section id="cerebelo-consideraciones">
+                    <h3>H. Consideraciones Finales sobre el Cerebelo</h3>
+                    <ul>
+                        <li>El examen cerebeloso es una parte importante del examen neurológico.</li>
+                        <li>Entrega mucha información y es altamente localizatorio de la posible lesión.</li>
+                        <li>Es importante realizarlo de forma ordenada y sistemática para poder diferenciar los hallazgos cerebelosos de otros síndromes neurológicos similares.</li>
+                    </ul>
+                </section>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Apuntes de Estudio. Creado para fines educativos.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const hamburgerButton = document.querySelector('.hamburger-button');
+            const sidebar = document.getElementById('sidebarNav');
+            const body = document.body;
+            const topBarHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--top-bar-height')) || 65;
+
+            if (hamburgerButton && sidebar) {
+                hamburgerButton.addEventListener('click', function () {
+                    body.classList.toggle('sidebar-open');
+                    const isExpanded = body.classList.contains('sidebar-open');
+                    hamburgerButton.setAttribute('aria-expanded', isExpanded);
+                    sidebar.setAttribute('aria-hidden', !isExpanded);
+                });
+            }
+
+            const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
+            sidebarLinks.forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - topBarHeight - 20; // Adjusted offset
+                        window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+
+                        // Close sidebar on link click if it's open (mobile-like behavior)
+                        if (body.classList.contains('sidebar-open')) {
+                           body.classList.remove('sidebar-open');
+                           hamburgerButton.setAttribute('aria-expanded', 'false');
+                           sidebar.setAttribute('aria-hidden', 'true');
+                        }
+                    }
+                });
+            });
+
+            const sections = document.querySelectorAll('.main-content section[id], .content-section > h2[id]');
+            function highlightSidebarLink() {
+                let current = '';
+                sections.forEach(section => {
+                    // Adjust for the top bar and a little bit of margin
+                    const sectionTop = section.getBoundingClientRect().top + window.pageYOffset - topBarHeight - 30;
+                    if (window.pageYOffset >= sectionTop) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                sidebarLinks.forEach(link => {
+                    link.classList.remove('active');
+                    const linkHref = link.getAttribute('href');
+                    if (linkHref && linkHref.substring(1) === current) {
+                        link.classList.add('active');
+                        // Expand parent if it's a sub-item
+                        let parentUl = link.closest('ul');
+                        if (parentUl && parentUl.previousElementSibling && parentUl.previousElementSibling.tagName === 'A') {
+                           // parentUl.previousElementSibling.classList.add('active'); // Optionally activate parent too
+                        }
+                    }
+                });
+                 // Fallback for top of page or if no section is matched
+                if (!current && window.pageYOffset < (sections[0] ? sections[0].getBoundingClientRect().top + window.pageYOffset - topBarHeight - 30 : 200) ) {
+                    const firstLink = document.querySelector('.sidebar-nav > ul > li > a');
+                    if (firstLink) firstLink.classList.add('active');
+                }
+            }
+            window.addEventListener('scroll', highlightSidebarLink);
+            window.addEventListener('resize', highlightSidebarLink); // Recalculate on resize
+            highlightSidebarLink(); // Initial call
+
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patología de Nervios Craneanos</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-main: #1ABC9C; 
+            --primary-dark: #16A085; 
+            --accent-orange: #E67E22; 
+            --accent-petroleum-blue: #2C3E50; 
+            --alert-red: #E74C3C; 
+            --complement-light-blue: #AED6F1; 
+            --complement-beige: #F5EFEB; 
+            --text-dark: #212529; 
+            --text-medium: #495057; 
+            --text-light: #6C757D; 
+            --bg-main: #F8F9FA; 
+            --card-bg: #FFFFFF; 
+            --border-color: #DEE2E6; 
+            --border-strong: #CED4DA;
+            --sidebar-width: 280px;
+            --top-bar-height: 65px;
+            --main-content-max-width: 1000px; 
+        }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-main); 
+            color: var(--text-dark); 
+            line-height: 1.6;
+            margin: 0;
+            padding-top: var(--top-bar-height);
+        }
+
+        .top-bar {
+            position: fixed; top: 0; left: 0; right: 0;
+            height: var(--top-bar-height);
+            background-color: var(--card-bg); 
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center;
+            padding: 0 1rem; 
+            z-index: 1032; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        }
+        .fixed-back-button {
+            background-color: var(--primary-main); color: var(--card-bg); border: 2px solid var(--card-bg);      
+            padding: 0.6rem 1rem; border-radius: 6px; text-decoration: none; 
+            font-weight: 600; font-size: 0.85rem; white-space: nowrap; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15); 
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            margin-left: 5px; 
+        }
+        .fixed-back-button:hover { background-color: var(--accent-orange); border-color: var(--accent-orange); }
+        .hamburger-button {
+            background-color: var(--accent-petroleum-blue); color: var(--card-bg); border: none;
+            padding: 0.6rem 0.8rem; border-radius: 6px; cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15); margin-left: 1.5rem; 
+        }
+        .hamburger-button span { display: block; width: 20px; height: 2px; background-color: var(--card-bg); margin: 4px 0; transition: all 0.3s ease-in-out; }
+        body.sidebar-open .hamburger-button span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+        body.sidebar-open .hamburger-button span:nth-child(2) { opacity: 0; }
+        body.sidebar-open .hamburger-button span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+        .sidebar-nav {
+            position: fixed; top: var(--top-bar-height); 
+            left: calc(-1 * var(--sidebar-width)); 
+            width: var(--sidebar-width); height: calc(100vh - var(--top-bar-height)); 
+            background-color: var(--card-bg); color: var(--text-dark);
+            overflow-y: auto; transition: left 0.3s ease; 
+            z-index: 1030; border-right: 1px solid var(--border-color);
+            box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+        }
+        body.sidebar-open .sidebar-nav { left: 0; }
+        .sidebar-nav h3 {
+            color: var(--accent-petroleum-blue); padding: 1.2rem 1.5rem 0.8rem;
+            margin: 0; font-size: 1.15rem; border-bottom: 1px solid var(--border-color);
+        }
+        .sidebar-nav ul { list-style: none; padding: 0.75rem 0; margin: 0; }
+        .sidebar-nav li a {
+            display: block; padding: 0.75rem 1.5rem; margin: 0.5rem 1rem; 
+            color: var(--card-bg); background-color: var(--primary-main); 
+            border: 1px solid var(--primary-dark); border-radius: 6px;
+            text-decoration: none; font-size: 0.9rem; font-weight: 500;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.07); text-align: left;
+        }
+        .sidebar-nav li a:hover { background-color: var(--accent-orange); border-color: var(--accent-orange); color: var(--card-bg); }
+        .sidebar-nav li a.active {
+            background-color: var(--primary-dark); color: var(--card-bg);
+            border-color: var(--primary-main); font-weight: bold;
+        }
+
+        .main-content { padding: 1.5rem; max-width: var(--main-content-max-width); margin-left: auto; margin-right: auto; }
+        .page-header-within-content {
+            background-color: var(--primary-main); color: var(--card-bg);
+            padding: 2rem 1.5rem; text-align: center; border-radius: 8px; 
+            margin-bottom: 2rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .page-header-within-content h1 { color: var(--card-bg); font-size: 1.8rem; margin:0; } 
+        .page-header-within-content p { color: var(--complement-beige); font-size: 1.0rem; margin-top: 0.5rem; }
+
+        .content-section { background-color: var(--card-bg); border-radius: 12px; margin-bottom: 1.5rem; box-shadow: 0 6px 18px rgba(44, 62, 80, 0.08); border: 1px solid var(--border-color); }
+        .content-wrapper { padding: 1.5rem; } 
+        
+        .content-section h2 { 
+            border-bottom: 3px solid var(--primary-main); 
+            padding-bottom: 0.75rem; 
+            margin-bottom: 1.75rem; 
+            font-size: 1.85rem; 
+            color: var(--accent-petroleum-blue); 
+            margin-top:0; 
+        }
+        details summary h3 {
+            font-size: 1.5rem; 
+            margin-top: 0; 
+            margin-bottom: 0; 
+            color: var(--primary-dark); 
+            display: inline; 
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        .details-content h3 {
+             font-size: 1.5rem; 
+            margin-top: 1.5rem; 
+            margin-bottom: 1rem; 
+            color: var(--primary-dark); 
+        }
+        .details-content h4 { 
+            font-size: 1.2rem; 
+            margin-top: 1.2rem; 
+            margin-bottom: 0.75rem; 
+            color: var(--text-dark); 
+            font-weight: 600; 
+        }
+        
+        table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.05); font-size: 0.88rem; }
+        th, td { border: 1px solid var(--border-strong); padding: 0.7rem; text-align: left; vertical-align: top;} 
+        th { background-color: var(--accent-petroleum-blue); color: var(--card-bg); font-weight: 600; }
+        tbody tr:nth-child(even) { background-color: var(--complement-beige); }
+        
+        details {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 1.2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        }
+        summary { 
+            font-weight: 600; 
+            cursor: pointer; 
+            padding: 0.8rem 1rem; 
+            color: var(--primary-dark); 
+            background-color: var(--complement-light-blue); 
+            border-radius: 7px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            list-style-position: inside;
+        }
+        details[open] summary {
+            border-bottom: 1px solid var(--border-color);
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        summary:hover {
+            background-color: var(--primary-main);
+            color: var(--card-bg);
+        }
+        details .details-content { 
+            padding: 1rem; 
+            border: none; 
+            border-top: 1px solid var(--border-color); 
+            border-radius: 0 0 7px 7px;
+        }
+        details[open] .details-content {
+             border-top: 1px solid var(--border-color);
+        }
+
+        .chart-container { max-width: 400px; height: auto; margin: 2rem auto; padding: 1rem; background-color: var(--complement-beige); border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.07); }
+        
+        footer { text-align: center; padding: 2rem 1.5rem; margin-top: 3rem; border-top: 1px solid var(--border-strong); background-color: var(--accent-petroleum-blue); color: var(--complement-beige); }
+        footer p { color: var(--complement-beige); }
+        html { scroll-behavior: smooth; }
+
+        .citation { font-size: 0.75em; color: var(--text-light); margin-left: 2px; }
+        .key-point { display: block; background-color: var(--complement-light-blue); border-left: 4px solid var(--primary-main); padding: 0.75em 1em; margin: 1em 0; border-radius: 4px; }
+        .highlight-tip { display: block; background-color: #e7f6fd; border-left: 4px solid #2ECC71; padding: 0.75em 1em; margin: 1em 0; border-radius: 4px; color: var(--text-dark); }
+        .clarification-note { display: block; background-color: var(--complement-beige); border-left: 4px solid var(--accent-orange); padding: 0.75em 1em; margin: 1em 0; border-radius: 4px; font-style: italic; }
+
+        .table-responsive { overflow-x: auto; margin-bottom: 1.5rem; }
+        .table-responsive table { margin-top: 0; margin-bottom: 0;} /* Ajuste para que el margen esté en el div */
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <a href="Prueba_2_Neuro.html" class="fixed-back-button">Volver al Índice</a>
+        <button class="hamburger-button" aria-label="Abrir/Cerrar Navegación" aria-expanded="false" aria-controls="sidebarNav">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </div>
+
+    <nav class="sidebar-nav" id="sidebarNav" aria-hidden="true" role="navigation">
+        <h3>Nervios Craneanos</h3>
+        <ul>
+            <li><a href="#generalidades">I. Generalidades</a></li>
+            <li><a href="#olfatorio">II. N. Olfatorio (I)</a></li>
+            <li><a href="#optico">III. N. Óptico (II)</a></li>
+            <li><a href="#oculomotores">IV. N. Oculomotores (III, IV, VI)</a></li>
+            <li><a href="#trigemino">V. N. Trigémino (V)</a></li>
+            <li><a href="#facial">VI. N. Facial (VII)</a></li>
+            <li><a href="#vestibulococlear">VII. N. Vestibulococlear (VIII)</a></li>
+            <li><a href="#glosofaringeo">VIII. N. Glosofaríngeo (IX)</a></li>
+            <li><a href="#vago">IX. N. Vago (X)</a></li>
+            <li><a href="#accesorio">X. N. Accesorio (XI)</a></li>
+            <li><a href="#hipogloso">XI. N. Hipogloso (XII)</a></li>
+            <li><a href="#sindromes-combinados">XII. Síndromes Combinados</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <header class="page-header-within-content">
+            <h1>Patología de Nervios Craneanos</h1>
+            <p>Apuntes Detallados de Estudio</p>
+        </header>
+
+        <section id="generalidades" class="content-section">
+            <div class="content-wrapper">
+                <h2>I. Generalidades de los Nervios Craneanos</h2>
+                <details open>
+                    <summary><h3>A. Localización de los Núcleos</h3></summary>
+                    <div class="details-content">
+                        <p>Los núcleos de los nervios craneales se pueden localizar en diferentes niveles del sistema nervioso central:</p>
+                        <ul>
+                            <li><strong>Diencéfalo:</strong>
+                                <ul>
+                                    <li>Nervio Olfatorio (I)</li>
+                                    <li>Nervio Óptico (II)</li>
+                                    <li><span class="highlight-tip"><strong>Nota:</strong> El I y II par no son verdaderos nervios periféricos, sino prolongaciones del diencéfalo.</span></li>
+                                </ul>
+                            </li>
+                            <li><strong>Mesencéfalo:</strong>
+                                <ul>
+                                    <li>Nervio Oculomotor (III)</li>
+                                    <li>Nervio Troclear (IV)</li>
+                                    <li>Nervio Trigémino (V) (componente mesencefálico de su núcleo)</li>
+                                </ul>
+                            </li>
+                            <li><strong>Puente (Protuberancia):</strong>
+                                <ul>
+                                    <li>Nervio Trigémino (V) (componente pontino principal)</li>
+                                    <li>Nervio Abducens (VI)</li>
+                                    <li>Nervio Facial (VII)</li>
+                                    <li>Nervio Vestibulococlear (VIII)</li>
+                                </ul>
+                            </li>
+                            <li><strong>Bulbo Raquídeo (Médula Oblonga):</strong>
+                                <ul>
+                                    <li>Nervio Glosofaríngeo (IX)</li>
+                                    <li>Nervio Vago (X)</li>
+                                    <li>Nervio Accesorio (XI)</li>
+                                    <li>Nervio Hipogloso (XII)</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary><h3>B. Emergencia de los Nervios Craneales (Forámenes Craneales)</h3></summary>
+                    <div class="details-content">
+                        <p>Los nervios craneales emergen del cráneo a través de los siguientes forámenes:</p>
+                        <ul>
+                            <li><strong>Fosa Anterior:</strong>
+                                <ul>
+                                    <li>Lámina cribosa: Nervio Olfatorio (I)</li>
+                                </ul>
+                            </li>
+                            <li><strong>Fosa Media:</strong>
+                                <ul>
+                                    <li>Canal óptico: Nervio Óptico (II)</li>
+                                    <li>Fisura orbitaria superior (Hendidura esfenoidal): Nervios Oculomotor (III), Troclear (IV), porción oftálmica del Trigémino (V1), Abducens (VI)</li>
+                                    <li>Foramen rotundum (Redondo Mayor): Nervio Maxilar (V2) del Trigémino <p class="clarification-note"><strong>Nota Aclaratoria:</strong> La fuente original del apunte podría haber tenido una imprecisión aquí. Lo correcto es: V2 (Maxilar) por Foramen Rotundum y V3 (Mandibular) por Foramen Oval. El Nervio Abducens (VI) emerge por la Fisura Orbitaria Superior.</p></li>
+                                </ul>
+                            </li>
+                            <li><strong>Fosa Posterior:</strong>
+                                <ul>
+                                    <li>Meato acústico interno (Conducto Auditivo Interno): Nervios Facial (VII), Vestibulococlear (VIII)</li>
+                                    <li>Foramen yugular (Agujero Rasgado Posterior): Nervios Glosofaríngeo (IX), Vago (X), Accesorio (XI)</li>
+                                    <li>Canal hipogloso: Nervio Hipogloso (XII)</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary><h3>C. Patología General</h3></summary>
+                    <div class="details-content">
+                        <p>Los nervios craneanos se pueden enfermar por sí solos o en relación a otras patologías, principalmente compromisos del tronco cerebral y de la base del cráneo.</p>
+                        <p>Algunos componentes especiales de los nervios craneanos los hacen más susceptibles a patologías específicas.</p>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="olfatorio" class="content-section">
+            <div class="content-wrapper">
+                <h2>II. Nervio Olfatorio (I Par)</h2>
+                <details open>
+                    <summary><h3>A. Anatomía y Función</h3></summary>
+                    <div class="details-content">
+                        <p>Es una prolongación del diencéfalo, lo que lo hace menos susceptible a enfermarse que otros nervios craneanos.</p>
+                        <p>Función: Especial sensorial para el olfato.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary><h3>B. Patología y Manifestaciones Clínicas</h3></summary>
+                    <div class="details-content">
+                        <ol>
+                            <li><strong>Disosmia o distorsión del olfato:</strong> Por ejemplo, en crisis epilépticas, los pacientes pueden sentir olores especiales (la patología no está en el nervio en sí).</li>
+                            <li><strong>Hiperosmia o aumento de la sensibilidad olfativa:</strong> Ocurre en condiciones como la migraña y el embarazo. Se perciben olores con mayor intensidad y a veces con desagrado, pero no implica mayor capacidad olfativa.</li>
+                            <li>
+                                <p><strong>Hiposmia (disminución) o Anosmia (pérdida) de la sensación olfativa:</strong></p>
+                                <ul>
+                                    <li>Causas:
+                                        <ul>
+                                            <li>Traumatismo de cráneo con compromiso de la fosa anterior.</li>
+                                            <li>Meningioma de la vaina del olfatorio.</li>
+                                            <li>Exposición a tóxicos (ej. vapores de hierro, aluminio; antiguamente en trabajadores de fundiciones).</li>
+                                            <li>Enfermedades neurodegenerativas (Parkinson, Demencia por Cuerpos de Lewy, Alzheimer), donde la anosmia puede ser un síntoma temprano por depósito de proteínas anormales. Clásicamente se describe que no huelen el orégano.</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="optico" class="content-section">
+            <div class="content-wrapper">
+                <h2>III. Nervio Óptico (II Par)</h2>
+                <details open>
+                    <summary><h3>A. Anatomía y Función</h3></summary>
+                    <div class="details-content">
+                        <p>Al igual que el olfatorio, NO es un verdadero nervio periférico, sino una prolongación del diencéfalo.</p>
+                        <p>Función: Especial sensorial para la visión.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary><h3>B. Neuropatías Ópticas (Generalidades)</h3></summary>
+                    <div class="details-content">
+                        <p>Todas las patologías del nervio óptico se denominan <strong>neuropatías ópticas</strong>. (Neuritis óptica es un tipo específico de neuropatía óptica inflamatoria).</p>
+                        <p><strong>Manifestaciones Clínicas Comunes:</strong></p>
+                        <ul>
+                            <li>Compromiso del campo visual o de la agudeza visual.</li>
+                            <li>Tienden a ser unilaterales, especialmente por etiología vascular. El compromiso bilateral puede verse en patologías tóxicas o metabólicas.</li>
+                            <li>Dolor a la movilización del ojo: Sugiere origen inflamatorio no isquémico.</li>
+                            <li><strong>Defecto Pupilar Aferente Relativo (DPAR) o Pupila de Marcus Gunn:</strong> La pupila del ojo afectado no se contrae adecuadamente a la luz directa, pero sí lo hace con el reflejo consensual al iluminar el ojo contralateral sano.</li>
+                            <li>El tipo de defecto del campo visual puede ayudar a determinar la etiología.</li>
+                            <li>El fondo de ojo puede mostrar alteraciones (edema de papila, palidez papilar, atrofia óptica), excepto en la presentación más frecuente de la neuritis óptica desmielinizante (neuritis óptica retrobulbar), donde la papila puede estar normal inicialmente.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary><h3>C. Etiologías Frecuentes de Neuropatía Óptica</h3></summary>
+                    <div class="details-content">
+                        <h4>1. Neuropatía Óptica Isquémica (NOI):</h4>
+                        <p>Por falta de aporte sanguíneo. Se divide en:</p>
+                        <ul>
+                            <li><strong>No Arterítica (NOINA):</strong>
+                                <ul>
+                                    <li>Generalmente en &gt;50 años.</li>
+                                    <li>Pérdida de visión indolora.</li>
+                                    <li>Causada por hipoperfusión de la arteria ciliar posterior corta (que irriga la cabeza del nervio óptico).</li>
+                                    <li>Fondo de ojo: Disco puede estar edematoso, con hemorragias pequeñas en astilla peripapilares.</li>
+                                    <li>Asociada a factores de riesgo vascular clásicos (HTA especialmente), apneas del sueño, uso de sildenafil (por hipotensión), dislipidemias.</li>
+                                    <li>Pronóstico visual relativamente pobre.</li>
+                                    <li>Campimetría: Hemianopsia altitudinal (superior o inferior) es característica por oclusión arterial.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Arterítica (NOIA):</strong>
+                                <ul>
+                                    <li>Generalmente debida a <strong>Arteritis de Células Gigantes (ACG)</strong> o Arteritis de la Temporal, un compromiso inflamatorio de la arteria.</li>
+                                    <li>Más frecuente en mujeres mayores (&gt;70 años).</li>
+                                    <li>Síntomas sistémicos de ACG: Cefalea (dolor hemicraneal permanente), engrosamiento y dolor a la palpación de la arteria temporal, claudicación mandibular, polimialgia reumática.</li>
+                                    <li>Fondo de ojo: Papila pálida y edematosa.</li>
+                                    <li>Puede ser unilateral, pero con alto riesgo de bilateralización si no se trata.</li>
+                                    <li>Es una <strong>urgencia médica</strong>: si no se trata con corticoides sistémicos a altas dosis, puede llevar a ceguera irreversible.</li>
+                                    <li>Diagnóstico: Sospecha clínica, VHS elevada. La confirmación es con biopsia de arteria temporal, pero no es obligatoria para iniciar tratamiento si la sospecha es alta.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <h4>2. Neuritis Óptica:</h4>
+                        <p>Inflamación del nervio óptico, específicamente de su mielina (en la forma desmielinizante).</p>
+                        <ul>
+                            <li>Si es de causa autoinmune desmielinizante, suele ser el debut de Esclerosis Múltiple (EM) o parte de Enfermedades del Espectro de la Neuromielitis Óptica (NMOSD) o MOGAD. Puede ser también una neuritis óptica aislada.</li>
+                            <li><strong>Clínica:</strong>
+                                <ul>
+                                    <li>Disminución de la agudeza visual de inicio agudo/subagudo (horas a días), más lento que la isquémica.</li>
+                                    <li><strong>Dolor retroocular</strong>, que empeora con los movimientos oculares (característico).</li>
+                                    <li>Discromatopsia (alteración en la visión de colores), especialmente rojo-verde.</li>
+                                    <li>Defectos en el campo visual, típicamente <strong>escotoma central o centrocecal</strong> (porque se comprometen primero las fibras con más mielina del haz papilomacular, localizadas en el centro del nervio).</li>
+                                    <li>Fondo de ojo: Puede haber edema de papila (papilitis) en 1/3 de los casos; en 2/3 la papila es normal (neuritis óptica retrobulbar).</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <h4>3. Otras Causas de Neuropatía Óptica:</h4>
+                        <ul>
+                            <li>Infecciosas: Meningitis, neuroretinitis (virus, toxoplasmosis, Bartonella), sífilis, enfermedad de Lyme.</li>
+                            <li>Inflamatorias no desmielinizantes: Parainfecciosas, enfermedades autoinmunes sistémicas (LES, Sjögren), sarcoidosis, paraneoplásicas.</li>
+                            <li>Genéticas: Neuropatía óptica hereditaria de Leber (NOHL), Atrofia óptica dominante tipo Kjer.</li>
+                            <li>Neoplásicas: Por compresión (meningioma del nervio óptico, otros tumores orbitarios o selares) o infiltración (glioma óptico, metástasis, linfoma).</li>
+                            <li>Hipertensión intracraneana idiopática (pseudotumor cerebri).</li>
+                            <li>Tóxica/Metabólica/Nutricional: Fármacos (etambutol, amiodarona), drogas recreacionales, toxinas (metanol - causa ceguera en presos que lo sintetizan; tto: diluir con etanol), deficiencias nutricionales (vitamina B1, B12, folato).</li>
+                            <li>Radiación, Trauma.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary><h3>D. Tabla Comparativa de Neuropatías Ópticas Comunes</h3></summary>
+                    <div class="details-content">
+                        <p>(Resumen de la tabla presentada en la fuente)</p>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Característica</th>
+                                        <th>Neuritis Óptica</th>
+                                        <th>NOINA</th>
+                                        <th>NOIA (Arterítica)</th>
+                                        <th>NOHL Leber</th>
+                                        <th>Neuroretinitis</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Edad (años)</strong></td>
+                                        <td>20-50</td>
+                                        <td>&gt;50</td>
+                                        <td>&gt;70</td>
+                                        <td>25-40</td>
+                                        <td>Niños</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Sexo</strong></td>
+                                        <td>2:1 Femenino</td>
+                                        <td>Igual</td>
+                                        <td>3.5:1 Femenino</td>
+                                        <td>80-90% Masculino</td>
+                                        <td>Igual</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Dolor</strong></td>
+                                        <td>&gt;90% (retroocular, con movs)</td>
+                                        <td>&lt;10%</td>
+                                        <td>Cefalea, dolor cuero cabelludo, claud. mand.</td>
+                                        <td>No</td>
+                                        <td>Variable</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Inicio</strong></td>
+                                        <td>Horas a días</td>
+                                        <td>Súbito</td>
+                                        <td>Súbito</td>
+                                        <td>Semanas a meses</td>
+                                        <td>Horas a días</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Uni/Bilateral</strong></td>
+                                        <td>Usualm. unilateral</td>
+                                        <td>Usualm. unilateral; bajo riesgo recur.</td>
+                                        <td>Puede ser bilateral rápido (no tratado)</td>
+                                        <td>Bilateral, presentación puede ser uni</td>
+                                        <td>A menudo bilateral</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Fondo de Ojo</strong></td>
+                                        <td>Papilitis 1/3; normal 2/3 (retrobulb)</td>
+                                        <td>Papilitis mayoría</td>
+                                        <td>Edema pálido papila</td>
+                                        <td>Hiperemia disco, telangiectasias</td>
+                                        <td>Papilitis, edema macular, exudados</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Campo Visual</strong></td>
+                                        <td>Escotoma central</td>
+                                        <td>Altitudinal (usualm. inferior)</td>
+                                        <td>Altitudinal o constricción generalizada</td>
+                                        <td>Central o cecocentral</td>
+                                        <td>Variable</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>RM Nervio Óptico</strong></td>
+                                        <td>Inflamación nervio (lesiones EM)</td>
+                                        <td>A menudo normal</td>
+                                        <td>Puede mostrar realce</td>
+                                        <td>Normal</td>
+                                        <td>Variablemente anormal</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Pronóstico</strong></td>
+                                        <td>Mayoría recupera 20/40 o mejor</td>
+                                        <td>40% mejora &gt;3 líneas</td>
+                                        <td>Pobre si no tto; ceguera rápida</td>
+                                        <td>1/3 mejora algo</td>
+                                        <td>Mayoría recupera total</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="oculomotores" class="content-section">
+            <div class="content-wrapper">
+                <h2>IV. Nervios Oculomotores (III, IV, VI Pares)</h2>
+                <p>Controlan los movimientos oculares extrínsecos y algunas funciones intrínsecas (III par). Los movimientos verticales requieren acción de más de un músculo, por lo que no son ideales para evaluación semiológica aislada.</p>
+                <details open>
+                    <summary><h3>A. Músculos Inervados y Acciones Principales</h3></summary>
+                    <div class="details-content">
+                        <ul>
+                            <li><strong>Nervio Abducens (VI):</strong> Músculo Recto Externo (Lateral) -&gt; Abducción (ojo hacia afuera).</li>
+                            <li><strong>Nervio Troclear (IV):</strong> Músculo Oblicuo Superior -&gt; Intorsión, depresión y abducción (principalmente mirada hacia abajo y adentro).</li>
+                            <li><strong>Nervio Oculomotor (III):</strong>
+                                <ul>
+                                    <li>Músculo Recto Superior -&gt; Elevación, aducción, intorsión.</li>
+                                    <li>Músculo Oblicuo Inferior -&gt; Extorsión, elevación, abducción.</li>
+                                    <li>Músculo Recto Interno (Medial) -&gt; Aducción (ojo hacia adentro).</li>
+                                    <li>Músculo Recto Inferior -&gt; Depresión, aducción, extorsión.</li>
+                                    <li>Músculo Elevador del Párpado Superior -&gt; Elevación del párpado.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary><h3>B. Nervio Oculomotor (III Par)</h3></summary>
+                    <div class="details-content">
+                        <h4>1. Anatomía y Núcleos:</h4>
+                        <ul>
+                            <li>Emerge en la porción ventral de los pedúnculos cerebrales (mesencéfalo), pasa paralelo a la silla turca e ingresa a la órbita.</li>
+                            <li><strong>Complejo Nuclear Oculomotor (Motor Somático):</strong> Se encarga de la inervación de los músculos extrínsecos del ojo (Recto Superior -RS-, Recto Inferior -RI-, Recto Interno -RIn-, Oblicuo Inferior -OI-) y del músculo elevador del párpado superior. Si se compromete, hay ptosis palpebral.</li>
+                            <li><strong>Núcleo de Edinger-Westphal (Motor Visceral Parasimpático):</strong> Sus fibras viajan con el III par, hacen sinapsis en el ganglio ciliar, y las fibras postganglionares (nervios ciliares cortos) inervan el músculo constrictor de la pupila (miosis) y el músculo ciliar (acomodación).</li>
+                        </ul>
+                        <h4>2. Relaciones Anatómicas Importantes:</h4>
+                        <ul>
+                            <li>Su trayecto lo relaciona con la <strong>arteria comunicante posterior (ACP)</strong>; un aneurisma en esta arteria es una causa frecuente de parálisis compresiva del III par.</li>
+                            <li>Contigüidad con el <strong>lóbulo temporal medial (uncus)</strong>; un aumento de la PIC con herniación uncal puede comprimir el III par.</li>
+                        </ul>
+                        <h4>3. Patología del III Par:</h4>
+                        <ul>
+                            <li><strong>Compromiso Nuclear:</strong> Es raro que una lesión afecte aisladamente el núcleo del III par. Suele asociarse a compromiso de la vía corticoespinal en el mesencéfalo, causando parálisis del III par ipsilateral y hemiparesia contralateral (Síndrome de Weber).</li>
+                            <li><strong>Compromiso Compresivo (Afecta fibras parasimpáticas periféricas primero):</strong>
+                                <ul>
+                                    <li>Clínica: Oftalmoplejía (desviación del ojo hacia abajo y afuera -"down and out"- por acción del VI y IV par sin oposición), ptosis palpebral completa, y <strong>midriasis</strong> (pupila dilatada y no reactiva). Signo de la "lucecita": la luz reflejada no cae al centro de la pupila, sino en el borde del iris.</li>
+                                    <li>Causas: Aneurisma de la ACP, hernia uncal por HTE, tumores.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Compromiso No Compresivo (Isquémico/Microvascular):</strong>
+                                <ul>
+                                    <li>Clínica: Oftalmoplejía y ptosis similar al compresivo, PERO <strong>SIN compromiso pupilar</strong> (pupila isocórica y reactiva, o "pupil sparing"). Las fibras pupilares son más externas y susceptibles a compresión, mientras que las fibras motoras son más internas y vulnerables a isquemia del vasa nervorum.</li>
+                                    <li>Causas: Diabetes Mellitus (causa más frecuente de mononeuropatía del III par con respeto pupilar), HTA, otras microvasculopatías.</li>
+                                </ul>
+                            </li>
+                            <li><strong>Oftalmoplejía de origen muscular y neuromuscular:</strong> Miastenia Gravis, pseudotumor orbitario (inflamación idiopática de la órbita).</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary><h3>C. Nervio Troclear (IV Par o Patético)</h3></summary>
+                    <div class="details-content">
+                        <p>Inerva el músculo Oblicuo Superior, cuya acción principal es la depresión del ojo en aducción (mirar hacia abajo y adentro) y la intorsión.</p>
+                        <p><strong>Clínica de la Lesión:</strong></p>
+                        <ul>
+                            <li>El ojo afectado se desvía ligeramente hacia <strong>superior y medial (hipertropia)</strong>, especialmente al mirar hacia el lado contralateral y hacia abajo.</li>
+                            <li><strong>Diplopía vertical o torsional</strong>, que empeora al mirar hacia abajo (ej. al leer o bajar escaleras) y al inclinar la cabeza hacia el hombro del lado afectado (Prueba de Bielschowsky positiva).</li>
+                            <li><strong>Tortícolis compensadora:</strong> El paciente inclina la cabeza hacia el lado sano y rota la cara ligeramente para evitar la diplopía. Por esto se le llama "nervio patético".</li>
+                        </ul>
+                        <p><strong>Causas:</strong> Traumática (es el nervio craneal más vulnerable a trauma craneal cerrado por su largo trayecto intracraneal y delgadez), microvascular diabética, congénita.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary><h3>D. Nervio Abducens (VI Par o Motor Ocular Externo)</h3></summary>
+                    <div class="details-content">
+                        <p>Inerva el músculo Recto Externo (Lateral), responsable de la abducción del ojo (mirar hacia afuera).</p>
+                        <p><strong>Clínica de la Lesión:</strong></p>
+                        <ul>
+                            <li>El ojo afectado se desvía hacia <strong>adentro (endotropia o esotropia)</strong> por acción sin oposición del recto medial.</li>
+                            <li>Diplopía horizontal que empeora al mirar hacia el lado de la parálisis.</li>
+                        </ul>
+                        <p><strong>Causas:</strong></p>
+                        <ul>
+                            <li>No tiene mucho valor localizatorio por sí solo, ya que tiene un largo trayecto intracraneal.</li>
+                            <li>Hipertensión intracraneana (puede causar parálisis bilateral por estiramiento de los nervios).</li>
+                            <li>Compresiones tumorales del ángulo pontocerebeloso.</li>
+                            <li>Microvasculopatía (diabetes, HTA), traumatismos, inflamación, tumores de base de cráneo.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary><h3>E. Reflejo Pupilar y Vías Simpáticas Oculares</h3></summary>
+                    <div class="details-content">
+                        <h4>1. Reflejo Fotomotor (Constricción Pupilar):</h4>
+                        <ul>
+                            <li>Depende del sistema parasimpático.</li>
+                            <li><strong>Vía Aferente:</strong> Luz estimula la retina -&gt; Nervio Óptico (II par) -&gt; Quiasma Óptico (decusación parcial) -&gt; Tracto Óptico -&gt; Área pretectal del mesencéfalo. Desde el área pretectal hay una segunda decusación hacia ambos núcleos de Edinger-Westphal (lo que permite el reflejo consensual).</li>
+                            <li><strong>Vía Eferente:</strong> Núcleo de Edinger-Westphal -&gt; Fibras parasimpáticas viajan con el III par -&gt; Ganglio ciliar (sinapsis) -&gt; Nervios ciliares cortos -&gt; Músculo constrictor de la pupila (miosis).</li>
+                        </ul>
+                        <h4>2. Dilatación Pupilar (Midriasis):</h4>
+                        <ul>
+                            <li>Depende del sistema simpático.</li>
+                            <li><strong>Vía Simpática Ocular (3 neuronas):</strong>
+                                <ul>
+                                    <li>1ª Neurona (Central): Hipotálamo posterior -&gt; Tronco encefálico -&gt; Médula espinal cervical hasta el centro cilioespinal de Budge (T1-T2).</li>
+                                    <li>2ª Neurona (Preganglionar): Desde T1 -&gt; Asciende por la cadena ganglionar simpática cervical -&gt; Ganglio cervical superior (sinapsis).</li>
+                                    <li>3ª Neurona (Postganglionar): Desde ganglio cervical superior -&gt; Fibras viajan con la arteria carótida interna (plexo carotídeo) -&gt; Seno cavernoso -&gt; Se unen a la rama oftálmica del V par -&gt; Nervios ciliares largos -&gt; Músculo dilatador del iris.</li>
+                                </ul>
+                            </li>
+                            <li>Lesiones frecuentes que afectan esta vía: tumores del vértice pulmonar (Síndrome de Pancoast, afecta T1) y disecciones o aneurismas de la carótida.</li>
+                        </ul>
+                        <h4>3. Defecto Pupilar Aferente Relativo (DPAR) o Pupila de Marcus Gunn:</h4>
+                        <ul>
+                            <li>Indica una lesión en la vía aferente del reflejo fotomotor (nervio óptico o retina extensa) de un ojo.</li>
+                            <li><strong>Prueba de la linterna alternante (Swinging flashlight test):</strong> En una habitación oscura, se ilumina un ojo y se observa miosis en ambos (directa y consensual). Luego se pasa rápidamente la luz al otro ojo.
+                                <ul>
+                                    <li>Normal: Ambas pupilas permanecen contraídas o se contraen más.</li>
+                                    <li>Con DPAR: Al iluminar el ojo afectado, ambas pupilas se dilatan paradójicamente (o se contraen menos que al iluminar el ojo sano), porque el estímulo luminoso que llega al cerebro desde el ojo enfermo es menor. El reflejo consensual desde el ojo sano se conserva.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <h4>4. Síndrome de Horner:</h4>
+                        <ul>
+                            <li>Causado por una interrupción de la vía simpática ocular ipsilateral.</li>
+                            <li><strong>Tríada clásica:</strong> Ptosis palpebral (leve, por parálisis del músculo de Müller, que es de inervación simpática), Miosis (pupila pequeña, por predominio parasimpático) y Anhidrosis facial ipsilateral (disminución de la sudoración; puede ser menos evidente).</li>
+                            <li>Se evidencia una dificultad en la dilatación (midriasis) del ojo afectado en la oscuridad. Si se sospecha, oscurecer la habitación: el lado enfermo permanece en miosis mientras el sano se dilata.</li>
+                            <li>Causas: Lesiones a cualquier nivel de la vía simpática (hipotálamo, tronco, médula cervical, tumores del vértice pulmonar, disección carotídea, tumores del seno cavernoso, displasia fibromuscular).</li>
+                        </ul>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="trigemino" class="content-section">
+            <div class="content-wrapper">
+                <h2>V. Nervio Trigémino (V Par)</h2>
+                <p>Principal nervio sensitivo de la cara y motor para los músculos de la masticación.</p>
+                <p>La inervación sensitiva de la cara por sus tres ramas (V1 oftálmica, V2 maxilar, V3 mandibular) respeta el ángulo mandibular (inervado por C2-C3).</p>
+                <details open>
+                    <summary><h3>Patologías Frecuentes</h3></summary>
+                    <div class="details-content">
+                        <h4>1. Neuralgia Esencial del Trigémino (Tic Douloureux):</h4>
+                        <ul>
+                            <li>Dolor facial paroxístico, severo, unilateral, de carácter eléctrico o lancinante, de breve duración (segundos a minutos), que afecta el territorio de una o más ramas del trigémino.</li>
+                            <li>Puede ser gatillado por estímulos táctiles leves en "zonas gatillo" (trigger zones) como lavarse los dientes, maquillarse, hablar, comer, afeitarse, o incluso una corriente de aire.</li>
+                            <li>Más frecuente en mujeres &gt;60 años.</li>
+                            <li>La patología subyacente se cree que es una compresión vascular del nervio por una arteria o vena anómala cerca de su salida del tronco encefálico, aunque también se ha mencionado atrofia senil del ganglio de Gasser (ganglio del trigémino). <span class="highlight-tip">(<strong>Nota:</strong> la compresión vascular es la teoría más aceptada actualmente).</span></li>
+                            <li>Tratamiento: Antiepilépticos como Carbamazepina (primera línea), Oxcarbazepina, Gabapentina, Pregabalina, Lamotrigina, Baclofeno. En casos refractarios: cirugía (descompresión microvascular, rizotomía).</li>
+                        </ul>
+                        <h4>2. Neuralgia Secundaria del Trigémino:</h4>
+                        <ul>
+                            <li>Dolor similar al esencial, pero ocurre en edades más tempranas (ej. 20-40 años) y es secundario a una causa identificable.</li>
+                            <li>Causas: Zonas de desmielinización por Esclerosis Múltiple (EM), compresiones vasculares (diferente a la idiopática por la edad de presentación), tumores, malformaciones arteriovenosas, fracturas de base de cráneo. Requiere estudio para buscar la etiología de base.</li>
+                        </ul>
+                        <h4>3. Herpes Zóster del Trigémino:</h4>
+                        <ul>
+                            <li>Reactivación del virus Varicela-Zóster en el ganglio de Gasser, afectando una de las ramas del trigémino (más frecuentemente V1 oftálmica).</li>
+                            <li>Cursa con dolor neuropático y erupción vesicular característica en el dermatoma afectado.</li>
+                            <li>Si afecta la rama oftálmica (V1), puede haber compromiso ocular grave (queratitis, uveítis, glaucoma), por lo que requiere evaluación oftalmológica urgente (Signo de Hutchinson: vesículas en la punta de la nariz, indica compromiso del nervio nasociliar y alto riesgo ocular).</li>
+                            <li>Tratamiento: Antivirales (Aciclovir, idealmente IV si es extenso o con compromiso ocular, como si fuera una encefalitis herpética, para disminuir riesgo de neuralgia post-herpética), analgésicos.</li>
+                            <li>Complicaciones: Neuralgia post-herpética (dolor crónico de difícil tratamiento), complicaciones oftálmicas, hipoestesia ocular.</li>
+                        </ul>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="facial" class="content-section">
+            <div class="content-wrapper">
+                <h2>VI. Nervio Facial (VII Par)</h2>
+                <p>Nervio mixto: motor para los músculos de la expresión facial, parasimpático para glándulas lacrimales y salivales (submandibular, sublingual), sensitivo especial para el gusto de los 2/3 anteriores de la lengua (vía cuerda del tímpano), y sensitivo general para una pequeña área del conducto auditivo externo (CAE) y pabellón auricular.</p>
+                <p>Tiene un trayecto prolongado dentro del hueso temporal (canal facial), lo que lo hace susceptible a fenómenos inflamatorios y compresivos.</p>
+                <details open>
+                    <summary><h3>A. Patologías</h3></summary>
+                    <div class="details-content">
+                        <h4>1. Parálisis Facial Periférica Idiopática (Parálisis de Bell):</h4>
+                        <ul>
+                            <li>Compromiso motor periférico agudo y unilateral de todos los músculos de una hemicara.</li>
+                            <li><strong>Fenómeno de Bell:</strong> Al intentar cerrar los ojos voluntariamente, el globo ocular del lado paralizado se desvía hacia arriba y afuera, quedando expuesta la esclera por debajo del párpado que no cierra completamente.</li>
+                            <li><strong>Clínica:</strong> Afecta toda la hemicara: imposibilidad de arrugar la frente, cerrar el ojo (lagoftalmos), desviación de la comisura bucal hacia el lado sano, borramiento del surco nasogeniano, dificultad para silbar o inflar la mejilla. El lado enfermo es el que "no tira", no tiene arrugas.</li>
+                            <li>Puede asociarse a: alteración del gusto en los 2/3 anteriores de la lengua (por compromiso de la cuerda del tímpano), hiperacusia (dolor o molestia con sonidos fuertes, por denervación del músculo estapedio), disminución del lagrimeo.</li>
+                            <li><strong>Pronóstico:</strong> La recuperación es espontánea en la mayoría de los casos (70-85% recuperan completamente).</li>
+                            <li><strong>Tratamiento:</strong> Corticoides orales (ej. Prednisona) iniciados precozmente (dentro de 72h) ACORTAN el tiempo de evolución y mejoran la probabilidad de recuperación completa. <span class="highlight-tip"><strong>Precaución:</strong> NO tratar con corticoides a diabéticos o hipertensos no controlados sin supervisión.</span> Protección ocular (lágrimas artificiales, parche oclusivo nocturno) para prevenir queratitis por exposición. Antivirales no han demostrado beneficio adicional claro en parálisis de Bell idiopática.</li>
+                        </ul>
+                        <h4>2. Parálisis Facial Periférica por Herpes Zóster (Síndrome de Ramsay Hunt):</h4>
+                        <ul>
+                            <li>El nervio facial lleva algunas fibras sensitivas del CAE, lo que explica la infección por VVZ.</li>
+                            <li><strong>Clínica:</strong> Parálisis facial periférica unilateral, similar a la de Bell, PERO asociada a:
+                                <ul>
+                                    <li><strong>Otalgia aguda</strong> (dolor de oído intenso) que puede preceder a la parálisis por 24-36 horas.</li>
+                                    <li><strong>Erupción vesicular herpética</strong> en el CAE, pabellón auricular, membrana timpánica, y/o paladar blando del mismo lado. <span class="key-point">SIEMPRE mirar estos sitios.</span></li>
+                                    <li>Puede haber compromiso de otros pares craneales (ej. VIII - hipoacusia, vértigo; V, IX).</li>
+                                </ul>
+                            </li>
+                            <li><strong>Pronóstico:</strong> Peor que la parálisis de Bell idiopática, con menor tasa de recuperación completa.</li>
+                            <li><strong>Tratamiento:</strong> Antivirales (Aciclovir, Valaciclovir) y corticoides.</li>
+                            <li>Es fundamental diferenciarla de la parálisis de Bell idiopática por el pronóstico y manejo.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary><h3>B. Diferenciación Parálisis Facial Central vs. Periférica</h3></summary>
+                    <div class="details-content">
+                        <p class="key-point">Es crucial diferenciarlas porque la parálisis central puede ser una EMERGENCIA (ej. ACV), mientras que la periférica generalmente no lo es (excepto causas específicas).</p>
+                        <p><strong>Inervación Corticonuclear del Núcleo Facial:</strong></p>
+                        <ul>
+                            <li>La mitad superior del núcleo facial (que inerva la musculatura frontal y orbicular de los ojos - parte superior de la cara) recibe inervación corticonuclear <strong>bilateral</strong> (de ambas cortezas motoras).</li>
+                            <li>La mitad inferior del núcleo facial (que inerva la musculatura peribucal - parte inferior de la cara) recibe inervación corticonuclear <strong>contralateral exclusivamente</strong>.</li>
+                        </ul>
+                        <p><strong>Parálisis Facial Periférica:</strong></p>
+                        <ul>
+                            <li>La lesión afecta el tronco del nervio facial o su núcleo en el puente.</li>
+                            <li>Se compromete TODA la hemicara ipsilateral a la lesión (frente, ojo, boca). Hay incapacidad para arrugar la frente y cerrar el ojo.</li>
+                        </ul>
+                        <p><strong>Parálisis Facial Central:</strong></p>
+                        <ul>
+                            <li>La lesión afecta la vía corticonuclear (supranuclear) contralateral.</li>
+                            <li>Se compromete fundamentalmente la <strong>mitad inferior de la cara contralateral</strong> a la lesión cerebral (desviación de comisura bucal).</li>
+                            <li>La musculatura de la frente y el cierre ocular están RELATIVAMENTE PRESERVADOS, debido a la inervación bilateral de la parte superior del núcleo facial.</li>
+                            <li>Suele asociarse a otros signos de lesión de primera motoneurona, como hemiparesia del mismo lado de la cara afectada (es decir, contralateral a la lesión cerebral).</li>
+                        </ul>
+                        <p><strong>Maniobra Diferencial Adicional:</strong> Buscar la activación del músculo platisma (inervado por el facial). Si está conservado y simétrico: sugiere parálisis central. Si no hay activación o es asimétrica en el lado de la debilidad facial: sugiere parálisis periférica.</p>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="vestibulococlear" class="content-section">
+            <div class="content-wrapper">
+                <h2>VII. Nervio Vestibulococlear (VIII Par)</h2>
+                <p>Este nervio tiene dos componentes funcionalmente distintos:</p>
+                <ul>
+                    <li><strong>Nervio Vestibular:</strong> Detecta aceleraciones lineales (utrículo y sáculo) y rotacionales (canales semicirculares), importantes para el equilibrio y la orientación espacial.</li>
+                    <li><strong>Nervio Coclear:</strong> Transmite información auditiva (ondas sonoras).</li>
+                </ul>
+                <p>Cuando se compromete, puede afectarse uno o ambos componentes.</p>
+                <details open>
+                    <summary><h3>A. Vértigo</h3></summary>
+                    <div class="details-content">
+                        <p><strong>Definición:</strong> Sensación subjetiva de movimiento (rotatorio, oscilatorio, de caída) del propio cuerpo o del entorno, cuando realmente no hay movimiento.</p>
+                        <p>Causado por un desbalance o compromiso de los receptores vestibulares periféricos (canales semicirculares para movimiento rotatorio, utrículo/sáculo para movimiento vertical/lineal) o de las vías y núcleos vestibulares centrales.</p>
+                        <p>El vértigo más frecuente es de tipo horizontal (rotatorio).</p>
+                        <p class="key-point"><strong>Diferenciación Vértigo Periférico vs. Central:</strong> Es lo más importante.</p>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Característica</th>
+                                        <th>Vértigo Periférico</th>
+                                        <th>Vértigo Central</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Inicio</strong></td>
+                                        <td>Siempre súbito</td>
+                                        <td>Súbito o gradual (depende etiología)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Intensidad</strong></td>
+                                        <td>Severo inicialmente, a menudo disminuye con el tiempo</td>
+                                        <td>Leve en mayoría, puede ser severo (ACV, EM)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Duración</strong></td>
+                                        <td>Intermitente (segundos a &lt;1min en VPPB), continuo (horas a días en neuronitis)</td>
+                                        <td>Semanas, meses (continuo), o segundos/minutos (ACV TIA)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Nistagmus</strong></td>
+                                        <td>Horizontal o horizonto-rotatorio, unidireccional, disminuye con fijación visual, fatigable</td>
+                                        <td>Puede ser vertical puro, torsional puro, multidireccional, no disminuye con fijación, no fatigable</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Efecto Posición Cabeza</strong></td>
+                                        <td>Induce vértigo (VPPB); empeora vértigo (neuronitis)</td>
+                                        <td>Usualmente poco cambio, puede empeorar</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Síntomas Neurovegetativos</strong> (náuseas, vómitos, sudoración)</td>
+                                        <td>Más intensos</td>
+                                        <td>Menos intensos</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Hallazgos Neurológicos Asociados</strong></td>
+                                        <td>NINGUNO (excepto hipoacusia/tinnitus si es laberíntico)</td>
+                                        <td>USUALMENTE PRESENTES (ej. disartria, ataxia, diplopía, déficits motores/sensitivos)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Hallazgos Auditivos</strong></td>
+                                        <td>Pueden estar presentes (tinnitus, hipoacusia en Meniere, laberintitis)</td>
+                                        <td>Raramente</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </details>
+                <details>
+                    <summary><h3>B. Nistagmus</h3></summary>
+                    <div class="details-content">
+                        <p>Movimientos oculares oscilatorios, rítmicos e involuntarios, que pueden ser conjugados o no. (También existe el nistagmo velopalatino). Se nombra por su fase rápida.</p>
+                        <ul>
+                            <li><strong>Nistagmus Optoquinético:</strong> Movimiento ocular reflejo en respuesta a un estímulo visual en movimiento que ocupa gran parte del campo visual. Tiene un componente de seguimiento lento (occipital) y una sacada rápida de refijación en dirección opuesta.</li>
+                            <li><strong>Nistagmus Vestibular:</strong> Se produce por una asimetría en la descarga de los receptores vestibulares o sus vías. Puede ser fisiológico (provocado por movimiento) o patológico.
+                                <ul>
+                                    <li><i>Fisiológico:</i> Ej. al girar la cabeza bruscamente, los canales semicirculares detectan el movimiento, generando un nistagmo compensatorio.</li>
+                                    <li><i>Patológico:</i> Uno de los laberintos disminuye su frecuencia de descarga, creando una asimetría con el lado sano.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary><h3>C. Trastornos Periféricos Comunes</h3></summary>
+                    <div class="details-content">
+                        <p>Generalmente de evolución benigna (excepto Enf. de Meniere).</p>
+                        <h4>1. Neuronitis Vestibular:</h4>
+                        <ul>
+                            <li>Inflamación del nervio vestibular de un lado, que causa una disminución súbita de su función, mientras el otro lado funciona normalmente.</li>
+                            <li>Produce un vértigo agudo, severo y persistente (dura días), con náuseas, vómitos intensos y desequilibrio importante que impide estar de pie.</li>
+                            <li>Es un episodio único, no relacionado con los movimientos (no posicional).</li>
+                            <li>Resolución espontánea en días o semanas. Posiblemente de etiología viral.</li>
+                        </ul>
+                        <h4>2. Vértigo Postural Paroxístico Benigno (VPPB):</h4>
+                        <ul>
+                            <li>Vértigo rotatorio breve (segundos a &lt;1 minuto), desencadenado por cambios específicos de posición de la cabeza (ej. girarse en la cama, mirar hacia arriba).</li>
+                            <li>Causa: Desprendimiento de otoconias (cristales de carbonato de calcio) del utrículo o sáculo, que se alojan anómalamente en uno de los canales semicirculares (más comúnmente el posterior), estimulándolo con los movimientos cefálicos.</li>
+                            <li>Se acompaña de nistagmo característico (torsional y vertical hacia arriba en VPPB del canal posterior) durante la crisis. Puede haber náuseas/vómitos, pero suele ser menos intenso que la neuronitis.</li>
+                            <li>Puede haber antecedente de golpe, pero también puede ser espontáneo.</li>
+                            <li>Tratamiento: Maniobras de reposición canalicular (ej. Maniobra de Epley para canal posterior).</li>
+                        </ul>
+                        <h4>3. Paroxismos Vestibulares:</h4>
+                        <ul>
+                            <li>Aparición súbita de episodios breves de vértigo sin gatillantes claros.</li>
+                            <li>Mecanismo similar a la neuralgia del trigémino (posible compresión neurovascular del VIII par).</li>
+                            <li>A diferencia de la neuronitis, son múltiples episodios.</li>
+                        </ul>
+                        <h4>4. Fístula Vestibular (o Perilinfática):</h4>
+                        <ul>
+                            <li>Comunicación anormal entre el oído medio y el oído interno, con fuga de perilinfa.</li>
+                            <li>Puede ocurrir una ruptura de la ventana oval o redonda, a menudo por maniobras de Valsalva bruscas, barotrauma o traumatismo craneal.</li>
+                            <li>Clínica similar a la neuronitis (vértigo, desequilibrio), pero puede haber síntomas auditivos (hipoacusia, tinnitus) y el nistagmo puede no ser horizontal. Los síntomas pueden ser inducidos por cambios de presión (ej. toser, sonarse).</li>
+                        </ul>
+                        <h4>5. Enfermedad de Meniere:</h4>
+                        <ul>
+                            <li>Trastorno crónico del oído interno caracterizado por episodios recurrentes de vértigo espontáneo (20 minutos a horas), acompañados de síntomas auditivos fluctuantes como hipoacusia neurosensorial (inicialmente para tonos graves), tinnitus (acúfenos) y sensación de plenitud o presión en el oído afectado.</li>
+                            <li>Causa: Desconocida, se cree que hay un aumento del contenido endolinfático (hidrops endolinfático) por mal control de canales iónicos (K/Na). Frecuentemente unilateral al inicio.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary><h3>D. Trastornos Centrales que Causan Vértigo</h3></summary>
+                    <div class="details-content">
+                        <p>Cualquier lesión que afecte las vías vestibulares centrales en el tronco encefálico o cerebelo.</p>
+                        <ul>
+                            <li>ACV isquémico o hemorrágico de tronco o cerebelo (especialmente territorio vertebrobasilar).</li>
+                            <li>Esclerosis Múltiple (placas desmielinizantes).</li>
+                            <li>Alteraciones estructurales de fosa posterior (ej. Malformación de Chiari).</li>
+                            <li>Tumores del ángulo pontocerebeloso o tronco.</li>
+                            <li>Ataxias espinocerebelosas y otras enfermedades degenerativas.</li>
+                            <li>Migraña vestibular.</li>
+                        </ul>
+                        <p class="highlight-tip"><strong>Importante:</strong> Ante un vértigo en un adulto mayor con factores de riesgo cardiovascular, siempre descartar un ACV central (especialmente de fosa posterior) con neuroimagen (RNM).</p>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="glosofaringeo" class="content-section">
+            <div class="content-wrapper">
+                <h2>VIII. Nervio Glosofaríngeo (IX Par)</h2>
+                <p>Funciones: Sensibilidad general y gusto del tercio posterior de la lengua, faringe, trompa de Eustaquio, oído medio. Motor para el músculo estilofaríngeo (eleva faringe al tragar). Parasimpático para la glándula parótida. Aferencias viscerales del cuerpo y seno carotídeo (baro y quimiorreceptores).</p>
+                <details open>
+                    <summary><h3>Patología</h3></summary>
+                    <div class="details-content">
+                        <ul>
+                            <li><strong>Neuralgia del Glosofaríngeo:</strong> Dolor paroxístico, unilateral, intenso y de breve duración, localizado en la base de la lengua, fosa amigdalina, ángulo de la mandíbula o conducto auditivo externo. Puede irradiar al oído. Se gatilla al tragar, bostezar, hablar, toser. La mayoría son idiopáticos. Se trata con antiepilépticos (similar a neuralgia del trigémino).</li>
+                            <li>Las lesiones del IX par aislado son raras. Frecuentemente se afecta junto con el X y XI par en lesiones del foramen yugular (Síndrome del Agujero Rasgado Posterior).</li>
+                        </ul>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="vago" class="content-section">
+            <div class="content-wrapper">
+                <h2>IX. Nervio Vago (X Par)</h2>
+                <p>Funciones: Motor para músculos de la faringe (deglución), laringe (fonación, excepto palatogloso). Parasimpático para vísceras torácicas y abdominales (corazón, pulmones, tracto GI hasta ángulo esplénico del colon). Sensibilidad general de una pequeña área alrededor del oído, CAE, meninges posteriores, faringe, laringe. Aferencias viscerales de faringe, laringe, vísceras toracoabdominales, cuerpos aórticos.</p>
+                <details open>
+                    <summary><h3>Patología</h3></summary>
+                    <div class="details-content">
+                        <ul>
+                            <li><strong>Paresia Velopalatina:</strong> Caída del velo del paladar del lado afectado, desviación de la úvula hacia el lado sano al decir "Ahh".</li>
+                            <li><strong>Disfonía/Ronquera:</strong> Por parálisis de cuerdas vocales (lesión del nervio laríngeo recurrente, rama del vago).</li>
+                            <li>Las paresias del nervio laríngeo recurrente izquierdo se suelen asociar a patologías del ápex pulmonar o mediastino (aneurismas del cayado aórtico, adenopatías, tumores del vértice pulmonar), o complicaciones de cirugía de cuello y tiroides.</li>
+                            <li><span class="highlight-tip"><strong>TIP:</strong> Cirugía de parótida puede comprometer el VII par (facial). Cirugía de tiroides puede comprometer el X par (vago, específicamente laríngeo recurrente).</span></li>
+                            <li>Lesión conjunta IX-X-XI: pensar en problema en agujero yugular.</li>
+                        </ul>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="accesorio" class="content-section">
+            <div class="content-wrapper">
+                <h2>X. Nervio Accesorio (XI Par o Espinal)</h2>
+                <p>Función: Motor para los músculos Esternocleidomastoideo (ECM) y Trapecio (porción superior).</p>
+                <details open>
+                    <summary><h3>Clínica y Causas de Lesión</h3></summary>
+                    <div class="details-content">
+                        <p><strong>Clínica de la Lesión:</strong> Debilidad para la rotación de la cabeza hacia el lado contralateral (ECM) y para la elevación del hombro (Trapecio) del lado afectado. Atrofia de dichos músculos.</p>
+                        <p><strong>Causas:</strong> Compromiso del agujero yugular (junto con IX y X), tumores del foramen magno, traumatismos cervicales, cirugías de cuello, compromiso idiopático (Parálisis de Bell del XI).</p>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="hipogloso" class="content-section">
+            <div class="content-wrapper">
+                <h2>XI. Nervio Hipogloso (XII Par)</h2>
+                <p>Sale por su agujero propio (canal hipogloso).</p>
+                <p>Función: Motor para los músculos intrínsecos y extrínsecos de la lengua (excepto palatogloso, inervado por el vago).</p>
+                <details open>
+                    <summary><h3>Clínica y Causas de Lesión</h3></summary>
+                    <div class="details-content">
+                        <p><strong>Clínica de la Lesión:</strong></p>
+                        <ul>
+                            <li>Parálisis y atrofia de la hemilengua ipsilateral a la lesión.</li>
+                            <li>Al protruir la lengua, ésta se desvía hacia el lado enfermo (por acción sin oposición del geniogloso sano contralateral).</li>
+                            <li>Pueden observarse fasciculaciones en la hemilengua afectada.</li>
+                            <li><span class="clarification-note">"Toda lengua arrugada es ELA (Esclerosis Lateral Amiotrófica), media lengua arrugada es hipogloso" (<strong>Nota:</strong> Esta es una simplificación; la atrofia y fasciculaciones son clave).</span></li>
+                        </ul>
+                        <p><strong>Causas:</strong> Compromiso meníngeo crónico basal, tumores y metástasis de la base del cráneo (ej. metástasis de cáncer de mama), traumatismos, cirugía cervical, ELA (afecta motoneuronas del XII).</p>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="sindromes-combinados" class="content-section">
+            <div class="content-wrapper">
+                <h2>XII. Síndromes Combinados de Nervios Craneanos</h2>
+                <details open>
+                    <summary><h3>A. Parálisis Bulbar vs. Pseudobulbar</h3></summary>
+                    <div class="details-content">
+                        <p><strong>Parálisis Bulbar (Síndrome Bulbar):</strong></p>
+                        <ul>
+                            <li>Lesión de los núcleos de los nervios craneales bajos (IX, X, XI, XII) en el bulbo raquídeo (lesión de motoneurona inferior).</li>
+                            <li><strong>Clínica:</strong> Disartria flácida, disfagia (con regurgitación nasal, riesgo de aspiración), debilidad y atrofia lingual con fasciculaciones, disminución o abolición del reflejo nauseoso, debilidad del velo del paladar, voz nasalada. Puede haber compromiso respiratorio si es extenso. Reflejo mandibular hipoactivo.</li>
+                            <li>Ejemplo: ELA forma bulbar.</li>
+                        </ul>
+                        <p><strong>Parálisis Pseudobulbar (Síndrome Pseudobulbar):</strong></p>
+                        <ul>
+                            <li>Lesión bilateral de las vías corticonucleares (o corticobulbares) que inervan los núcleos de los nervios craneales bajos (lesión de motoneurona superior).</li>
+                            <li><strong>Clínica:</strong> Disartria espástica (voz forzada, lenta, monótona), disfagia, PERO SIN atrofia ni fasciculaciones linguales. Reflejos (nauseoso, mandibular) hiperactivos o exaltados. NO hay compromiso respiratorio directo. Característicamente se asocia a labilidad emocional (risa y llanto espasmódicos o inapropiados) y puede haber deterioro intelectual.</li>
+                            <li><span class="key-point">Pupilas conservadas (el problema no es en el núcleo del III) es clave semiológica para diferenciar de otras patologías de tronco.</span></li>
+                            <li>Causas: Enfermedad cerebrovascular múltiple, EM, ELA (forma pseudobulbar), enfermedades degenerativas.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary><h3>B. Reflejos de Tronco</h3></summary>
+                    <div class="details-content">
+                        <p>Dependen del buen funcionamiento de nervios craneales específicos para sus arcos aferente y eferente:</p>
+                        <ul>
+                            <li><strong>Reflejo Fotomotor (Pupilar):</strong> Aferente II par, Eferente III par.</li>
+                            <li><strong>Reflejo Corneal:</strong> Aferente V par (V1), Eferente VII par (cierre palpebral bilateral).</li>
+                            <li><strong>Reflejos Oculocefálicos (Doll's eyes) y Oculovestibulares (Calóricos):</strong> Aferente VIII par (vestibular), Eferente III, IV, VI pares (movimiento ocular conjugado).</li>
+                            <li><strong>Reflejo Mandibular (Maseterino):</strong> Aferente V par (V3), Eferente V par (V3) (cierre mandibular).</li>
+                            <li><strong>Reflejo Nauseoso (Faríngeo):</strong> Aferente IX par, Eferente X par (elevación del paladar y constricción faríngea).</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary><h3>C. Síndromes Topográficos de Nervios Craneales (por localización de la lesión)</h3></summary>
+                    <div class="details-content">
+                        <h4>1. Fisura Esfenoidal (o Hendidura Orbitaria Superior):</h4>
+                        <ul>
+                            <li>Compromiso de nervios III, IV, V1 (rama oftálmica del trigémino), VI.</li>
+                            <li>Etiología: Suele ser compresiva (ej. tumores invasivos del esfenoides, aneurismas) y de evolución lenta.</li>
+                        </ul>
+                        <h4>2. Seno Cavernoso (Síndrome del Seno Cavernoso):</h4>
+                        <ul>
+                            <li>Contenido del seno: Nervio VI y Arteria Carótida Interna. En su pared lateral: Nervios III, IV, V1, V2.</li>
+                            <li>Compromiso de nervios III, IV, V1, V2, VI; a menudo con proptosis, quemosis.</li>
+                            <li>Generalmente de evolución aguda, es una emergencia. No muy frecuente, pero GRAVE.</li>
+                            <li>Causas: Trombosis séptica del seno cavernoso (secundaria a infecciones faciales o sinusales), tromboflebitis, aneurisma de la porción intracavernosa de la carótida, fístula carótido-cavernosa (puede tener soplo audible), tumores invasivos (de senos paranasales, silla turca), granuloma idiopático (Síndrome de Tolosa-Hunt, responde a corticoides), infecciones fúngicas (mucormicosis en diabéticos).</li>
+                        </ul>
+                        <h4>3. Espacio Retroesfenoidal:</h4>
+                        <p>Nervios II, III, IV, V, VI. Causa: Tumores grandes de fosa craneal media. <span class="clarification-note">(<strong>Nota:</strong> la fuente original podría indicar II, V, VI, pero es más típico III, IV, V, VI y a veces II por cercanía).</span></p>
+                        <h4>4. Ápex Petroso (Síndrome de Gradenigo):</h4>
+                        <p>Nervios V y VI. Causa: Petrositis (inflamación/infección del peñasco del temporal, complicación de otitis media), tumores del peñasco.</p>
+                        <h4>5. Meato Acústico Interno (Conducto Auditivo Interno):</h4>
+                        <p>Nervios VII y VIII. Causas: Tumores del peñasco (dermoides), procesos infecciosos, neurinoma del acústico (schwannoma vestibular).</p>
+                        <h4>6. Ángulo Pontocerebeloso:</h4>
+                        <p>Nervios V, VII, VIII, y a veces IX. Causas: Neurinoma del acústico (más frecuente), meningioma.</p>
+                        <h4>7. Foramen Yugular (Agujero Rasgado Posterior):</h4>
+                        <p>Nervios IX, X, XI. Causas: Tumores, aneurismas.</p>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2024-2025 Guía Interactiva Nervios Craneanos. Creado para fines educativos.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const hamburgerButton = document.querySelector('.hamburger-button');
+            const sidebar = document.getElementById('sidebarNav');
+            const body = document.body;
+            const topBarHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--top-bar-height')) || 65;
+
+            if (hamburgerButton && sidebar) {
+                hamburgerButton.addEventListener('click', function () {
+                    body.classList.toggle('sidebar-open');
+                    const isExpanded = body.classList.contains('sidebar-open');
+                    hamburgerButton.setAttribute('aria-expanded', isExpanded);
+                    sidebar.setAttribute('aria-hidden', !isExpanded);
+                });
+            }
+
+            const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
+            sidebarLinks.forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - topBarHeight - 15;
+                        window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+                        if (window.innerWidth < 768 && body.classList.contains('sidebar-open')) {
+                           body.classList.remove('sidebar-open');
+                           hamburgerButton.setAttribute('aria-expanded', 'false');
+                           sidebar.setAttribute('aria-hidden', 'true');
+                        }
+                    }
+                });
+            });
+
+            const sections = document.querySelectorAll('.main-content section[id]');
+            function highlightSidebarLink() {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTopMargin = parseFloat(window.getComputedStyle(section).marginTop) || 0;
+                    const sectionEffectiveTop = section.getBoundingClientRect().top + window.pageYOffset - topBarHeight - sectionTopMargin - 20; 
+                    if (window.pageYOffset >= sectionEffectiveTop) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                sidebarLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').substring(1) === current) {
+                        link.classList.add('active');
+                    }
+                });
+                if (!current && sections.length > 0 && window.pageYOffset < (sections[0].getBoundingClientRect().top + window.pageYOffset - topBarHeight - (parseFloat(window.getComputedStyle(sections[0]).marginTop) || 0) - 20) ) {
+                    const firstLink = document.querySelector('.sidebar-nav a[href="#' + sections[0].id + '"]');
+                    if (firstLink) { 
+                        firstLink.classList.add('active');
+                    }
+                }
+            }
+            window.addEventListener('scroll', highlightSidebarLink);
+            highlightSidebarLink(); 
+        });
+    </script>
+</body>
+</html>

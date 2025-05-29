@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorador Interactivo: Inflamaciones y Enfermedades Transmisibles del SNC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-main: #1ABC9C; 
+            --primary-dark: #16A085; 
+            --accent-orange: #E67E22; 
+            --accent-petroleum-blue: #2C3E50; 
+            --alert-red: #E74C3C; 
+            --complement-light-blue: #AED6F1; 
+            --complement-beige: #F5EFEB; 
+            --text-dark: #212529; 
+            --text-medium: #495057; 
+            --text-light: #6C757D; 
+            --bg-main: #F8F9FA; 
+            --card-bg: #FFFFFF; 
+            --border-color: #DEE2E6; 
+            --border-strong: #CED4DA;
+            --sidebar-width: 280px; /* Tomado de ACV hemorrágico.html */
+            --top-bar-height: 65px; /* Tomado de ACV hemorrágico.html */
+            --main-content-max-width: 1000px; /* Tomado de ACV hemorrágico.html, ajustado si es necesario por Tailwind más abajo */
+        }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-main); 
+            color: var(--text-dark); 
+            line-height: 1.6;
+            margin: 0;
+            padding-top: var(--top-bar-height); /* Para la top-bar fija */
+        }
+
+        /* Estilos de Navegación y Estructura de ACV hemorrágico.html */
+        .top-bar {
+            position: fixed; top: 0; left: 0; right: 0;
+            height: var(--top-bar-height);
+            background-color: var(--card-bg); 
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center;
+            padding: 0 1rem; 
+            z-index: 1032; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        }
+        .fixed-back-button {
+            background-color: var(--primary-main); color: var(--card-bg); border: 2px solid var(--card-bg);      
+            padding: 0.6rem 1rem; border-radius: 6px; text-decoration: none; 
+            font-weight: 600; font-size: 0.85rem; white-space: nowrap; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15); 
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            margin-left: 5px; 
+        }
+        .fixed-back-button:hover { background-color: var(--accent-orange); border-color: var(--accent-orange); }
+        .hamburger-button {
+            background-color: var(--accent-petroleum-blue); color: var(--card-bg); border: none;
+            padding: 0.6rem 0.8rem; border-radius: 6px; cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15); margin-left: 1.5rem; 
+        }
+        .hamburger-button span { display: block; width: 20px; height: 2px; background-color: var(--card-bg); margin: 4px 0; transition: all 0.3s ease-in-out; }
+        body.sidebar-open .hamburger-button span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+        body.sidebar-open .hamburger-button span:nth-child(2) { opacity: 0; }
+        body.sidebar-open .hamburger-button span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+        .sidebar-nav {
+            position: fixed; top: var(--top-bar-height); 
+            left: calc(-1 * var(--sidebar-width)); 
+            width: var(--sidebar-width); height: calc(100vh - var(--top-bar-height)); 
+            background-color: var(--card-bg); color: var(--text-dark);
+            overflow-y: auto; transition: left 0.3s ease; 
+            z-index: 1030; border-right: 1px solid var(--border-color);
+            box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+        }
+        body.sidebar-open .sidebar-nav { left: 0; }
+        .sidebar-nav h3 { /* Estilo para el título de la sidebar */
+            color: var(--accent-petroleum-blue); padding: 1.2rem 1.5rem 0.8rem;
+            margin: 0; font-size: 1.15rem; border-bottom: 1px solid var(--border-color);
+        }
+        .sidebar-nav ul { list-style: none; padding: 0.75rem 0; margin: 0; }
+        .sidebar-nav li a {
+            display: block; padding: 0.75rem 1.5rem; margin: 0.5rem 1rem; 
+            color: var(--card-bg); background-color: var(--primary-main); 
+            border: 1px solid var(--primary-dark); border-radius: 6px;
+            text-decoration: none; font-size: 0.9rem; font-weight: 500;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.07); text-align: left;
+        }
+        .sidebar-nav li a:hover { background-color: var(--accent-orange); border-color: var(--accent-orange); color: var(--card-bg); }
+        .sidebar-nav li a.active {
+            background-color: var(--primary-dark); color: var(--card-bg);
+            border-color: var(--primary-main); font-weight: bold;
+        }
+        /* Fin Estilos de Navegación y Estructura de ACV hemorrágico.html */
+
+
+        /* Estilos originales de Copia de Inflamaciones del SNC 3.html (adaptados y mantenidos para el contenido) */
+        /* h1, h2, h3, h4, h5 ya definidos en ACV o no necesitan redefinición global aquí, se manejan por sección */
+        header.page-title-header { background-color: var(--primary-main); color: var(--card-bg); } /* Renombrado para evitar conflicto con header global si existiera */
+        header.page-title-header h1 { color: var(--card-bg); }
+        header.page-title-header p { color: var(--complement-beige); }
+        
+        .content-section { background-color: var(--card-bg); border-radius: 12px; padding: 1.5rem; /* Ajustado padding para consistencia */ margin-bottom: 1.5rem; box-shadow: 0 6px 18px rgba(44, 62, 80, 0.08); border: 1px solid var(--border-color); }
+        .content-section h2 { border-bottom: 3px solid var(--primary-main); padding-bottom: 0.75rem; margin-bottom: 1.5rem; font-size: 1.7rem; color: var(--accent-petroleum-blue); margin-top:0; }
+        .content-section h3 { font-size: 1.35rem; margin-top: 1.5rem; margin-bottom: 1rem; color: var(--primary-dark); }
+        .content-section h4 { font-size: 1.15rem; margin-top: 1.2rem; margin-bottom: 0.75rem; color: var(--accent-petroleum-blue); font-weight: 500; }
+        .content-section h5 { font-size: 1.0rem; margin-top: 1rem; margin-bottom: 0.5rem; color: var(--primary-dark); font-weight: 500; }
+        
+        .highlight-emergency {
+            background-color: var(--alert-red); color: var(--card-bg); padding: 0.5em 0.8em;
+            margin: 0.5em 0; border-radius: 4px; font-weight: bold; text-align: center; display: block;
+        }
+        table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        th, td { border: 1px solid var(--border-strong); padding: 0.7rem 0.85rem; text-align: left; font-size: 0.90rem; }
+        th { background-color: var(--accent-petroleum-blue); color: var(--card-bg); font-weight: 600; }
+        tbody tr:nth-child(even) { background-color: var(--complement-beige); }
+        tbody tr:hover { background-color: var(--complement-light-blue); }
+        .table-responsive { overflow-x: auto; }
+        
+        details { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 1rem; padding: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
+        summary { font-weight: 600; cursor: pointer; padding: 0.8rem 1rem; color: var(--primary-dark); background-color: var(--complement-light-blue); border-radius: 8px 8px 0 0; transition: background-color 0.3s ease, color 0.3s ease; font-size: 1.0rem;}
+        details[open] summary { border-bottom: 1px solid var(--border-color); border-radius: 8px 8px 0 0; }
+        summary:hover { background-color: var(--primary-main); color: var(--card-bg); }
+        details .details-content { padding: 1rem; background-color: var(--card-bg); border-radius: 0 0 8px 8px; }
+        
+        html { scroll-behavior: smooth; }
+        footer { text-align: center; padding: 2rem 1.5rem; margin-top: 3rem; border-top: 1px solid var(--border-strong); background-color: var(--accent-petroleum-blue); color: var(--complement-beige); }
+        footer p { color: var(--complement-beige); }
+        .citation { font-size: 0.8em; color: var(--text-light); margin-left: 2px; }
+        .key-point { background-color: var(--complement-light-blue); border-left: 5px solid var(--primary-main); padding: 10px 15px; margin: 10px 0; border-radius: 4px; }
+        
+        .flowchart-container { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; margin: 1.5rem 0; padding: 1rem; background-color: var(--complement-beige); border-radius: 10px; border: 1px solid var(--border-strong); }
+        .flowchart-step, .flowchart-io, .flowchart-action { background-color: var(--primary-main); color: var(--card-bg); padding: 0.6rem 1.2rem; border-radius: 8px; text-align: center; min-width: 180px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid var(--primary-dark); font-weight: 500; margin-bottom: 0.4rem; font-size:0.9rem; }
+        .flowchart-decision { background-color: var(--accent-orange); color: var(--card-bg); padding: 0.6rem 1.5rem; border-radius: 8px; min-width: 200px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid #D35400; font-weight: 500; transform: skewX(-15deg); text-align: center; margin-bottom: 0.4rem; font-size:0.9rem;}
+        .flowchart-decision p { transform: skewX(15deg); margin:0; }
+        .flowchart-arrow { font-size: 1.3rem; color: var(--accent-petroleum-blue); line-height: 1; margin: 0.15rem 0; }
+        .flowchart-group { display: flex; justify-content: space-around; align-items: flex-start; width: 100%; gap: 0.8rem; margin-top: 0.4rem; flex-wrap: wrap; }
+        .flowchart-branch { display: flex; flex-direction: column; align-items: center; text-align: center; flex-basis: 48%; min-width: 200px;}
+        .flowchart-label { font-size: 0.8rem; color: var(--text-dark); margin-bottom: 0.2rem; font-weight: 500; background-color: var(--complement-light-blue); padding: 0.3rem 0.6rem; border-radius: 4px; border: 1px solid var(--primary-main); line-height: 1.2; min-width: 100px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);}
+        .flowchart-sub-action { background-color: var(--complement-light-blue); color: var(--text-dark); border: 1px dashed var(--primary-main); padding: 0.5rem 1rem; font-size:0.85em; }
+
+        /* Main content wrapper to control max-width if not using Tailwind's container for this */
+        .main-content-wrapper {
+             padding: 1.5rem; /* Equivalent to p-6, original had p-4 md:p-8 */
+             max-width: var(--main-content-max-width); /* original had max-w-5xl (1024px) */
+             margin-left: auto;
+             margin-right: auto;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <a href="Prueba_2_Neuro.html" class="fixed-back-button">Volver al Índice</a>
+        <button class="hamburger-button" aria-label="Abrir/Cerrar Navegación" aria-expanded="false" aria-controls="sidebarNav">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </div>
+
+    <nav class="sidebar-nav" id="sidebarNav" aria-hidden="true" role="navigation">
+        <h3>Inflamaciones SNC</h3>
+        <ul>
+            <li><a href="#generalidades-inflamacion">Generalidades Inflam.</a></li>
+            <li><a href="#infecciones-snc">Infecciones SNC</a></li>
+            <li><a href="#enf-inmunomediadas">Enf. Inmunomediadas</a></li>
+            <li><a href="#enf-priones">Enf. por Priones</a></li>
+            <li><a href="#vacunacion">Vacunación</a></li>
+        </ul>
+    </nav>
+
+    <header class="page-title-header py-8 text-center rounded-b-xl shadow-lg mt-[var(--top-bar-height)]">
+        <h1 class="text-4xl font-bold">Explorador Interactivo: Inflamaciones y Enfermedades Transmisibles del SNC</h1>
+        <p class="text-xl mt-2">Apuntes Detallados Basados en Material de Estudio</p>
+    </header>
+
+    <div class="main-content-wrapper">
+        <main> <section id="generalidades-inflamacion" class="content-section">
+                <h2>I. Generalidades de las Inflamaciones del SNC</h2>
+                <details open>
+                    <summary>A. Presentación Clínica</summary>
+                    <div class="details-content">
+                        <p>Las inflamaciones del Sistema Nervioso Central (SNC) tienen diversas presentaciones clínicas según el tejido más afectado, pero son muy semejantes entre ellas, independientemente de si son infecciosas o inmunomediadas, especialmente cuando el compromiso es encefálico.</p>
+                        <h5 class="mt-3">Los síntomas comunes incluyen:</h5>
+                        <ul class="list-disc list-inside ml-4">
+                            <li>Cefalea.</li>
+                            <li>Fiebre.</li>
+                            <li>Compromiso de conciencia.</li>
+                            <li>Compromiso cognitivo.</li>
+                            <li>Compromiso psiquiátrico.</li>
+                            <li>Compromiso de memoria.</li>
+                            <li>Crisis epilépticas.</li>
+                        </ul>
+                        <p class="mt-2">La etiología (el antígeno) puede sospecharse por la clínica, pero no siempre es posible determinarla solo con esta. El diagnóstico puede apoyarse en la detección de anticuerpos en el Líquido Cefalorraquídeo (LCR) o de los agentes causales directamente o mediante PCR.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>B. Clasificación Etiológica General</summary>
+                    <div class="details-content">
+                        <p>Las inflamaciones del SNC se pueden clasificar según el origen del antígeno:</p>
+                        <div class="flowchart-container my-4">
+                            <div class="flowchart-step">Inflamaciones del SNC</div>
+                            <div class="flowchart-arrow">↓</div>
+                            <div class="flowchart-group">
+                                <div class="flowchart-branch">
+                                    <div class="flowchart-label">1. Antígenos Exógenos (Infecciones)</div>
+                                    <div class="flowchart-arrow">↓</div>
+                                    <div class="flowchart-io" style="background-color: var(--accent-orange); border-color: #D35400;">Bacterias, Virus, Hongos, Parásitos</div>
+                                    <div class="flowchart-arrow">↓</div>
+                                    <div class="flowchart-sub-action">Tratamiento: Agentes Específicos</div>
+                                </div>
+                                <div class="flowchart-branch">
+                                    <div class="flowchart-label">2. Antígenos Endógenos (Autoinmunes)</div>
+                                    <div class="flowchart-arrow">↓</div>
+                                    <div class="flowchart-io" style="background-color: var(--complement-light-blue); color:var(--text-dark); border-color: var(--primary-main)">Gatilladas por: <br>- Antígenos exógenos <br>- Tumores (Paraneoplásicas) <br>- "Espontáneas" (Idiopáticas)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+            </section>
+
+            <section id="infecciones-snc" class="content-section">
+                <h2>II. Infecciones del SNC</h2>
+                <p>Implican el compromiso de estructuras del SNC por agentes infecciosos como bacterias, virus, hongos o parásitos.</p>
+
+                <details open>
+                    <summary>A. Meningitis</summary>
+                    <div class="details-content">
+                        <p>Es la inflamación de las meninges y del espacio subaracnoideo (LCR) causada por agentes infecciosos (antígenos exógenos). Dada la cercanía anatómica, la inflamación puede comprometer también el parénquima cerebral, resultando en una meningoencefalitis (encefalopatía).</p>
+
+                        <h4>1. Meningitis Bacteriana Aguda</h4>
+                        <p class="highlight-emergency">Es una EMERGENCIA MÉDICA con alta morbi-mortalidad.</p>
+                        <ul class="list-disc list-inside ml-4 mt-2">
+                            <li>Es una enfermedad de notificación inmediata.</li>
+                            <li>El pronóstico está ligado al inicio precoz de la terapia antibiótica y al uso correcto de corticoides.</li>
+                            <li class="font-bold text-red-600 text-lg my-2">La sospecha requiere una postura activa: "SOSPECHAR ES TRATAR!!!!"</li>
+                        </ul>
+
+                        <details>
+                            <summary>Etiología</summary>
+                            <div class="details-content">
+                                <ul class="list-disc list-inside ml-4">
+                                    <li>Agentes más frecuentes: *Streptococcus pneumoniae*, *Neisseria meningitidis*, *Staphylococcus aureus*, Bacilos gram (-), *Listeria monocytogenes*, *Streptococcus sp* y *Haemophilus influenzae*.</li>
+                                    <li>*S. pneumoniae* afecta principalmente a infantes y ancianos.</li>
+                                    <li>*N. meningitidis* afecta a niños mayores, adolescentes y adultos jóvenes.</li>
+                                    <li>Incidencia en países de altos ingresos: aprox. 3 por 100,000 habitantes/año. Mucho mayor en países de bajos ingresos, especialmente en el "cinturón de la meningitis" en África subsahariana.</li>
+                                </ul>
+                            </div>
+                        </details>
+                        <details>
+                            <summary>Fisiopatología</summary>
+                            <div class="details-content">
+                                <ul class="list-disc list-inside ml-4">
+                                    <li>Vías de llegada al SNC: hematógena, por continuidad (senos paranasales, oído interno), iatrogénica.</li>
+                                    <li>Colonización inicial: *S. pneumoniae* y *N. meningitidis* (epitelio respiratorio); *Streptococcus* grupo B, *E. Coli* y *Listeria* (tracto gastrointestinal).</li>
+                                    <li>Bacteriemia prolongada con alta carga de patógenos parece clave.</li>
+                                    <li>Supervivencia bacteriana en SNC: defensas del huésped ineficaces contra bacterias encapsuladas.</li>
+                                    <li>Mecanismos de daño cerebral: citotoxicidad bacteriana directa, toxicidad mediada por el huésped (respuesta inflamatoria), daño vascular.</li>
+                                </ul>
+                            </div>
+                        </details>
+                        <details>
+                            <summary>Personas en Riesgo</summary>
+                            <div class="details-content">
+                                 <ul class="list-disc list-inside ml-4">
+                                    <li>Extremos de la vida (neonatos/menores de 1 año y ancianos).</li>
+                                    <li>Inmunodeprimidos.</li>
+                                    <li>Esplenectomizados o con deficiencias de complemento.</li>
+                                    <li>Fumadores (meningococo).</li>
+                                    <li>Ciertas variaciones genéticas.</li>
+                                </ul>
+                            </div>
+                        </details>
+                        <details>
+                            <summary>Clínica</summary>
+                            <div class="details-content">
+                                <ul class="list-disc list-inside ml-4">
+                                    <li>Pródromo variable.</li>
+                                    <li>Fiebre (66-97%).</li>
+                                    <li>Signos de irritación meníngea: Rigidez de nuca (72-92%, S:31%, E:71%), Kernig (infrecuente, S:11%, E:95%), Brudzinski (infrecuente, S:9%, E:95%).</li>
+                                    <li>Alteración neurocognitiva (55-95%).</li>
+                                    <li>Cefalea.</li>
+                                    <li>Afectación de nervios craneales (10%).</li>
+                                    <li>Signos focales (10%).</li>
+                                    <li>Edema de papila (<1%, tardío).</li>
+                                    <li class="key-point"><strong>Tríada Clásica (cefalea, fiebre, rigidez de nuca):</strong> Presente SOLO en el 40% de los pacientes.</li>
+                                </ul>
+                            </div>
+                        </details>
+                         <details>
+                            <summary>Agentes Específicos</summary>
+                            <div class="details-content">
+                                <p><strong><em>Neisseria meningitidis</em>:</strong> Diplococo Gram (-). Transmisión por aerosoles. Puede causar púrpura hemorrágico (meningococcemia), S. de Watherhouse-Friederichsen. Requiere aislamiento y profilaxis a contactos.</p>
+                                <p class="mt-2"><strong><em>Streptococcus pneumoniae</em>:</strong> Diplococo Gram (+). Contagio por aerosoles. Morbimortalidad mayor que meningococo. Puede complicarse con vasculitis. Herpes labial en meningitis sugiere sepsis neumocócica.</p>
+                                <p class="mt-2"><strong><em>Haemophilus influenzae</em>:</strong> Cocobacilos Gram (-). Contagio por aerosoles. Importante en niños (disminuido post-vacunación). Cepas capsuladas tipo b son invasivas.</p>
+                                <p class="mt-2"><strong><em>Listeria monocytogenes</em>:</strong> Bacilo Gram (+). Causa meningitis, abscesos (troncoencéfalo), rombencefalitis. "Gran imitador". Alimentos contaminados. Riesgo: embarazadas, RN, >60 años, inmunocomprometidos. Tto: Ampicilina.</p>
+                            </div>
+                        </details>
+                        <details>
+                            <summary>Evaluación (PL, LCR, TAC)</summary>
+                            <div class="details-content">
+                                <p><strong>Punción Lumbar (PL)</strong> y hemocultivos son claves.</p>
+                                <h5 class="mt-3">Indicaciones absolutas de TAC antes de PL:</h5>
+                                <ul class="list-disc list-inside ml-4">
+                                    <li>Edad ≥60 años.</li>
+                                    <li>Inmunocomprometidos.</li>
+                                    <li>Historia de enfermedad del SNC (con posible efecto de masa).</li>
+                                    <li>Convulsiones dentro de la semana previa.</li>
+                                    <li>Déficit focal o alteración del nivel de conciencia.</li>
+                                </ul>
+                                <h5 class="mt-3">Estudio de LCR:</h5>
+                                <p>Citoquímico, Gram, Cultivo, Citológico, Látex, Tinta china, PCRs, ADA, etc.</p>
+                                <h5 class="mt-3">Características del LCR en meningitis bacteriana:</h5>
+                                <div class="table-responsive">
+                                    <table>
+                                        <thead><tr><th>Parámetro</th><th>Valor Típico</th></tr></thead>
+                                        <tbody>
+                                            <tr><td>Presión de apertura</td><td>>180 mmH₂O</td></tr>
+                                            <tr><td>Leucocitos</td><td>>10 y <10.000/mm³ (predominio PMN)</td></tr>
+                                            <tr><td>Glucosa</td><td><40 mg/dL</td></tr>
+                                            <tr><td>Relación glucosa LCR/plasma</td><td><0,31</td></tr>
+                                            <tr><td>Proteínas</td><td>>50 mg/dL</td></tr>
+                                            <tr><td>Tinción de Gram</td><td>Positiva en 70-90%</td></tr>
+                                            <tr><td>Cultivo</td><td>Positivo en 80%</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </details>
+                        <details>
+                            <summary>Algoritmo de Sospecha</summary>
+                            <div class="details-content">
+                                <div class="flowchart-container">
+                                    <div class="flowchart-step">Sospecha de Meningitis Bacteriana Aguda</div>
+                                    <div class="flowchart-arrow">↓</div>
+                                    <div class="flowchart-decision"><p>¿Criterios para TAC previo a PL?</p></div>
+                                    <div class="flowchart-group">
+                                        <div class="flowchart-branch">
+                                            <div class="flowchart-label">SÍ</div>
+                                            <div class="flowchart-arrow">↓</div>
+                                            <div class="flowchart-action">1. Hemocultivos STAT</div>
+                                            <div class="flowchart-arrow">↓</div>
+                                            <div class="flowchart-action">2. Dexametasona + ATB empírica</div>
+                                            <div class="flowchart-arrow">↓</div>
+                                            <div class="flowchart-action">3. TAC de cerebro</div>
+                                            <div class="flowchart-arrow">↓</div>
+                                            <div class="flowchart-decision"><p>¿TAC Negativa?</p></div>
+                                             <div class="flowchart-arrow">↓ (Sí)</div>
+                                            <div class="flowchart-action">Realizar PL</div>
+                                        </div>
+                                        <div class="flowchart-branch">
+                                            <div class="flowchart-label">NO</div>
+                                            <div class="flowchart-arrow">↓</div>
+                                            <div class="flowchart-action">1. Hemocultivos y PL STAT</div>
+                                            <div class="flowchart-arrow">↓</div>
+                                            <div class="flowchart-action">2. Dexametasona + ATB empírica</div>
+                                        </div>
+                                    </div>
+                                     <p class="mt-3 text-sm"><strong>En inmunocomprometidos:</strong> 1) Hemocultivos, 2) ATBs empíricos + corticoides, 3) Scanner de cerebro, 4) PL.</p>
+                                </div>
+                            </div>
+                        </details>
+                        <details>
+                            <summary>Manejo</summary>
+                            <div class="details-content">
+                                <ul class="list-disc list-inside ml-4">
+                                    <li><strong>Hospitalizar en unidad monitorizada</strong> y realizar <strong>notificación inmediata</strong>.</li>
+                                    <li>Establecer <strong>aislamiento respiratorio</strong> ante sospecha de meningitis meningocócica (mantener por 24 hrs desde inicio de terapia si se confirma).</li>
+                                    <li><strong>Terapia Antibiótica Empírica</strong> (adquirida en la comunidad):
+                                        <ul class="list-circle list-inside ml-6">
+                                            <li>Ceftriaxona 4 gr/día IV (c/12h) o Cefotaxima 8-12 gr/día IV (c/4h).</li>
+                                            <li>En >50 años, DM, alcohólicos, inmunodeprimidos: agregar Ampicilina 12 gr/día IV (2gr c/4h) para cubrir *Listeria*.</li>
+                                            <li>Considerar Vancomicina 2 gr/día (c/12h) en zonas con alta resistencia de neumococo (no general en Chile).</li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>Terapia Adyuvante con Corticoides:</strong>
+                                        <ul class="list-circle list-inside ml-6">
+                                            <li>Dexametasona 10 mg c/6 hrs por 4 días, administrar antes o junto con la primera dosis de ATB.</li>
+                                            <li>Efectiva en meningitis por neumococo y *H. influenzae*.</li>
+                                            <li>En Chile, se indica corticoides + ATB a todos ante sospecha.</li>
+                                            <li>Revisión Cochrane: reduce pérdida auditiva y secuelas neurológicas, sin efecto en mortalidad general. Apoyo en países de altos ingresos.</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </details>
+                         <details>
+                            <summary>Profilaxis a Contactos y Pronóstico</summary>
+                            <div class="details-content">
+                                <h5 class="mt-3">Profilaxis a Contactos:</h5>
+                                 <ul class="list-disc list-inside ml-4">
+                                    <li>Solo para contactos de meningitis meningocócica.</li>
+                                    <li>Personal de salud no se considera contacto actualmente.</li>
+                                    <li>Esquemas: Rifampicina 600 mg c/12h por 3 días o Ciprofloxacino 500 mg DU.</li>
+                                </ul>
+                                <h5 class="mt-3">Pronóstico y Complicaciones:</h5>
+                                <ul class="list-disc list-inside ml-4">
+                                    <li>Mortalidad: 20-30%.</li>
+                                    <li>Secuelas neurológicas: 50% de los sobrevivientes.</li>
+                                    <li>Complicaciones: Epilepsia (13%), déficit cognitivo (9%), déficit motor (12%), hidrocefalia (7%), hipoacusia neurosensorial (34%).</li>
+                                </ul>
+                            </div>
+                        </details>
+
+                        <h4 class="mt-6">2. Meningitis Virales</h4>
+                         <details>
+                            <summary>Meningitis Viral Aguda</summary>
+                            <div class="details-content">
+                                <p>Generalmente benigna y autolimitada ("resfrío de las meninges"). <strong>Enterovirus</strong> es el más frecuente.</p>
+                                <p><strong>Clínica:</strong> Pródromo respiratorio/digestivo, cefalea intensa (+++), fiebre escasa, signos meníngeos leves/ausentes, sin alteración de conciencia. Parámetros inflamatorios bajos/ausentes.</p>
+                                <p><strong>Tratamiento:</strong> Sintomático en la mayoría.</p>
+                                <h5 class="mt-3">Etiologías Específicas:</h5>
+                                <ul class="list-disc list-inside ml-4">
+                                    <li><strong>Enterovirus:</strong> Principal causa. Transmisión feco-oral. Puede asociarse a rash.</li>
+                                    <li><strong>Herpesvirus:</strong> Segunda causa. HSV-2 más común (reactivación herpes genital). VZV/CMV en inmunosuprimidos. VEB/CMV en síndrome mononucleósico.</li>
+                                </ul>
+                                 <h5 class="mt-3">Diagnóstico (LCR):</h5>
+                                <ul class="list-disc list-inside ml-4">
+                                    <li>Pleocitosis: 100-1000/mm³ (PMN al inicio, luego MN).</li>
+                                    <li>Proteínas: Levemente elevadas (<100 mg/dL).</li>
+                                    <li>Glucorraquia: Normal.</li>
+                                    <li>Paneles de PCR virales en LCR.</li>
+                                </ul>
+                            </div>
+                        </details>
+                        <details>
+                            <summary>Meningitis Recurrente de Mollaret</summary>
+                            <div class="details-content">
+                                <p>Síndrome de meningitis aséptica recurrente benigna, asociada a HSV-2.</p>
+                                <p>Episodios autolimitados de fiebre y síndrome meníngeo (3-4 días hasta 3 sem), separados por meses/años. Cesan en 3-5 años. Pueden tener convulsiones/signos focales (50%).</p>
+                                <p>LCR: pleocitosis mononuclear, células de Mollaret (macrófagos activados).</p>
+                                <p>Descartar otras causas (LES neuropsiquiátrico). Tratamiento antiviral no claro. No dejan secuelas.</p>
+                            </div>
+                        </details>
+
+                        <h4 class="mt-6">3. Meningitis Menos Frecuentes</h4>
+                         <ul class="list-disc list-inside ml-4">
+                            <li><strong>Meningitis por Hongos:</strong> *Cryptococcus neoformans*, *Coccidioides immitis*, *Histoplasma capsulatum*. Raro: *Aspergillus*, *Candida*. Sospechar en inmunodeprimidos.</li>
+                            <li><strong>Meningitis por Parásitos:</strong> Amebas (*Naegleria*, *Acanthamoeba*). Helmintos (*Angiostrongylus*, *Gnathostoma*, *Taenia solium*). ¡Ojo con viajes!</li>
+                        </ul>
+                    </div>
+                </details>
+
+                <details>
+                    <summary>B. Encefalitis</summary>
+                    <div class="details-content">
+                        <p>Inflamación del parénquima encefálico. En Chile: herpética y asociada a COVID-19 son relevantes.</p>
+                        <h4>1. Encefalitis Herpética</h4>
+                         <p>Causada por HSV (HSV-1 >90%). Enfermedad catastrófica.</p>
+                         <p><strong>Fisiopatología:</strong> Ingreso por mucosas/piel -> neurona sensitiva -> SNC (vía olfatoria/V par o hematógena). Afecta <strong>lóbulos frontales y mesiotemporales</strong>. Infección primaria o reactivación.</p>
+                         <p><strong>Epidemiología:</strong> Causa más frecuente de encefalitis viral aguda esporádica. Incidencia 1-3/millón/año. Bimodal: <1-20 años (30%), >50 años (50%).</p>
+                         <p><strong>Clínica:</strong> Pródromo respiratorio, luego fiebre, cefalea, encefalopatía, signos focales (afasia), crisis epilépticas.</p>
+                         <h5 class="mt-3">Diagnóstico:</h5>
+                         <ul class="list-disc list-inside ml-4">
+                             <li><strong>LCR:</strong> Pleocitosis linfocítica moderada, hiperproteinorraquia moderada, glucosa normal.</li>
+                             <li><strong>PCR en LCR para HSV I-II:</strong> Alta S (96%) y E (99%).</li>
+                             <li><strong>RMN de cerebro (elección):</strong> Lesiones hiperintensas y asimétricas en T2 (mesiotemporal, orbitofrontal, ínsula). DWI puede ser marcador temprano.</li>
+                             <li><strong>EEG:</strong> PLEDS, lentitud, descargas epileptiformes, status.</li>
+                         </ul>
+                         <h5 class="mt-3">Manejo:</h5>
+                         <ul class="list-disc list-inside ml-4">
+                            <li>Hospitalizar en UPC. Soporte general.</li>
+                            <li><strong>Aciclovir 10 mg/kg c/8h EV por 14-21 días</strong>.</li>
+                            <li>Ante meningoencefalitis: ATB meníngeos + aciclovir, ajustar según labs.</li>
+                            <li>Con aciclovir: hidratar, monitorizar función renal.</li>
+                         </ul>
+                         <h5 class="mt-3">Pronóstico:</h5>
+                         <p>Malo si: añosos, compromiso conciencia ingreso, DWI temprano alterado, EEG anormal, <strong>RETRASO EN INICIO DE TERAPIA ANTIVIRAL</strong>.</p>
+                         <p>Mortalidad: sin tto 70%; con tto 20-30%. Secuelas: sin tto 97%; con tto 20-80%.</p>
+
+                        <h4 class="mt-4">2. Encefalitis Aguda Necrotizante por SARS-CoV-2 (COVID-19)</h4>
+                        <p>Infrecuente, grave. Considerada inmunomediada (tormenta de citoquinas). Tratamiento de soporte, se plantea corticoides/IVIg/plasmaféresis (utilidad no clara). Pronóstico ominoso.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>C. Abscesos Cerebrales</summary>
+                    <div class="details-content">
+                        <p><strong>Mecanismo:</strong> Hematógena, extensión ORL/dental, iatrogénica.</p>
+                        <p><strong>Clínica:</strong> Proceso expansivo subagudo, signología focal. Síntomas sistémicos de infección pueden estar AUSENTES.</p>
+                        <h5 class="mt-3">Etiología:</h5>
+                        <ul class="list-disc list-inside ml-4">
+                            <li><strong>Inmunocompetentes:</strong> Mayoría mixta (50-60%). Estreptococos grupo milleri (70%). Anaerobios (30%) (*Bacteroides*, *Fusobacterium*, *Clostridium*). También *Staphylococcus*, Bacilos Gram (-).</li>
+                            <li><strong>Inmunodeprimidos:</strong> Anteriores + *Nocardia*, *Toxoplasma*, hongos.</li>
+                        </ul>
+                        <p>Tratamiento según etiología, consultar con infectólogo.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>D. Otras Infecciones Específicas del SNC</summary>
+                    <div class="details-content">
+                        <p><strong>1. Toxoplasmosis Cerebral:</strong> *Toxoplasma gondii*. Clínica: confusional subagudo, focales, convulsiones. Imágenes: lesiones múltiples corticosubcorticales, GG basales, tronco. Tto ante sospecha, confirmar con respuesta (cotrimoxazol).</p>
+                        <p class="mt-2"><strong>2. Tuberculosis del SNC:</strong> Meningitis TBC (más en niños, 75% con TBC pulmonar). Masa (Tuberculoma, Absceso - supratentorial en adultos, infratentorial en niños). Aracnoiditis Espinal.</p>
+                        <p class="mt-2"><strong>3. Neurosífilis:</strong> Diagnóstico: VDRL/RPR, FTA-ABS (suero y LCR). Ver tabla de Estadios Clínicos.</p>
+                        <div class="table-responsive mt-2">
+                            <table>
+                                <thead><tr><th>Estadio</th><th>Clínica</th><th>Laboratorio LCR/Suero</th></tr></thead>
+                                <tbody>
+                                    <tr><td>Asintomática Temprana</td><td>-</td><td>Pleocitosis LCR. VDRL reactivo (S y LCR).</td></tr>
+                                    <tr><td>Meningitis Sifilítica</td><td>Cefalea, meningismo, paresias craneales, confusión</td><td>VDRL reactivo (S y LCR), FTA-ABS LCR reactivo; pleocitosis LCR.</td></tr>
+                                    <tr><td>Meningovascular (Temprana/Tardía)</td><td>Stroke, paresias craneales, meningomielitis</td><td>VDRL reactivo (S y LCR); pleocitosis LCR.</td></tr>
+                                    <tr><td>Paresia General (Tardía)</td><td>Demencia, psiquiátricos, pupilas Argyll Robertson</td><td>VDRL LCR reactivo, FTA-ABS LCR reactivo; pleocitosis crónica leve.</td></tr>
+                                    <tr><td>Tabes Dorsalis (Tardía)</td><td>Ataxia, Romberg, dolores lancinantes, pupilas Argyll Robertson</td><td>VDRL LCR reactivo, FTA-ABS LCR reactivo; pleocitosis crónica leve.</td></tr>
+                                </tbody>
+                            </table>
+                            <p class="mt-1">Tratamiento: Penicilina G sódica EV.</p>
+                        </div>
+                        <p class="mt-2"><strong>4. Infecciones SNC en VIH:</strong> Meningoencefalitis Aguda por VIH. Oportunistas: JC (LMP), CMV, *Toxoplasma*, *Cryptococcus*, TBC. Neoplasias: Linfoma (VEB), Sarcoma Kaposi (VHH-8).</p>
+                        <p class="mt-2"><strong>5. Neurocisticercosis:</strong> *Taenia solium*. Clínica depende de localización, viabilidad parásito, efectos tisulares, hidrocefalia, número lesiones. Síndromes: hemisférico, ventricular, meníngeo, meningovasculares, espinales.</p>
+                    </div>
+                </details>
+            </section>
+
+            <section id="enf-inmunomediadas" class="content-section">
+                <h2>III. Enfermedades Neurológicas Inmunomediadas</h2>
+                <p>Compromiso de estructuras del SNC por anticuerpos endógenos. Incluyen enfermedades desmielinizantes, encefalitis inmunomediadas y síndromes paraneoplásicos.</p>
+                <details open>
+                    <summary>A. Encefalitis Autoinmune (Mediadas por Anticuerpos)</summary>
+                    <div class="details-content">
+                        <p>Inicio subagudo de inflamación del SNC (<3 meses).</p>
+                        <p><strong>Clínica:</strong> Deterioro memoria, cognición, conciencia; convulsiones, movimientos anormales, psicosis, pánico, agresión, cambios conductuales. Puede haber neuromiotonía o hiperekplexia.</p>
+                        <p><strong>Fisiopatología:</strong> Anticuerpos contra receptores de membrana y proteínas de canales iónicos (NMDAR más común). Ac. vs antígenos intracelulares (anti-Hu) suelen asociarse a cáncer.</p>
+                        <p><strong>Factores de Riesgo/Etiología:</strong> Episodio previo AE, inmunosupresión postrasplante, Ac. monoclonales, tumores (pulmón células pequeñas, timoma, teratoma), encefalitis HSV previa.</p>
+                        <p><strong>Diagnóstico:</strong> RMN cerebral, detección de anticuerpos (NMDAR, AMPAR, LGI1, Caspr2, GABA-B), EEG.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary>B. Síndromes Paraneoplásicos</summary>
+                    <div class="details-content">
+                        <p>Desórdenes inmunomediados asociados a cáncer. Tumores expresan proteína onconeuronal -> respuesta inmune mal dirigida vs SN. Ac. atacan antígenos intracelulares (mayoría). Detección predictiva de cáncer.</p>
+                        <h5 class="mt-3">Síndromes más frecuentes en SNC:</h5>
+                        <ul class="list-disc list-inside ml-4">
+                            <li>Degeneración cerebelosa paraneoplásica (PCD).</li>
+                            <li>Encefalitis y encefalomielitis paraneoplásica (PEM).</li>
+                            <li>Encefalitis límbica y de tronco encefálico.</li>
+                            <li>Opsoclonus-mioclonus.</li>
+                        </ul>
+                        <div class="table-responsive mt-3">
+                            <table>
+                                <thead><tr><th>Anticuerpo</th><th>Síndrome(s) Asociado(s)</th><th>Cáncer(es) Asociado(s)</th></tr></thead>
+                                <tbody>
+                                    <tr><td>Anti-Hu (ANNA1)</td><td>Encefalitis focal, PEM, PCD, PSN</td><td>SCLC, otros</td></tr>
+                                    <tr><td>Anti-Yo (PCA1)</td><td>PCD</td><td>Ginecológico, mama</td></tr>
+                                    <tr><td>Anti-Ri (ANNA2)</td><td>PCD, opsoclonus-mioclonus</td><td>Mama, ginecológico, SCLC</td></tr>
+                                    <tr><td>Anti-VGCC</td><td>LEMS, PCD</td><td>SCLC</td></tr>
+                                    <tr><td>Anti-AChR</td><td>MG</td><td>Timoma</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </details>
+            </section>
+
+            <section id="enf-priones" class="content-section">
+                <h2>IV. Enfermedades por Priones (Encefalopatías Espongiformes)</h2>
+                <p>Neurodegenerativas, transmisibles, subagudas, clínica semejante, patología característica; algunas heredables. Ej: Kuru.</p>
+                <details open>
+                    <summary>A. Neuropatología y Clasificación Fenotípica</summary>
+                    <div class="details-content">
+                        <h5 class="mt-3">Patología:</h5>
+                        <ul class="list-disc list-inside ml-4">
+                            <li>Pérdida neuronal.</li>
+                            <li>Cambios espongiformes.</li>
+                            <li>Gliosis.</li>
+                            <li>Placas de amiloide con PrP (no beta amiloide).</li>
+                        </ul>
+                        <h5 class="mt-3">Fenotipos:</h5>
+                        <ul class="list-disc list-inside ml-4">
+                            <li>Kuru.</li>
+                            <li>Enfermedad de Creutzfeldt-Jakob (ECJ o CJD).</li>
+                            <li>Síndrome de Gerstmann-Sträussler-Scheinker (GSS).</li>
+                            <li>Insomnio Familiar Fatal (IFF).</li>
+                            <li>Variante de Creutzfeldt-Jakob (vECJ o vCJD).</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary>B. Enfermedad de Creutzfeldt-Jakob (CJD)</summary>
+                    <div class="details-content">
+                        <p>Incidencia: 1/millón (aumentando). Edad: 50-70 años. Mecanismo: esporádica, familiar, yatrogénica.</p>
+                        <p><strong>Clínica:</strong> Pródromos inespecíficos. Deterioro cognitivo, ataxia cerebelosa, disfunción motora, mioclonías. EEG alterado (esporádica clásica). Deterioro progresivo a muerte.</p>
+                        <p><strong>Variante de CJD (vCJD):</strong> 1981 (asociada a "vacas locas"). Edad más joven, cambios conductuales, ataxia prominente. EEG normal.</p>
+                    </div>
+                </details>
+                 <details>
+                    <summary>C. Proteína Prión</summary>
+                    <div class="details-content">
+                         <ul class="list-disc list-inside ml-4">
+                            <li><strong>PrP<sup>C</sup> (Normal):</strong> Proteína de membrana neuronal, sensible a proteasa.</li>
+                            <li><strong>PrP<sup>Sc</sup> (Anormal):</strong> Resistente a proteasa y calor.</li>
+                            <li>PrP<sup>Sc</sup> induce a PrP<sup>C</sup> a convertirse en PrP<sup>Sc</sup> -> acumulación y daño SNC.</li>
+                            <li>Conversión más rápida intraespecie.</li>
+                        </ul>
+                    </div>
+                </details>
+            </section>
+
+            <section id="vacunacion" class="content-section">
+                <h2>V. Vacunación</h2>
+                <p>El documento fuente incluye información sobre el Programa Nacional de Inmunizaciones (PNI) de Chile y el impacto de las vacunas conjugadas en la disminución de la incidencia de meningitis bacteriana por *H. influenzae* tipo b (Hib), *S. pneumoniae* (SP) y *N. meningitidis* (NM).</p>
+                <p class="mt-2"><em>(Nota: El detalle del calendario de vacunación y los tipos específicos de vacunas, aunque presentes en el documento fuente, se omiten en este resumen por ser información de salud pública muy específica y extensa, pero se reconoce su presencia en el material original.)</em></p>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Guía Interactiva Inflamaciones y Enfermedades Transmisibles del SNC. Creado para fines educativos.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const hamburgerButton = document.querySelector('.hamburger-button');
+            const sidebar = document.getElementById('sidebarNav');
+            const body = document.body;
+            const topBarHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--top-bar-height')) || 65;
+
+            if (hamburgerButton && sidebar) {
+                hamburgerButton.addEventListener('click', function () {
+                    body.classList.toggle('sidebar-open');
+                    const isExpanded = body.classList.contains('sidebar-open');
+                    hamburgerButton.setAttribute('aria-expanded', isExpanded);
+                    sidebar.setAttribute('aria-hidden', !isExpanded);
+                });
+            }
+
+            const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
+            sidebarLinks.forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        // Ajustar el offset para la top-bar fija y un pequeño margen
+                        const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - topBarHeight - 15; 
+                        window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+                        
+                        // Cerrar la sidebar en móviles después de hacer clic
+                        if (window.innerWidth < 768 && body.classList.contains('sidebar-open')) {
+                           body.classList.remove('sidebar-open');
+                           hamburgerButton.setAttribute('aria-expanded', 'false');
+                           sidebar.setAttribute('aria-hidden', 'true');
+                        }
+                    }
+                });
+            });
+
+            // Modificado el selector para las secciones dentro del main con clase .main-content-wrapper o similar
+            const sections = document.querySelectorAll('.main-content-wrapper section[id]');
+            function highlightSidebarLink() {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTopMargin = parseFloat(window.getComputedStyle(section).marginTop) || 0;
+                    // Ajuste para la top-bar fija al calcular la posición efectiva de la sección
+                    const sectionEffectiveTop = section.getBoundingClientRect().top + window.pageYOffset - topBarHeight - sectionTopMargin - 20; // 20px buffer
+                    if (window.pageYOffset >= sectionEffectiveTop) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                sidebarLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').substring(1) === current) {
+                        link.classList.add('active');
+                    }
+                });
+                 // Si no hay 'current' y estamos arriba de la primera sección, activar el primer link
+                if (!current && sections.length > 0 && window.pageYOffset < (sections[0].getBoundingClientRect().top + window.pageYOffset - topBarHeight - 20) ) {
+                     if(sidebarLinks.length > 0) sidebarLinks[0].classList.add('active');
+                }
+            }
+            window.addEventListener('scroll', highlightSidebarLink);
+            highlightSidebarLink(); // Llamada inicial
+        });
+    </script>
+</body>
+</html>

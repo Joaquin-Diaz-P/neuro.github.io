@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Nervioso Periférico (SNP)</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-main: #1ABC9C; 
+            --primary-dark: #16A085; 
+            --accent-orange: #E67E22; 
+            --accent-petroleum-blue: #2C3E50; 
+            --alert-red: #E74C3C; 
+            --complement-light-blue: #AED6F1; 
+            --complement-beige: #F5EFEB; 
+            --text-dark: #212529; 
+            --text-medium: #495057; 
+            --text-light: #6C757D; 
+            --bg-main: #F8F9FA; 
+            --card-bg: #FFFFFF; 
+            --border-color: #DEE2E6; 
+            --border-strong: #CED4DA;
+            --sidebar-width: 280px;
+            --top-bar-height: 65px;
+            --main-content-max-width: 1000px; 
+        }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-main); 
+            color: var(--text-dark); 
+            line-height: 1.6;
+            margin: 0;
+            padding-top: var(--top-bar-height);
+        }
+
+        .top-bar {
+            position: fixed; top: 0; left: 0; right: 0;
+            height: var(--top-bar-height);
+            background-color: var(--card-bg); 
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center;
+            padding: 0 1rem; 
+            z-index: 1032; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        }
+        .fixed-back-button {
+            background-color: var(--primary-main); color: var(--card-bg); border: 2px solid var(--card-bg);      
+            padding: 0.6rem 1rem; border-radius: 6px; text-decoration: none; 
+            font-weight: 600; font-size: 0.85rem; white-space: nowrap; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15); 
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+            margin-left: 5px; 
+        }
+        .fixed-back-button:hover { background-color: var(--accent-orange); border-color: var(--accent-orange); }
+        .hamburger-button {
+            background-color: var(--accent-petroleum-blue); color: var(--card-bg); border: none;
+            padding: 0.6rem 0.8rem; border-radius: 6px; cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15); margin-left: 1.5rem; 
+        }
+        .hamburger-button span { display: block; width: 20px; height: 2px; background-color: var(--card-bg); margin: 4px 0; transition: all 0.3s ease-in-out; }
+        body.sidebar-open .hamburger-button span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+        body.sidebar-open .hamburger-button span:nth-child(2) { opacity: 0; }
+        body.sidebar-open .hamburger-button span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+        .sidebar-nav {
+            position: fixed; top: var(--top-bar-height); 
+            left: calc(-1 * var(--sidebar-width)); 
+            width: var(--sidebar-width); height: calc(100vh - var(--top-bar-height)); 
+            background-color: var(--card-bg); color: var(--text-dark);
+            overflow-y: auto; transition: left 0.3s ease; 
+            z-index: 1030; border-right: 1px solid var(--border-color);
+            box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+        }
+        body.sidebar-open .sidebar-nav { left: 0; }
+        .sidebar-nav h3 {
+            color: var(--accent-petroleum-blue); padding: 1.2rem 1.5rem 0.8rem;
+            margin: 0; font-size: 1.15rem; border-bottom: 1px solid var(--border-color);
+        }
+        .sidebar-nav ul { list-style: none; padding: 0.75rem 0; margin: 0; }
+        .sidebar-nav li a {
+            display: block; padding: 0.75rem 1.5rem; margin: 0.5rem 1rem; 
+            color: var(--card-bg); background-color: var(--primary-main); 
+            border: 1px solid var(--primary-dark); border-radius: 6px;
+            text-decoration: none; font-size: 0.9rem; font-weight: 500;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.07); text-align: left;
+        }
+        .sidebar-nav li a:hover { background-color: var(--accent-orange); border-color: var(--accent-orange); color: var(--card-bg); }
+        .sidebar-nav li a.active {
+            background-color: var(--primary-dark); color: var(--card-bg);
+            border-color: var(--primary-main); font-weight: bold;
+        }
+
+        .main-content { padding: 1.5rem; max-width: var(--main-content-max-width); margin-left: auto; margin-right: auto; }
+        .page-header-within-content {
+            background-color: var(--primary-main); color: var(--card-bg);
+            padding: 2rem 1.5rem; text-align: center; border-radius: 8px; 
+            margin-bottom: 2rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .page-header-within-content h1 { color: var(--card-bg); font-size: 1.8rem; margin:0; } 
+        .page-header-within-content p { color: var(--complement-beige); font-size: 1.0rem; margin-top: 0.5rem; }
+
+        .content-section { background-color: var(--card-bg); border-radius: 12px; margin-bottom: 1.5rem; box-shadow: 0 6px 18px rgba(44, 62, 80, 0.08); border: 1px solid var(--border-color); }
+        .content-wrapper { padding: 1.5rem; } 
+        
+        /* Estilos de Títulos de Sección (H2, H3, H4) inspirados en TAB.html y adaptados */
+        .content-section h2 { 
+            border-bottom: 3px solid var(--primary-main); 
+            padding-bottom: 0.75rem; 
+            margin-bottom: 1.75rem; /* Inspirado en TAB.html */
+            font-size: 1.85rem; /* Inspirado en TAB.html */
+            color: var(--accent-petroleum-blue); 
+            margin-top:0; 
+        }
+        /* Ajuste para que H3 dentro de summary no herede el borde inferior de H2 */
+        details summary h3 {
+            font-size: 1.5rem; /* Inspirado en TAB.html */
+            margin-top: 0; 
+            margin-bottom: 0; 
+            color: var(--primary-dark); 
+            display: inline; /* Para que no ocupe todo el ancho y permita buen clic */
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        .details-content h3 { /* Para H3 que no estén en summary, si los hubiera */
+             font-size: 1.5rem; /* Inspirado en TAB.html */
+            margin-top: 1.5rem; 
+            margin-bottom: 1rem; 
+            color: var(--primary-dark); 
+        }
+
+        .details-content h4 { 
+            font-size: 1.2rem; /* Inspirado en TAB.html */
+            margin-top: 1.2rem; 
+            margin-bottom: 0.75rem; 
+            color: var(--text-dark); /* Inspirado en TAB.html */
+            font-weight: 600; /* Un poco más de peso para H4 */
+        }
+        
+        table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.05); font-size: 0.88rem; }
+        th, td { border: 1px solid var(--border-strong); padding: 0.7rem; text-align: left; } 
+        th { background-color: var(--accent-petroleum-blue); color: var(--card-bg); font-weight: 600; }
+        tbody tr:nth-child(even) { background-color: var(--complement-beige); }
+        
+        details {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 1.2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        }
+        summary { 
+            font-weight: 600; 
+            cursor: pointer; 
+            padding: 0.8rem 1rem; 
+            color: var(--primary-dark); 
+            background-color: var(--complement-light-blue); 
+            border-radius: 7px; /* Ajuste para que no se corte el borde del details */
+            transition: background-color 0.3s ease, color 0.3s ease;
+            list-style-position: inside; /* Asegura que el marcador esté dentro */
+        }
+        details[open] summary {
+            border-bottom: 1px solid var(--border-color);
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        summary:hover {
+            background-color: var(--primary-main);
+            color: var(--card-bg);
+        }
+        details .details-content { 
+            padding: 1rem; 
+            border: none; /* El borde ya está en <details> */
+            border-top: 1px solid var(--border-color); /* Línea divisoria si <details> está abierto */
+            border-radius: 0 0 7px 7px;
+        }
+        details[open] .details-content {
+             border-top: 1px solid var(--border-color);
+        }
+
+
+        .chart-container { max-width: 400px; height: auto; margin: 2rem auto; padding: 1rem; background-color: var(--complement-beige); border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.07); }
+        
+        footer { text-align: center; padding: 2rem 1.5rem; margin-top: 3rem; border-top: 1px solid var(--border-strong); background-color: var(--accent-petroleum-blue); color: var(--complement-beige); }
+        footer p { color: var(--complement-beige); }
+        html { scroll-behavior: smooth; }
+
+        .citation { font-size: 0.75em; color: var(--text-light); margin-left: 2px; }
+        .key-point { display: block; background-color: var(--complement-light-blue); border-left: 4px solid var(--primary-main); padding: 0.75em 1em; margin: 1em 0; border-radius: 4px; }
+        .highlight-tip { display: block; background-color: #e7f6fd; border-left: 4px solid #2ECC71; padding: 0.75em 1em; margin: 1em 0; border-radius: 4px; color: var(--text-dark); }
+        .photo-reference { font-style: italic; color: var(--text-medium); font-size: 0.9em; }
+        .contradiction-point { border: 2px solid var(--alert-red); padding: 1em; margin-top: 1em; border-radius: 8px; background-color: #FEF9E7; }
+        .contradiction-point strong { color: var(--alert-red); }
+        .table-responsive { overflow-x: auto; }
+
+        /* Flowchart styles (inspirado en TAB.html, simplificado) */
+        .flowchart-container.simple-process {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem; 
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            background-color: var(--complement-beige); 
+            border-radius: 10px;
+            border: 1px solid var(--border-strong);
+        }
+        .flowchart-step {
+            background-color: var(--primary-main);
+            color: var(--card-bg);
+            padding: 0.7rem 1.2rem;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 200px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid var(--primary-dark);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        .flowchart-arrow {
+            font-size: 1.5rem;
+            color: var(--accent-petroleum-blue);
+            margin: 0.1rem 0;
+            line-height: 1;
+        }
+        .note-block {
+            padding: 1rem;
+            margin-top: 2rem;
+            background-color: var(--complement-beige);
+            border-left: 4px solid var(--accent-orange);
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <a href="Prueba_2_Neuro.html" class="fixed-back-button">Volver al Índice</a>
+        <button class="hamburger-button" aria-label="Abrir/Cerrar Navegación" aria-expanded="false" aria-controls="sidebarNav">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </div>
+
+    <nav class="sidebar-nav" id="sidebarNav" aria-hidden="true" role="navigation">
+        <h3>SNP: Temario</h3>
+        <ul>
+            <li><a href="#generalidades">I. Generalidades</a></li>
+            <li><a href="#clasificacion-patologias">II. Clasificación Patologías</a></li>
+            <li><a href="#enfrentamiento-clinico">III. Enfrentamiento Clínico</a></li>
+            <li><a href="#patologias-especificas">IV. Patologías Específicas</a></li>
+            <li><a href="#ela">V. Esclerosis Lateral Amiotrófica</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <header class="page-header-within-content">
+            <h1>Sistema Nervioso Periférico (SNP)</h1>
+            <p>Apuntes Detallados de Estudio</p>
+        </header>
+
+        <section id="generalidades" class="content-section">
+            <div class="content-wrapper">
+                <h2>I. Generalidades</h2>
+                <details open>
+                    <summary><h3>A. Definición y Componentes</h3></summary>
+                    <div class="details-content">
+                        <p>El sistema nervioso periférico (SNP) recibe información del entorno para llevarla hacia el sistema nervioso central (SNC) y transmite las respuestas motoras<span class="citation"></span>.</p>
+                        <p>Se divide en<span class="citation"></span>:</p>
+                        <ol>
+                            <li>
+                                <p><strong>Componente Somático:</strong> Encargado de las funciones motoras voluntarias y la sensibilidad consciente<span class="citation"></span>.</p>
+                                <ul>
+                                    <li><strong>Estructura básica:</strong> La vía motora se origina en la alfa-motoneurona en el asta anterior de la médula espinal. La vía sensitiva tiene su soma (cuerpo celular) en el ganglio de la raíz dorsal<span class="citation"></span>. Ambas raíces (anterior motora y posterior sensitiva) se unen para formar los nervios periféricos, que llegan a su efector final, como el músculo<span class="citation"></span>.</li>
+                                </ul>
+                            </li>
+                            <li><p><strong>Componente Autonómico:</strong> Controla funciones involuntarias y se subdivide en simpático y parasimpático<span class="citation"></span>.</p></li>
+                        </ol>
+                    </div>
+                </details>
+                <details>
+                    <summary><h3>B. Organización Anatómica</h3></summary>
+                    <div class="details-content">
+                        <p><strong>Raíces Nerviosas:</strong> Existen 8 pares de raíces nerviosas cervicales (C1-C8), 12 torácicas (T1-T12), 5 lumbares (L1-L5), y 5 sacras (S1-S5), además de las coccígeas<span class="citation"></span>. Cada raíz tiene un componente motor y uno sensitivo<span class="citation"></span>.</p>
+                        <p><strong>Plexos Nerviosos:</strong> En algunas regiones, las raíces nerviosas se organizan para formar plexos antes de dar origen a los nervios periféricos<span class="citation"></span>.</p>
+                        <ul>
+                            <li><strong>Plexo Braquial:</strong> Formado por las raíces nerviosas C5 a T1<span class="citation"></span>. Se relaciona íntimamente con la arteria subclavia y el pulmón en su trayecto<span class="citation"></span>. De aquí emergen todos los nervios que inervan la extremidad superior<span class="citation"></span>.</li>
+                            <li><strong>Plexo Lumbosacro:</strong> Da origen a nervios de la extremidad inferior, incluyendo el nervio ciático (el más largo y grueso del cuerpo), que tiene un componente tibial y uno peroneal, dividiéndose en la región poplítea<span class="citation"></span>.</li>
+                        </ul>
+                        <p><strong>Dermatomas y Miotomas:</strong></p>
+                        <ul>
+                            <li><strong>Dermatoma:</strong> Zona de la piel inervada por una única raíz nerviosa sensitiva<span class="citation"></span>. Ejemplos clásicos: T4 a nivel de las mamilas, T10 a nivel del ombligo, T7 a nivel del reborde costal<span class="citation"></span>.</li>
+                            <li><strong>Miotoma:</strong> Grupo de músculos inervados por una única raíz nerviosa motora<span class="citation"></span>.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary><h3>C. Conducción Nerviosa</h3></summary>
+                    <div class="details-content">
+                        <p>La conducción nerviosa en el SNP es <strong>saltatoria</strong> en las fibras mielinizadas<span class="citation"></span>.</p>
+                        <p>La principal célula encargada de la mielina en el SNP es la <strong>célula de Schwann</strong><span class="citation"></span>.</p>
+                        <p><strong>Tipos de Fibras:</strong></p>
+                        <ul>
+                            <li><strong>Fibras gruesas mielinizadas:</strong> Conducen impulsos rápidamente. Incluyen fibras motoras y las responsables de la sensibilidad vibratoria y propioceptiva<span class="citation"></span>.</li>
+                            <li>
+                                <p><strong>Fibras delgadas amielínicas:</strong> Conducen impulsos más lentamente. Incluyen fibras responsables de la termalgesia (temperatura y dolor) y fibras autonómicas<span class="citation"></span>.</p>
+                                <ul>
+                                    <li>Ejemplo: Al tocar fuego, la retirada de la mano (respuesta motora, vía rápida mielinizada) ocurre antes de la percepción del dolor (vía lenta amielínica)<span class="citation"></span>.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary><h3>D. Unión Neuromuscular (UNM)</h3></summary>
+                    <div class="details-content">
+                        <p>Es la sinapsis entre una neurona motora y una fibra muscular<span class="citation"></span>.</p>
+                        <h4>Proceso de Contracción:</h4>
+                        <div class="flowchart-container simple-process">
+                            <div class="flowchart-step">1. Llegada del Potencial de Acción (PA) a la terminal nerviosa</div>
+                            <div class="flowchart-arrow">↓</div>
+                            <div class="flowchart-step">2. Entrada de Calcio (Ca²⁺) a la neurona<span class="citation"></span></div>
+                            <div class="flowchart-arrow">↓</div>
+                            <div class="flowchart-step">3. Liberación de Acetilcolina (ACh) al espacio sináptico<span class="citation"></span></div>
+                            <div class="flowchart-arrow">↓</div>
+                            <div class="flowchart-step">4. Unión de ACh a receptores (nicotínicos) en membrana muscular<span class="citation"></span></div>
+                            <div class="flowchart-arrow">↓</div>
+                            <div class="flowchart-step">5. Despolarización de fibra muscular y contracción<span class="citation"></span></div>
+                            <div class="flowchart-arrow">↓</div>
+                            <div class="flowchart-step">6. Degradación de ACh por Acetilcolinesterasa (AChE)<span class="citation"></span></div>
+                        </div>
+                         <p class="highlight-tip">También hay receptores muscarínicos para ACh en otros sitios del cuerpo, no solo los nicotínicos en la placa motora<span class="citation"></span>.</p>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="clasificacion-patologias" class="content-section">
+            <div class="content-wrapper">
+                <h2>II. Clasificación de las Patologías del SNP</h2>
+                <p>Las patologías del SNP se pueden clasificar según la estructura afectada<span class="citation"></span>:</p>
+                <ul>
+                    <li><strong>Radiculopatía:</strong> Daño a nivel de la raíz nerviosa<span class="citation"></span>.</li>
+                    <li><strong>Neuronopatía:</strong> Afectación del soma neuronal (ej. en ganglio de la raíz dorsal para las sensitivas, o asta anterior para motoras)<span class="citation"></span>.</li>
+                    <li><strong>Plexopatía:</strong> Daño a nivel de un plexo nervioso<span class="citation"></span>.</li>
+                    <li><strong>Mononeuropatía:</strong> Daño de un único nervio periférico<span class="citation"></span>.</li>
+                    <li><strong>Mononeuropatía Múltiple (o Mononeuritis Múltiple):</strong> Daño secuencial o simultáneo de múltiples nervios periféricos no contiguos<span class="citation"></span>.</li>
+                    <li><strong>Polineuropatía:</strong> Daño difuso y simétrico de múltiples nervios periféricos<span class="citation"></span>.</li>
+                    <li>
+                        <p><strong>Patología de la Unión Neuromuscular (UNM):</strong></p>
+                        <ul>
+                            <li><strong>Síndromes Miasténicos:</strong> Ej. Miastenia Gravis (principal exponente), Síndrome de Lambert-Eaton, Botulismo<span class="citation"></span>.</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <p><strong>Patología del Músculo:</strong></p>
+                        <ul>
+                            <li><strong>Miopatía:</strong> Afectación primaria del músculo (puede ser inflamatoria, genética, metabólica, etc.)<span class="citation"></span>.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="enfrentamiento-clinico" class="content-section">
+            <div class="content-wrapper">
+                <h2>III. Enfrentamiento Clínico de las Patologías del SNP</h2>
+                <details open>
+                    <summary><h3>A. Análisis de Síntomas y Signos</h3></summary>
+                    <div class="details-content">
+                        <h4>1. Síntoma Predominante:</h4> 
+                        <p>Ayuda a identificar el componente afectado (motor, sensitivo, autonómico)<span class="citation"></span>.</p>
+                        <ul>
+                            <li>
+                                <p><strong>Motor:</strong> Debilidad<span class="citation"></span>.</p>
+                                <ul>
+                                    <li>Características de 2ª motoneurona: Disminución o abolición de reflejos osteotendinosos (ROT), tono muscular disminuido (hipotonía) o normal, trofismo disminuido (atrofia muscular, ya que la 2ª MN tiene efecto trófico), reflejo plantar flexor (la respuesta extensora o signo de Babinski indica lesión de 1ª MN), fasciculaciones pueden estar presentes<span class="citation"></span>.</li>
+                                </ul>
+                            </li>
+                            <li>
+                                <p><strong>Sensitivo:</strong></p>
+                                <ul>
+                                    <li>Dolor: Carácter neuropático (eléctrico, urente, quemante)<span class="citation"></span>.</li>
+                                    <li>Parestesias (hormigueos, adormecimiento)<span class="citation"></span>.</li>
+                                    <li>Alteraciones de la sensibilidad: Hipoestesia, anestesia.</li>
+                                    <li>Fenómenos positivos: Hiperalgesia (duele más de lo que debería), alodinia (estímulos no dolorosos se perciben como dolorosos)<span class="citation"></span>.</li>
+                                    <li>Alteración propioceptiva: Ataxia sensitiva (incoordinación por pérdida de información posicional), empeora con ojos cerrados (Romberg +), tropiezos, caídas (especialmente en la noche al perder la ayuda visual)<span class="citation"></span>.</li>
+                                </ul>
+                            </li>
+                            <li><p><strong>Autonómico:</strong> Intolerancia al calor (puede llevar a síncope), trastornos esfinterianos, ortostatismo (alteraciones de PA y FC con los cambios posturales), disfunción sexual<span class="citation"></span>.</p></li>
+                        </ul>
+                        <h4>2. Distribución de la Debilidad:</h4>
+                        <p>Orientadora de la posible causa<span class="citation"></span>.</p>
+                        <ul>
+                            <li>
+                                <p><strong>Proximal vs. Distal:</strong></p>
+                                <ul>
+                                    <li><strong>Debilidad Proximal</strong> (cinturas pélvica y escapular): Sugiere compromiso muscular (miopático). Ej: dificultad para pararse de una silla, peinarse, alcanzar objetos en altura, subir escaleras<span class="citation"></span>.</li>
+                                    <li><strong>Debilidad Distal</strong> (manos y pies): Sugiere compromiso de nervios periféricos (polineuropático). Ej: dificultad para agarrar objetos, abotonarse, tropiezos por debilidad en dorsiflexión del pie<span class="citation"></span>.</li>
+                                </ul>
+                            </li>
+                            <li><p><strong>Simétrico vs. Asimétrico:</strong> Ayuda a orientar la causa<span class="citation"></span>.</p></li>
+                            <li>
+                                <p><strong>Compromiso Medular:</strong></p>
+                                <ul>
+                                    <li>Motor: Paraparesia o tetraparesia<span class="citation"></span>.</li>
+                                    <li>Sensitivo: Presencia de un <strong>nivel sensitivo</strong> (altura a partir de la cual se pierde la sensibilidad)<span class="citation"></span>.</li>
+                                    <li>Reflejos: En agudo pueden estar abolidos (fase de shock espinal, paciente flácido); posteriormente se exaltan (fase crónica, paciente espástico) - esto indica compromiso de 1ª motoneurona<span class="citation"></span>.</li>
+                                    <li>Esfínteres: Compromiso de esfínteres es una clave para pensar en lesión medular<span class="citation"></span>.</li>
+                                    <li>Distribución: El compromiso motor y sensitivo suele ser simétrico<span class="citation"></span>.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <h4>3. Perfil Temporal:<span class="citation"></span></h4>
+                        <ul>
+                            <li><strong>Duración:</strong> Agudo (&lt;4 semanas), Subagudo (4-8 semanas), Crónico (&gt;8 semanas)<span class="citation"></span>.</li>
+                            <li><strong>Curso:</strong> Monofásico (un solo episodio), Progresivo (empeora con el tiempo), Recurrente (episodios que se repiten)<span class="citation"></span>.</li>
+                        </ul>
+                        <p class="highlight-tip"><strong>TIP:</strong> Un compromiso <strong>fluctuante</strong> de la fuerza debe hacer pensar en patología de la unión neuromuscular<span class="citation"></span>.</p>
+                        <h4>4. Antecedentes del Paciente:<span class="citation"></span></h4>
+                        <ul>
+                            <li>Mórbidos: Diabetes Mellitus (DM2), VIH, alcoholismo (OH), amiloidosis, enfermedades autoinmunes (AI)<span class="citation"></span>.</li>
+                            <li>Fármacos: Quimioterapia (QT), corticoides, estatinas<span class="citation"></span>.</li>
+                            <li>Familiares: Enfermedades hereditarias del SNP<span class="citation"></span>.</li>
+                            <li>Hábitos: Consumo de OH, dietas carenciales (ej. veganos estrictos sin suplementación de B12)<span class="citation"></span>.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary><h3>B. Estudio Diagnóstico</h3></summary>
+                    <div class="details-content">
+                        <p><strong>Estudio de Conducción Nerviosa (ECN) y Electromiografía (EMG):</strong> Son los componentes del estudio electrofisiológico<span class="citation"></span>.</p>
+                        <ol>
+                            <li>
+                                <p><strong>Velocidad de Conducción Nerviosa (VCN):</strong> Se aplican estímulos eléctricos y se registran las respuestas de los nervios<span class="citation"></span>.</p>
+                                <ul>
+                                    <li>
+                                        <p>Permite diferenciar entre:</p>
+                                        <ul>
+                                            <li><strong>Daño Axonal:</strong> Se afecta principalmente la amplitud de la respuesta motora o sensitiva. La velocidad de conducción puede ser normal o levemente disminuida<span class="citation"></span>.</li>
+                                            <li><strong>Daño Desmielinizante:</strong> Se afecta marcadamente la velocidad de conducción (muy enlentecida). La amplitud puede estar conservada si no hay bloqueo de conducción o daño axonal secundario<span class="citation"></span>.</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <p><strong>Electromiografía (EMG) de Aguja:</strong> Se inserta una aguja-electrodo en el músculo y se le pide al paciente que lo contraiga para evaluar la actividad eléctrica de la unidad motora<span class="citation"></span>.</p>
+                                <ul>
+                                    <li>
+                                        <p>Permite diferenciar entre:</p>
+                                        <ul>
+                                            <li><strong>Compromiso Neuropático:</strong> (Falla el nervio). Se observan signos de denervación (ej. actividad espontánea como fibrilaciones, ondas positivas agudas) y reinervación (potenciales de unidad motora de mayor duración, amplitud y polifásicos).</li>
+                                            <li><strong>Compromiso Miopático:</strong> (Falla el músculo). Se observan potenciales de unidad motora de corta duración, baja amplitud y polifásicos, con reclutamiento precoz<span class="citation"></span>.</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="patologias-especificas" class="content-section">
+            <div class="content-wrapper">
+                <h2>IV. Patologías Específicas del Nervio</h2>
+                <details open>
+                    <summary><h3>A. Radiculopatía</h3></summary>
+                    <div class="details-content">
+                        <p>Daño a nivel de la raíz nerviosa.</p>
+                        <h4>1. Herpes Zóster (HZ):</h4>
+                        <ul>
+                            <li>Causado por la reactivación del virus Varicela-Zóster (VVZ), que permanece latente en el ganglio de la raíz dorsal (soma de la neurona sensitiva) tras la primoinfección (varicela)<span class="citation"></span>.</li>
+                            <li><strong>Síntoma principal:</strong> Dolor de carácter neuropático (quemante, eléctrico), que sigue la distribución de un dermatoma, es unilateral (no cruza la línea media), y se asocia a hiperalgesia y alodinia (molestia con el roce de la ropa)<span class="citation"></span>.</li>
+                            <li>A los días, aparecen las vesículas características sobre una base eritematosa en el dermatoma afectado<span class="citation"></span>.</li>
+                            <li>Si el HZ cruza la línea media o compromete más de un dermatoma (HZ diseminado), se debe sospechar inmunosupresión (ej. VIH)<span class="citation"></span>.</li>
+                            <li><strong>Tratamiento:</strong> Antivirales (Aciclovir, Valaciclovir)<span class="citation"></span>.</li>
+                            <li><strong>Neuralgia Post-Herpética (NPH):</strong> Dolor que persiste por más de 1 mes después del tratamiento adecuado de la infección aguda<span class="citation"></span>. Es importante manejar el dolor agudo del HZ (ej. con pregabalina o duloxetina) para disminuir el riesgo de desarrollar NPH<span class="citation"></span>.</li>
+                        </ul>
+                        <h4>2. Hernia del Núcleo Pulposo (HNP):</h4>
+                        <ul>
+                            <li>Causa frecuente de radiculopatía. Los sitios más frecuentes son a nivel lumbar y cervical<span class="citation"></span>.</li>
+                            <li><strong>Clínica:</strong> Dolor lumbar o cervical que se irradia siguiendo el trayecto del dermatoma correspondiente a la raíz comprometida (ej. ciática en HNP lumbar)<span class="citation"></span>. Puede haber compromiso motor (debilidad, hiporreflexia) en el miotoma correspondiente<span class="citation"></span>.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary><h3>B. Plexopatías</h3></summary>
+                    <div class="details-content">
+                        <p>Daño a nivel de un plexo nervioso. Son más infrecuentes que las radiculopatías<span class="citation"></span>. Se sospechan ante un compromiso difuso que afecta varios dermatomas y miotomas<span class="citation"></span>.</p>
+                        <p><strong>Plexopatía Braquial:</strong></p>
+                        <ul>
+                            <li>Causas: Tumor de Pancoast (tumor del ápex pulmonar, puede asociarse a Síndrome de Horner)<span class="citation"></span>, traumatismos (lesión obstétrica del plexo braquial en recién nacidos durante partos traumáticos)<span class="citation"></span>.</li>
+                        </ul>
+                        <p><strong>Plexopatía Lumbosacra:</strong></p>
+                        <ul>
+                            <li>Causas: Tumores pélvicos que compriman el plexo<span class="citation"></span>, hematomas extensos de la arteria ilíaca/femoral<span class="citation"></span>.</li>
+                            <li><strong>Diabetes Mellitus:</strong> Puede causar cualquier tipo de compromiso del SNP, incluyendo plexopatías (ej. amiotrofia diabética)<span class="citation"></span>.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary><h3>C. Mononeuropatías</h3></summary>
+                    <div class="details-content">
+                        <p>Afectación de un solo nervio periférico.</p>
+                        <h4>1. Mononeuropatía de Extremidad Superior (EESS):</h4>
+                        <ul>
+                            <li>
+                                <p><strong>Nervio Mediano (Síndrome del Túnel Carpiano - STC):</strong> Es la mononeuropatía más común de todas<span class="citation"></span>.</p>
+                                <ul>
+                                    <li>El nervio mediano se origina en el plexo braquial (raíces C5-T1)<span class="citation"></span>. Inerva músculos para la pronación del antebrazo, flexión profunda de los 3 dedos más externos (pulgar, índice, medio), oposición y abducción corta del pulgar<span class="citation"></span>. Da sensibilidad a la mitad externa (radial) de la mano<span class="citation"></span>. Pasa por el túnel carpiano a nivel de la muñeca, donde es el sitio más frecuente de compresión<span class="citation"></span>.</li>
+                                    <li><strong>Factores de Riesgo:</strong> Embarazo, factores ocupacionales (discutible), hipotiroidismo, diabetes/obesidad, artritis reumatoide, amiloidosis<span class="citation"></span>.</li>
+                                    <li><strong>Clínica:</strong> Parestesias (hormigueo) en el territorio del nervio mediano (pulgar, índice, medio y mitad radial del anular), que típicamente despiertan al paciente en la noche, llevándolo a mover o sacudir la mano para aliviar los síntomas ("signo de la sacudida" o "flick sign")<span class="citation"></span>. En etapas más avanzadas, puede haber debilidad para agarrar objetos y atrofia de la eminencia tenar (músculo abductor corto del pulgar)<span class="citation"></span>. El examen neurológico puede ser normal al inicio, o mostrar hipoestesia en el territorio del mediano<span class="citation"></span>. Maniobras provocadoras: Signo de Tinel (percusión sobre el túnel carpiano reproduce síntomas), Signo de Phalen (flexión palmar de la muñeca por 1 minuto reproduce síntomas)<span class="citation"></span>.</li>
+                                    <li><strong>Mano del Predicador:</strong> Ocurre por una lesión del nervio mediano ALTA (ANTES del túnel carpiano). Al intentar cerrar el puño, solo se pueden flexionar los dedos anular y meñique, ya que se pierde la flexión de los dedos índice y medio, y la oposición del pulgar<span class="citation"></span>.</li>
+                                    <li><strong>Diagnóstico Diferencial:</strong> Radiculopatía C6-C7 (más C7)<span class="citation"></span>.</li>
+                                    <li><strong>Tratamiento:</strong> Uso de muñequeras (especialmente nocturnas), infiltración con corticoides en el túnel carpiano, o cirugía (liberación del retináculo flexor)<span class="citation"></span>.</li>
+                                </ul>
+                            </li>
+                            <li>
+                                <p><strong>Nervio Ulnar (Cubital):</strong> Atrapamiento más frecuente que el radial<span class="citation"></span>. Se origina en el plexo braquial (raíces C8-T1)<span class="citation"></span>. Viaja por la cara anteromedial del brazo y se relaciona íntimamente con el epicóndilo medial del húmero (canal epitrocleo-olecraneano), que es el sitio más frecuente de atrapamiento<span class="citation"></span>.</p>
+                                <ul>
+                                    <li><strong>Factores de Riesgo:</strong> No claramente descritos; pueden influir ciertos movimientos repetitivos o laxitud ligamentosa<span class="citation"></span>.</li>
+                                    <li><strong>Clínica:</strong> Parestesias en el dedo meñique y la mitad ulnar del anular (4º y 5º dedos)<span class="citation"></span>. Debilidad y atrofia de los músculos intrínsecos de la mano inervados por el ulnar (interóseos, lumbricales mediales, músculos de la eminencia hipotenar), lo que puede llevar a una deformidad en "mano en garra" (hiperextensión de metacarpofalángicas y flexión de interfalángicas de 4º y 5º dedos)<span class="citation"></span>. Se puede percutir el canal para reproducir síntomas<span class="citation"></span>.</li>
+                                    <li><strong>Diagnóstico Diferencial:</strong> Radiculopatía C8<span class="citation"></span>.</li>
+                                </ul>
+                            </li>
+                            <li>
+                                <p><strong>Nervio Radial:</strong> Se origina en el plexo braquial (todas las raíces C5-T1) y es el principal nervio extensor de la extremidad superior<span class="citation"></span>. Se relaciona anatómicamente con la fosa espiroidea (canal de torsión) del húmero, que es el sitio más frecuente de compresión<span class="citation"></span>.</p>
+                                <ul>
+                                    <li><strong>"Parálisis del sábado por la noche" o "Saturday night palsy":</strong> Compresión del nervio radial en la fosa espiroidea, típicamente cuando una persona se queda dormida con el brazo apoyado sobre el respaldo de una silla<span class="citation"></span>.</li>
+                                    <li><strong>Clínica:</strong> Dificultad para la extensión de la muñeca, dedos y antebrazo, resultando en una "mano en gota" o "mano caída"<span class="citation"></span>. Puede haber parestesias en el dorso de la mano y antebrazo<span class="citation"></span>.</li>
+                                    <li><strong>Pronóstico:</strong> Generalmente es un cuadro de resolución espontánea en semanas; el manejo es conservador (paciencia, evitar nueva compresión)<span class="citation"></span>.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <h4>2. Mononeuropatía de Extremidad Inferior (EEII):</h4>
+                        <ul>
+                            <li>
+                                <p><strong>Nervio Fibular Común (Peroneo Común):</strong> Proviene de la división lateral del nervio ciático a nivel de la fosa poplítea<span class="citation"></span>. Inerva el músculo tibial anterior, responsable de la dorsiflexión e inversión del pie<span class="citation"></span>. El sitio más frecuente de atrapamiento es en relación con la cabeza de la fíbula<span class="citation"></span>.</p>
+                                <ul>
+                                    <li><strong>Factores de Riesgo:</strong> Inmovilización prolongada (yeso), cruzar las piernas habitualmente ("posiciones de indio"), ropa muy apretada a ese nivel<span class="citation"></span>.</li>
+                                    <li><strong>Clínica:</strong> Dolor, parestesias en el territorio del nervio fibular (dorso del pie, cara lateral de la pierna). Debilidad para la dorsiflexión del pie y los dedos, resultando en <strong>pie caído (foot drop)</strong> y una marcha característica (marcha equina o steppage, donde se eleva exageradamente la rodilla para no arrastrar el pie)<span class="citation"></span>. Se puede reproducir dolor a la percusión sobre la cabeza de la fíbula<span class="citation"></span>.</li>
+                                </ul>
+                            </li>
+                            <li>
+                                <p><strong>Nervio Femorocutáneo (Cutáneo Femoral Lateral):</strong> Es un nervio puramente sensitivo<span class="citation"></span>. Se encarga de la sensibilidad de la cara lateral del muslo<span class="citation"></span>. Puede comprimirse al pasar por el canal inguinal<span class="citation"></span>.</p>
+                                <ul>
+                                    <li><strong>Síndrome: Meralgia Parestésica</strong><span class="citation"></span>.</li>
+                                    <li><strong>Factores de Riesgo:</strong> Uso de cinturón apretado, obesidad, embarazo (cualquier condición que aumente la presión abdominal)<span class="citation"></span>.</li>
+                                    <li><strong>Clínica:</strong> Parestesias (hormigueo, adormecimiento, dolor urente) en la cara lateral del muslo<span class="citation"></span>. El diagnóstico es clínico, y el resto del examen neurológico es normal<span class="citation"></span>.</li>
+                                    <li><strong>Manejo:</strong> Tratar la causa subyacente (bajar de peso, evitar ropa/cinturones apretados, resolución del embarazo)<span class="citation"></span>.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary><h3>D. Polineuropatía</h3></summary>
+                    <div class="details-content">
+                        <p>Compromiso de muchos nervios periféricos, pudiendo afectar fibras sensitivas, motoras y/o autonómicas<span class="citation"></span>. Lo más frecuente es la combinación sensitivo-motora<span class="citation"></span>.</p>
+                        <p><strong>Clínica Característica:</strong></p>
+                        <ul>
+                            <li>Síntomas sensitivos: Parestesias (hormigueo, adormecimiento), dolor quemante o urente<span class="citation"></span>.</li>
+                            <li>Distribución: Típicamente <strong>simétrica</strong>, de predominio <strong>distal</strong> y <strong>longitud-dependiente</strong> ("en guante y calcetín"). Afecta primero los axones más largos (de las extremidades inferiores) y luego, si progresa, los de las extremidades superiores<span class="citation"></span>.</li>
+                        </ul>
+                        <p><strong>Hallazgos al Examen Neurológico:</strong></p>
+                        <ul>
+                            <li><strong>Motor:</strong> Fuerza conservada o disminuida de forma simétrica y distal<span class="citation"></span>. ROT abolidos o disminuidos, comenzando por los reflejos aquilianos y luego los rotulianos si la neuropatía es muy avanzada<span class="citation"></span>.</li>
+                            <li><strong>Sensibilidad:</strong> Hipoestesia o anestesia en la distribución "en guante y calcetín". Alteración de la sensibilidad vibratoria (con diapasón) y propioceptiva. Alodinia puede estar presente. El examen con monofilamento suele estar alterado<span class="citation"></span>.</li>
+                        </ul>
+                        <p><strong>Causas:</strong></p>
+                        <ul>
+                            <li><strong>Diabetes Mellitus:</strong> Es la causa más común de polineuropatía<span class="citation"></span>.</li>
+                            <li>Causas genéticas (neuropatías hereditarias).</li>
+                            <li>Enfermedades sistémicas (ej. patologías urémicas en insuficiencia renal crónica)<span class="citation"></span>.</li>
+                            <li>Tóxico-metabólicas: Deficiencia de vitamina B12, alcoholismo crónico, fármacos (ej. quimioterápicos como vincristina, cisplatino; disulfiram), metales pesados<span class="citation"></span>.</li>
+                            <li>Nutricionales (además de B12, otras deficiencias vitamínicas).</li>
+                            <li>Infecciones (ej. VIH, enfermedad de Lyme, lepra).</li>
+                            <li>Inmunomediadas (ej. Síndrome de Guillain-Barré, Polineuropatía Desmielinizante Inflamatoria Crónica - PDIC).</li>
+                            <li>Neoplásicas/Paraneoplásicas.</li>
+                            <li>Gamapatías monoclonales (ej. asociadas a mieloma múltiple)<span class="citation"></span>.</li>
+                        </ul>
+                        <p><strong>Estudio:</strong> Exámenes generales (glicemia, HbA1c, niveles de vitamina B12). Según el contexto clínico, se pueden agregar otros estudios como perfil reumatológico, electroforesis de proteínas, etc.<span class="citation"></span>. En un 30% de los casos no se encuentra una causa específica (polineuropatía idiopática)<span class="citation"></span>.</p>
+                        <p><strong>Manejo:</strong> Depende de la causa subyacente (ej. control metabólico en diabetes). Manejo sintomático del dolor neuropático (ej. antidepresivos tricíclicos, ISRSN, gabapentinoides, opioides en casos refractarios)<span class="citation"></span>.</p>
+                        <p class="key-point"><strong>Diagnóstico Diferencial Principal:</strong> Mononeuropatía Múltiple. La clave es que la polineuropatía DEBE SER SIMÉTRICA<span class="citation"></span>.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary><h3>E. Mononeuropatía Múltiple (Mononeuritis Múltiple)</h3></summary>
+                    <div class="details-content">
+                        <p>Afectación secuencial o simultánea de troncos nerviosos individuales, no contiguos, de forma <strong>ASIMÉTRICA</strong> y <strong>NO longitud-dependiente</strong><span class="citation"></span>.</p>
+                        <p>Puede haber compromiso de nervios craneanos (ej. XI par) de manera concomitante<span class="citation"></span>.</p>
+                        <p>Se manifiesta con <strong>mucho dolor</strong><span class="citation"></span>.</p>
+                        <p>Es mucho menos frecuente que la polineuropatía, pero potencialmente mucho más grave<span class="citation"></span>.</p>
+                        <p><strong>Causa Principal:</strong> Vasculitis sistémica o no sistémica (vasculitis de los vasa nervorum), que produce isquemia y necrosis de los nervios (lo que explica el dolor intenso)<span class="citation"></span>.</p>
+                        <ul>
+                            <li>Ejemplos de vasculitis: Poliarteritis nodosa (PAN), vasculitis asociada a ANCA (Churg-Strauss, Wegener/Granulomatosis con Poliangeítis), crioglobulinemia, vasculitis en enfermedades del tejido conectivo (LES, Artritis Reumatoide, Síndrome de Sjögren)<span class="citation"></span>.</li>
+                        </ul>
+                        <p><strong>Otras causas:</strong> Diabetes, variante multifocal de PDIC (Síndrome de Lewis-Sumner), múltiples neuropatías por atrapamiento (hereditarias o adquiridas), infecciones (Lyme, lepra, VIH), infiltración neoplásica (linfoma, leucemia) o granulomatosa (sarcoidosis)<span class="citation"></span>.</p>
+                        <p class="highlight-tip"><strong>Manejo:</strong> Derivar a urgencia para estudio y tratamiento agresivo con inmunosupresión si se confirma vasculitis, ya que la enfermedad suele estar muy activa<span class="citation"></span>. Es crucial diferenciarla de la polineuropatía<span class="citation"></span>.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary><h3>F. Síndrome de Guillain-Barré (SGB)</h3></summary>
+                    <div class="details-content">
+                        <p>Es una <strong>Polirradiculoneuropatía Aguda Desmielinizante Inflamatoria (AIDP)</strong>, la forma más común de SGB<span class="citation"></span>.</p>
+                        <p>Enfermedad inmunomediada: El sistema inmune ataca los nervios periféricos (principalmente la mielina, aunque hay variantes axonales) tras una desregulación gatillada por un antígeno externo<span class="citation"></span>.</p>
+                        <p><strong>Antecedente Infeccioso:</strong> Muchos pacientes refieren una infección (respiratoria o gastrointestinal) hasta 3 semanas antes del inicio de los síntomas<span class="citation"></span>. La infección más frecuentemente descrita es la gastrointestinal por <i>Campylobacter jejuni</i>, debido a que epítopes de este agente tienen similitud estructural con componentes de la mielina (mimetismo molecular)<span class="citation"></span>.</p>
+                        <p><strong>Clínica:</strong></p>
+                        <ul>
+                            <li>Inicio típico con <strong>parestesias en los pies</strong> que progresan de forma <strong>ascendente</strong><span class="citation"></span>.</li>
+                            <li>Puede haber dolor (no necesariamente en pies; también rodillas, región poplítea, lumbar)<span class="citation"></span>.</li>
+                            <li>Posteriormente se agrega <strong>debilidad muscular progresiva, simétrica</strong>, que también suele ser ascendente (inicialmente distal, puede llegar a ser proximal y afectar tronco y músculos respiratorios)<span class="citation"></span>.</li>
+                            <li>Aproximadamente el 70% de los pacientes tiene compromiso de pares craneanos, manifestándose como diplejía facial periférica, síndrome bulbar (disfagia, disartria)<span class="citation"></span>.</li>
+                            <li>Alrededor del 30% puede desarrollar insuficiencia respiratoria que requerirá ventilación mecánica invasiva (VMI)<span class="citation"></span>.</li>
+                            <li><strong>Examen Físico Motor:</strong> Fuerza disminuida (puede llegar a tetraparesia, incluso con debilidad cefálica), tono muscular disminuido (flacidez), y ROT abolidos o muy disminuidos (hipo o arreflexia). El cuadro clásico es una <strong>tetraparesia flácida arrefléctica</strong><span class="citation"></span>.</li>
+                        </ul>
+                        <p><strong>Evolución:</strong> El cuadro se desarrolla en días a semanas, alcanzando el nadir (máximo déficit) a las 4 semanas desde el inicio. Si la progresión continúa por más de 4 semanas, se deben considerar diagnósticos diferenciales (ej. PDIC)<span class="citation"></span>.</p>
+                        <p><strong>Manejo y Diagnóstico:</strong></p>
+                        <ul>
+                            <li><strong>Hospitalización:</strong> En unidad monitorizada (al menos Unidad de Tratamiento Intermedio - UTI al comienzo; si requiere VMI, Unidad de Cuidados Intensivos - UCI)<span class="citation"></span>.</li>
+                            <li><strong>Punción Lumbar (PL):</strong> Característicamente muestra <strong>disociación albuminocitológica</strong>: proteínas elevadas en LCR con recuento celular normal o bajo (0-5 células/mm³)<span class="citation"></span>.</li>
+                            <p class="highlight-tip"><strong>OJO:</strong> si la PL se realiza muy precozmente (primeros días), el LCR puede ser normal; esto NO descarta SGB<span class="citation"></span>.</p>
+                            <li><strong>Resonancia Magnética (RM) de Columna:</strong> Podría mostrar captación de contraste en las raíces nerviosas. Se pide habitualmente para descartar compromiso medular compresivo (diagnóstico diferencial)<span class="citation"></span>.</li>
+                            <li><strong>Estudio Electrofisiológico (ECN/EMG):</strong> Muestra signos de desmielinización (en AIDP) o daño axonal (en variantes axonales como AMAN o AMSAN). Ayuda al pronóstico (formas desmielinizantes tienden a tener mejor pronóstico que las axonales).</li>
+                             <p class="highlight-tip"><strong>OJO:</strong> si es normal en etapas tempranas, tampoco descarta SGB<span class="citation"></span>.</p>
+                        </ul>
+                        <p><strong>Tratamiento:</strong></p>
+                        <ul>
+                            <li><strong>Inmunoglobulinas Intravenosas (IgIV)</strong><span class="citation"></span>.</li>
+                            <li><strong>Plasmaféresis</strong> (intercambio plasmático)<span class="citation"></span>.</li>
+                            <li>Ambas terapias buscan remover los autoanticuerpos patogénicos. Los corticoides NO son efectivos en SGB.</li>
+                        </ul>
+                        <p><strong>Pronóstico:</strong> Generalmente bueno; 60-80% de los pacientes recuperan la marcha al año. Sin embargo, algunos pueden quedar con secuelas, como debilidad distal (ej. "footdrop" o pie caído) o fatiga crónica<span class="citation"></span>.</p>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section id="ela" class="content-section">
+            <div class="content-wrapper">
+                <h2>V. Esclerosis Lateral Amiotrófica (ELA)</h2>
+                <details open>
+                    <summary><h3>Características Generales</h3></summary>
+                    <div class="details-content">
+                        <p>Enfermedad neurodegenerativa progresiva y mortal que afecta a las <strong>motoneuronas superiores (primera motoneurona)</strong> en la corteza cerebral y el tronco, y a las <strong>motoneuronas inferiores (segunda motoneurona)</strong> en el tronco encefálico y la médula espinal<span class="citation"></span>.</p>
+                        <p><strong>Etiología:</strong> Desconocida en la mayoría de los casos (esporádica). No hay factores de riesgo claramente conocidos, aunque existen algunas variantes familiares (5-10% de los casos) con mutaciones genéticas identificadas (ej. SOD1, C9orf72, TARDBP, FUS)<span class="citation"></span>.</p>
+                        <p><strong>Características Clave:</strong></p>
+                        <ul>
+                            <li>Compromiso exclusivo de la vía corticoespinal (sistema motor)<span class="citation"></span>.</li>
+                            <li><strong>Ausencia de síntomas sensitivos</strong>, autonómicos o disfunción vesical/intestinal (al menos inicialmente)<span class="citation"></span>.</li>
+                            <li>Patrón temporal degenerativo y progresivo<span class="citation"></span>.</li>
+                        </ul>
+                        <p><strong>Epidemiología:</strong> Edad de presentación más habitual es alrededor de los 50 años<span class="citation"></span>.</p>
+                    </div>
+                </details>
+                <details>
+                    <summary><h3>Clínica</h3></summary>
+                    <div class="details-content">
+                        <p>Combinación de signos de primera y segunda motoneurona.</p>
+                        <ul>
+                            <li><strong>Signos de Segunda Motoneurona:</strong> Debilidad muscular progresiva (puede iniciar en una mano, una pierna, y luego extenderse), atrofia muscular, fasciculaciones (contracciones musculares visibles bajo la piel, un elemento característico son las fasciculaciones en toda la lengua, que es un signo de alarma), calambres<span class="citation"></span>.</li>
+                            <li><strong>Signos de Primera Motoneurona:</strong> Espasticidad (rigidez muscular), hiperreflexia (ROT exaltados), signo de Babinski positivo (respuesta plantar extensora).</li>
+                            <li><strong>Compromiso Bulbar:</strong> Dificultad para tragar (disfagia), hablar (disartria), y respirar (insuficiencia respiratoria, que es la causa de muerte más frecuente)<span class="citation"></span>.</li>
+                            <li>Pueden coexistir reflejos vivos en un segmento (por afectación de 1ª MN) y ausentes o disminuidos en otro (por afectación de 2ª MN)<span class="citation"></span>.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details>
+                    <summary><h3>Pronóstico y Tratamiento</h3></summary>
+                    <div class="details-content">
+                        <p><strong>Pronóstico:</strong> Enfermedad mortal. La sobrevida promedio es de 12-24 meses (o 2-5 años según otras fuentes) post-diagnóstico<span class="citation"></span>.</p>
+                        <p><strong>Tratamiento:</strong> No existen terapias curativas eficaces hasta el momento<span class="citation"></span>. El manejo se enfoca en:</p>
+                        <ul>
+                            <li>Soporte ventilatorio (VNI, VMI).</li>
+                            <li>Manejo nutricional (gastrostomía).</li>
+                            <li>Comunicación alternativa (ej. con movimientos oculares).</li>
+                            <li>Fármacos que pueden prolongar discretamente la sobrevida o mejorar algunos síntomas (ej. Riluzol, Edaravone).</li>
+                            <li>Planificación de directrices avanzadas<span class="citation"></span>.</li>
+                        </ul>
+                    </div>
+                </details>
+            </div>
+        </section>
+        
+        <div class="note-block" style="max-width: var(--main-content-max-width); margin-left: auto; margin-right: auto; margin-bottom: 2rem;">
+            <hr style="margin-bottom: 1rem; border-top: 1px solid var(--border-strong);">
+            <p><strong>Nota sobre Fuentes:</strong></p>
+            <ul>
+                <li>Source 1 (<code>Sistema Nervioso Periférico 1.pdf</code>) solo contenía el título.</li>
+                <li>Toda la información de este apunte proviene de Source A (<code>7. SNP.pdf</code>).</li>
+            </ul>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2024-2025 Guía Interactiva SNP. Creado para fines educativos.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const hamburgerButton = document.querySelector('.hamburger-button');
+            const sidebar = document.getElementById('sidebarNav');
+            const body = document.body;
+            const topBarHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--top-bar-height')) || 65;
+
+            if (hamburgerButton && sidebar) {
+                hamburgerButton.addEventListener('click', function () {
+                    body.classList.toggle('sidebar-open');
+                    const isExpanded = body.classList.contains('sidebar-open');
+                    hamburgerButton.setAttribute('aria-expanded', isExpanded);
+                    sidebar.setAttribute('aria-hidden', !isExpanded);
+                });
+            }
+
+            const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
+            sidebarLinks.forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - topBarHeight - 15;
+                        window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+                        if (window.innerWidth < 768 && body.classList.contains('sidebar-open')) {
+                           body.classList.remove('sidebar-open');
+                           hamburgerButton.setAttribute('aria-expanded', 'false');
+                           sidebar.setAttribute('aria-hidden', 'true');
+                        }
+                    }
+                });
+            });
+
+            const sections = document.querySelectorAll('.main-content section[id]');
+            function highlightSidebarLink() {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTopMargin = parseFloat(window.getComputedStyle(section).marginTop) || 0;
+                    const sectionEffectiveTop = section.getBoundingClientRect().top + window.pageYOffset - topBarHeight - sectionTopMargin - 20; // Ajuste de 20px para sensibilidad
+                    if (window.pageYOffset >= sectionEffectiveTop) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                sidebarLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').substring(1) === current) {
+                        link.classList.add('active');
+                    }
+                });
+                 // Fallback para el inicio de la página o si no hay sección activa
+                if (!current && sections.length > 0 && window.pageYOffset < (sections[0].getBoundingClientRect().top + window.pageYOffset - topBarHeight - (parseFloat(window.getComputedStyle(sections[0]).marginTop) || 0) - 20) ) {
+                    const firstLink = document.querySelector('.sidebar-nav a[href="#' + sections[0].id + '"]');
+                    if (firstLink) { // Asegurarse de que el primer enlace existe
+                        firstLink.classList.add('active');
+                    }
+                }
+            }
+            window.addEventListener('scroll', highlightSidebarLink);
+            highlightSidebarLink(); // Llamada inicial para establecer el estado activo
+
+            // Chart.js (si se usara en el futuro, la librería está cargada)
+            // Ejemplo de cómo se podría inicializar un gráfico si hubiera datos:
+            /*
+            const miGraficoCanvas = document.getElementById('miGrafico');
+            if (miGraficoCanvas) {
+                const miGraficoData = {
+                    labels: ['Dato A', 'Dato B', 'Dato C'],
+                    datasets: [{ 
+                        label: 'Mi Dataset',
+                        data: [10, 20, 30], 
+                        backgroundColor: ['rgba(26, 188, 156, 0.7)', 'rgba(230, 126, 34, 0.7)', 'rgba(44, 62, 80, 0.7)'], 
+                        borderColor: ['#16A085', '#D35400', '#1F2D3D'], 
+                        borderWidth: 1 
+                    }]
+                };
+                new Chart(miGraficoCanvas.getContext('2d'), { 
+                    type: 'bar', // o 'line', 'pie', 'doughnut', etc.
+                    data: miGraficoData, 
+                    options: { // Opciones de Chart.js (ver ejemplos en ACV o TAB.html)
+                        responsive: true,
+                        maintainAspectRatio: false 
+                    } 
+                });
+            }
+            */
+        });
+    </script>
+</body>
+</html>
