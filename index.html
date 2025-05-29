@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Índice Prueba 2 - Neurología</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary-main: #1ABC9C; 
+            --primary-dark: #16A085; 
+            --accent-orange: #E67E22; 
+            --accent-orange-dark: #D35400; 
+            --accent-petroleum-blue: #2C3E50; 
+            --alert-red: #E74C3C; 
+            --complement-light-blue: #AED6F1; 
+            --complement-beige: #F5EFEB; 
+            --text-dark: #212529; 
+            --text-medium: #495057; 
+            --text-light: #6C757D; 
+            --bg-main: #F8F9FA; 
+            --card-bg: #FFFFFF; 
+            --border-color: #DEE2E6; 
+            --border-strong: #CED4DA; 
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-main); 
+            color: var(--text-dark); 
+            line-height: 1.6; 
+            margin: 0;
+        }
+        h1, h2, h3, h4, h5 { 
+            color: var(--text-dark); 
+            font-weight: 600; 
+        }
+        .page-header { 
+            background-color: var(--primary-main); 
+            color: var(--card-bg); 
+            padding: 2rem 1rem;
+            text-align: center; 
+            border-bottom-left-radius: 0.75rem;
+            border-bottom-right-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .page-header h1 { 
+            color: var(--card-bg); 
+            font-size: 2.25rem;
+            line-height: 2.5rem;
+            font-weight: 700;
+        }
+        .main-content {
+            max-width: 48rem; 
+            margin-left: auto;
+            margin-right: auto;
+            padding: 2rem 1rem;
+        }
+        .index-list-container {
+            background-color: var(--card-bg); 
+            border-radius: 12px; 
+            padding: 1.5rem; 
+            margin-bottom: 1.5rem; 
+            box-shadow: 0 6px 18px rgba(44, 62, 80, 0.08); 
+            border: 1px solid var(--border-color);
+        }
+        .index-list-container h2 {
+            font-size: 1.75rem; 
+            color: var(--accent-petroleum-blue);
+            border-bottom: 3px solid var(--primary-main); 
+            padding-bottom: 0.75rem; 
+            margin-bottom: 1.5rem; 
+        }
+
+        .topic-list {
+            list-style-type: none; /* Ocultamos los números por defecto del <ol> */
+            padding-left: 0; /* Reseteamos el padding del <ol> */
+            counter-reset: topic-counter; /* Iniciamos un contador CSS */
+        }
+        .topic-list li {
+            margin-bottom: 0.75rem; 
+            counter-increment: topic-counter; /* Incrementamos el contador por cada <li> */
+        }
+        .topic-list li a {
+            display: flex; /* Usamos flexbox para alinear número y texto */
+            align-items: center; /* Centramos verticalmente el contenido del flex */
+            padding: 1rem 1.5rem; 
+            background-color: var(--primary-main); 
+            color: var(--card-bg); 
+            text-decoration: none;
+            border-radius: 8px; 
+            border: 1px solid var(--primary-dark); 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+            transition: all 0.2s ease-in-out;
+            font-weight: 500; 
+            font-size: 1rem; 
+            text-align: left; 
+        }
+        .topic-list li a::before { /* Creamos el pseudo-elemento para el número */
+            content: counter(topic-counter) "."; /* Mostramos el valor del contador seguido de un punto */
+            font-weight: 600; /* Hacemos el número un poco más grueso */
+            margin-right: 0.75em; /* Espacio entre el número y el texto del enlace */
+            min-width: 1.5em; /* Un ancho mínimo para alinear números de 1 y 2 dígitos, ajusta si es necesario */
+            text-align: right; /* Alineamos el número a la derecha dentro de su espacio (ej. ' 1.', '10.') */
+        }
+        .topic-list li a:hover {
+            background-color: var(--accent-orange); 
+            color: var(--card-bg); 
+            border-color: var(--accent-orange-dark); 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08); 
+            transform: translateY(-2px) scale(1.01);
+        }
+        
+        .page-footer { 
+            text-align: center; 
+            padding: 2rem 1rem; 
+            margin-top: 3rem; 
+            border-top: 1px solid var(--border-strong); 
+            background-color: var(--accent-petroleum-blue); 
+            color: var(--complement-beige); 
+        }
+        .page-footer p { 
+            color: var(--complement-beige); 
+            margin: 0;
+            font-size: 0.875rem; 
+        }
+    </style>
+</head>
+<body>
+
+    <header class="page-header">
+        <h1>Índice Prueba 2 - Neurología</h1>
+    </header>
+
+    <main class="main-content">
+        <div class="index-list-container">
+            <h2>Temario</h2>
+            <ol class="topic-list">
+                <li><a href="ACV isquémico.html">ACV isquémico</a></li>
+                <li><a href="ACV hemorrágico.html">ACV hemorrágico</a></li>
+                <li><a href="Epilepsia.html">Epilepsia</a></li>
+                <li><a href="Inflamaciones del SNC.html">Inflamaciones del SNC</a></li>
+                <li><a href="Médula y cerebelo.html">Médula y cerebelo</a></li>
+                <li><a href="Patología de nervios craneanos.html">Patología de nervios craneanos</a></li>
+                <li><a href="SNP.html">SNP</a></li>
+                <li><a href="Trastornos del sueño.html">Trastornos del sueño</a></li>
+                <li><a href="Traumatismo encefalo craneano y raquimedular.html">Traumatismo encefalo craneano y raquimedular</a></li>
+                <li><a href="Tumores del SNC.html">Tumores del SNC</a></li>
+            </ol>
+        </div>
+    </main>
+
+    <footer class="page-footer">
+        <p>&copy; 2025 - Índice de Apuntes de Neurología</p>
+    </footer>
+
+</body>
+</html>
